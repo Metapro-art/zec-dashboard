@@ -6,57 +6,108 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0c0c0d">
+<meta name="theme-color" content="#0a0a0b">
 <title>ZEC · Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0c0c0d;--card:#131315;--card2:#0e0e0f;--b1:#252528;--b2:#1c1c1f;--text:#ddd9d0;--muted:#4a4a4e;--muted2:#2a2a2d;--gold:#C9A84C;--green:#4ade80;--red:#f87171;--amber:#fbbf24;--blue:#60a5fa;--purple:#c084fc}
+:root{
+  --bg:#0a0a0b;--card:#121214;--card2:#0d0d0f;
+  --b1:#222226;--b2:#1a1a1e;
+  --text:#e0dcd3;--muted:#585860;--muted2:#383840;
+  --gold:#C9A84C;--green:#4ade80;--red:#f87171;
+  --amber:#fbbf24;--blue:#60a5fa;--purple:#c084fc;
+  --signal:#585860;
+}
 html,body{background:var(--bg);color:var(--text);font-family:'Palatino Linotype',Palatino,Georgia,serif;min-height:100vh;overflow-x:hidden}
-body{padding:env(safe-area-inset-top,8px) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
-.shell{max-width:980px;margin:0 auto;padding:1rem .875rem 2.5rem}
+body{padding:env(safe-area-inset-top,0) 0 0 0}
+.shell{max-width:1020px;margin:0 auto;padding:1rem .875rem 2.5rem}
 .mono{font-family:'Courier New',Courier,monospace}
 .card{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:1rem}
-.lbl{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.tf-btn{font-size:10px;padding:6px 14px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
-.tf-btn.on{background:var(--gold);color:#0c0c0d;border-color:var(--gold)}
-.cond-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b2)}
+.lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.tf-btn{font-size:10px;padding:6px 15px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
+.tf-btn.on{background:var(--gold);color:#0a0a0b;border-color:var(--gold)}
+.cond-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2)}
 .cond-row:last-child{border-bottom:none}
 input[type=text],input[type=email]{width:100%;background:var(--card2);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:12px;padding:8px 10px;border-radius:7px;outline:none}
 input[type=text]:focus,input[type=email]:focus{border-color:#C9A84C55}
 .btn{font-size:12px;padding:8px 18px;border-radius:7px;cursor:pointer;font-family:inherit;letter-spacing:.03em;border:none;transition:opacity .15s}
 .btn:hover{opacity:.85}.btn:active{opacity:.65}
-code{font-size:11px;background:#1e1e21;color:var(--gold);padding:3px 7px;border-radius:4px;font-family:'Courier New',monospace}
+code{font-size:11px;background:#1c1c20;color:var(--gold);padding:3px 7px;border-radius:4px;font-family:'Courier New',monospace}
+
+/* Layout grids */
 .mg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mg5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .fg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
 .eg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ch{position:relative;height:250px}
-.rh{position:relative;height:135px}
-@media(max-width:600px){
-  .mg{grid-template-columns:1fr 1fr}
+
+/* Score labels */
+.slbl{font-size:9px;color:var(--muted);letter-spacing:.05em}
+
+/* Mobile */
+@media(max-width:580px){
+  .mg,.mg5{grid-template-columns:1fr 1fr}
   .fg{grid-template-columns:repeat(3,1fr)}
   .eg{grid-template-columns:1fr}
   #price-main{font-size:34px !important}
-  .ch{height:160px}
-  .rh{height:95px}
-  .hdr{flex-direction:column !important;align-items:flex-start !important}
-  .hdr-right{align-items:flex-start !important}
+  .hdr{flex-direction:column !important}
+  .hdr-r{align-items:flex-start !important}
+  .ch{height:200px !important}
+  .rh{height:90px !important}
 }
+@media(min-width:581px){
+  .ch{height:280px}
+  .rh{height:130px}
+}
+
+/* Tooltip custom */
+#zec-tooltip{
+  position:absolute;pointer-events:none;z-index:99;
+  background:#0d0d10;border:1.5px solid var(--gold);
+  border-radius:10px;padding:10px 14px;min-width:180px;
+  font-family:'Palatino Linotype',Palatino,Georgia,serif;
+  font-size:12px;color:var(--text);display:none;
+  transition:border-color .3s,background .3s;
+}
+#zec-tooltip .tt-title{font-size:10px;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+#zec-tooltip .tt-ohlc{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;margin-bottom:8px}
+#zec-tooltip .tt-ohlc span{font-size:11px;color:var(--muted)}
+#zec-tooltip .tt-ohlc b{font-family:'Courier New',monospace;font-size:11px}
+#zec-tooltip .tt-sep{height:1px;background:var(--b1);margin:6px 0}
+#zec-tooltip .tt-fib-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
+#zec-tooltip .tt-fib-row span{font-size:10px;color:var(--muted)}
+#zec-tooltip .tt-fib-row b{font-family:'Courier New',monospace;font-size:11px}
+#zec-tooltip .tt-fib-row .tt-dist{font-size:10px;font-family:'Courier New',monospace}
 </style>
 </head>
 <body>
 <div class="shell">
 
-  <div class="hdr" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.125rem">
+  <!-- Custom tooltip -->
+  <div id="zec-tooltip">
+    <div class="tt-title" id="tt-date">—</div>
+    <div class="tt-ohlc">
+      <span>Apertura</span><b id="tt-o">—</b>
+      <span>Máximo</span><b id="tt-h" style="color:#4ade80">—</b>
+      <span>Mínimo</span><b id="tt-l" style="color:#f87171">—</b>
+      <span>Cierre</span><b id="tt-c">—</b>
+    </div>
+    <div class="tt-sep"></div>
+    <div style="font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:5px">Fibonacci</div>
+    <div id="tt-fibs"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="hdr" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1rem">
     <div>
       <div class="lbl" style="margin-bottom:3px">Zcash · USD · Análisis técnico</div>
       <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
         <span id="price-main" class="mono" style="font-size:44px;color:var(--text);letter-spacing:-.02em;line-height:1">—</span>
-        <span id="price-chg" style="font-size:13px;color:var(--muted)"></span>
+        <span id="price-chg" style="font-size:13px"></span>
       </div>
       <div id="ema500-note" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
     </div>
-    <div class="hdr-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:9px">
-      <div id="sig-badge" style="padding:7px 18px;border-radius:8px;font-size:13px;background:#1e1e21;color:var(--muted);border:1px solid var(--b1);white-space:nowrap">Cargando...</div>
+    <div class="hdr-r" style="display:flex;flex-direction:column;align-items:flex-end;gap:9px">
+      <div id="sig-badge" style="padding:7px 20px;border-radius:8px;font-size:13px;background:#1a1a1e;color:var(--muted);border:1px solid var(--b1);white-space:nowrap">Cargando...</div>
       <div style="display:flex;gap:6px">
         <button id="btn-d" class="tf-btn on" onclick="setTF('daily')">DIARIO</button>
         <button id="btn-w" class="tf-btn" onclick="setTF('weekly')">SEMANAL</button>
@@ -65,59 +116,74 @@ code{font-size:11px;background:#1e1e21;color:var(--gold);padding:3px 7px;border-
     </div>
   </div>
 
-  <div style="margin-bottom:1.125rem">
-    <div style="height:3px;background:#1e1e21;border-radius:2px;overflow:hidden;margin-bottom:5px">
-      <div id="score-bar" style="height:100%;border-radius:2px;transition:width .7s,background .7s;width:0"></div>
+  <!-- Score bar -->
+  <div style="margin-bottom:1rem">
+    <div style="height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-bottom:6px">
+      <div id="score-bar" style="height:100%;border-radius:2px;transition:width .8s,background .8s;width:0"></div>
     </div>
-    <div style="display:flex;justify-content:space-between">
-      <span style="font-size:9px;color:var(--muted2)">Esperar</span>
-      <span style="font-size:9px;color:var(--muted2)">Cautela</span>
-      <span style="font-size:9px;color:var(--muted2)">Observar</span>
-      <span style="font-size:9px;color:var(--muted2)">Señal</span>
-      <span style="font-size:9px;color:var(--muted2)">Fuerte</span>
+    <div style="display:flex;justify-content:space-between;padding:0 1px">
+      <span class="slbl">Esperar</span>
+      <span class="slbl">Cautela</span>
+      <span class="slbl">Observar</span>
+      <span class="slbl">Señal</span>
+      <span class="slbl">Fuerte</span>
     </div>
   </div>
 
-  <div class="mg" style="margin-bottom:1rem">
-    <div class="card"><div class="lbl">RSI 14</div><div id="m-rsi" class="mono" style="font-size:24px;color:var(--text)">—</div><div id="m-rsi-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
-    <div class="card"><div class="lbl">Soporte Fib</div><div id="m-fib" class="mono" style="font-size:24px;color:var(--text)">—</div><div id="m-fib-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
-    <div class="card"><div id="ema-lbl" class="lbl">vs EMA 500</div><div id="m-ema" class="mono" style="font-size:24px;color:var(--text)">—</div><div id="m-ema-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
-    <div class="card"><div class="lbl">Vol 7d/7d</div><div id="m-vol" class="mono" style="font-size:24px;color:var(--text)">—</div><div id="m-vol-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
+  <!-- Metrics: 5 cards including EMA 500 macro status -->
+  <div class="mg5" style="margin-bottom:1rem">
+    <div class="card"><div class="lbl">RSI 14</div><div id="m-rsi" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-rsi-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
+    <div class="card"><div class="lbl">Soporte Fib</div><div id="m-fib" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-fib-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
+    <div class="card"><div id="ema-lbl" class="lbl">vs EMA 500</div><div id="m-ema" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-ema-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
+    <div class="card"><div class="lbl">Vol 7d/7d</div><div id="m-vol" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-vol-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
+    <div class="card" id="macro-card"><div class="lbl">Estado macro</div><div id="m-macro" class="mono" style="font-size:18px;color:var(--text)">—</div><div id="m-macro-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
   </div>
 
+  <!-- Divergence banner -->
   <div id="div-banner" style="display:none;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5"></div>
 
-  <div class="card" style="margin-bottom:1rem">
+  <!-- Price chart with candlesticks -->
+  <div class="card" style="margin-bottom:1rem;position:relative">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:6px">
-      <span id="pchart-title" class="lbl" style="margin-bottom:0">Precio · EMA 50 · EMA 200 · EMA 500 · Fibonacci</span>
+      <span id="pchart-title" class="lbl" style="margin-bottom:0">Velas · EMA 50 · EMA 200 · EMA 500 · Fibonacci</span>
       <span id="fib-hl" style="font-size:10px;color:var(--muted)"></span>
     </div>
-    <div class="ch"><canvas id="cPrice" role="img" aria-label="Precio ZEC con EMAs y Fibonacci"></canvas></div>
+    <div class="ch" style="position:relative">
+      <canvas id="cPrice" role="img" aria-label="Gráfico de velas ZEC con EMAs y Fibonacci"></canvas>
+    </div>
     <div id="pchart-leg" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:.625rem"></div>
   </div>
 
+  <!-- RSI chart -->
   <div class="card" style="margin-bottom:1rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
       <span class="lbl" style="margin-bottom:0">RSI 14 · Divergencias</span>
       <span id="div-tag" style="font-size:11px;color:var(--muted)"></span>
     </div>
-    <div class="rh"><canvas id="cRSI" role="img" aria-label="RSI 14"></canvas></div>
+    <div class="rh" style="position:relative">
+      <canvas id="cRSI" role="img" aria-label="RSI 14"></canvas>
+    </div>
   </div>
 
+  <!-- Fib extensions -->
   <div class="card" style="margin-bottom:1rem">
     <div class="lbl" style="margin-bottom:.75rem">Extensiones Fibonacci · Targets de salida</div>
     <div id="fib-ext" class="fg"></div>
   </div>
 
+  <!-- Conditions -->
   <div class="card" style="margin-bottom:1rem">
     <div class="lbl" style="margin-bottom:.75rem">Condiciones activas</div>
     <div id="conditions"></div>
     <div style="margin-top:10px;height:3px;background:var(--card2);border-radius:2px;overflow:hidden">
       <div id="cond-bar" style="height:100%;border-radius:2px;transition:width .6s,background .6s;width:0"></div>
     </div>
-    <div style="margin-top:6px"><span id="score-lbl" style="font-size:11px;color:var(--muted)"></span></div>
+    <div style="margin-top:6px">
+      <span id="score-lbl" style="font-size:11px;color:var(--muted)"></span>
+    </div>
   </div>
 
+  <!-- Email -->
   <div class="card">
     <div class="lbl" style="margin-bottom:1rem">Alertas por email · EmailJS</div>
     <div class="eg" style="margin-bottom:12px">
@@ -132,8 +198,8 @@ code{font-size:11px;background:#1e1e21;color:var(--gold);padding:3px 7px;border-
       <span id="etv" class="mono" style="font-size:15px;color:var(--text)">4</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
-      <button class="btn" onclick="testEmail()" style="background:var(--gold);color:#0c0c0d">Enviar prueba</button>
-      <button class="btn" onclick="refresh()" style="background:#1e1e21;color:var(--text);border:1px solid var(--b1)">Actualizar datos</button>
+      <button class="btn" onclick="testEmail()" style="background:var(--gold);color:#0a0a0b">Enviar prueba</button>
+      <button class="btn" onclick="refresh()" style="background:#1a1a1e;color:var(--text);border:1px solid var(--b1)">Actualizar datos</button>
       <span id="email-st" style="font-size:12px;color:var(--muted)"></span>
     </div>
     <div style="background:var(--card2);border:1px solid var(--b1);border-radius:8px;padding:.875rem">
@@ -147,113 +213,490 @@ code{font-size:11px;background:#1e1e21;color:var(--gold);padding:3px 7px;border-
   </div>
 
   <div style="text-align:center;font-size:10px;color:var(--muted2);padding:.875rem;margin-top:.5rem;line-height:1.7">
-    Cel: Chrome → ⋮ → "Añadir a pantalla de inicio" · Se actualiza cada 5 min
+    Cel: Chrome → ⋮ → Añadir a pantalla de inicio · Actualiza cada 5 min
   </div>
 
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-const G='#C9A84C',GR='#4ade80',RD='#f87171',AM='#fbbf24',BL='#60a5fa',PU='#c084fc',SL='#4a4a4e';
+/* ── Constants ── */
+const G='#C9A84C',GR='#4ade80',RD='#f87171',AM='#fbbf24',BL='#60a5fa',PU='#c084fc',SL='#585860';
+const BULL_COL='#4ade80', BEAR_COL='#f87171';
+
 let cP=null,cR=null,raw=null,stats=null,tf='daily',lastAlerted=0;
-function calcEMA(arr,p){if(arr.length<p)return arr.map(()=>null);const k=2/(p+1),r=Array(p-1).fill(null);let e=arr.slice(0,p).reduce((a,b)=>a+b,0)/p;r.push(e);for(let i=p;i<arr.length;i++){e=arr[i]*k+e*(1-k);r.push(e);}return r;}
-function calcRSI(arr,p=14){if(arr.length<p+1)return arr.map(()=>null);const r=Array(p).fill(null);let g=0,l=0;for(let i=1;i<=p;i++){const d=arr[i]-arr[i-1];d>0?g+=d:l-=d;}let ag=g/p,al=l/p;r.push(al===0?100:100-100/(1+ag/al));for(let i=p+1;i<arr.length;i++){const d=arr[i]-arr[i-1];ag=(ag*(p-1)+(d>0?d:0))/p;al=(al*(p-1)+(d<0?-d:0))/p;r.push(al===0?100:100-100/(1+ag/al));}return r;}
+
+/* ── Candlestick plugin ── */
+const CandlePlugin={
+  id:'candles',
+  afterDatasetsDraw(chart){
+    if(!chart._ohlcv) return;
+    const{ctx,scales:{x,y}}=chart;
+    const meta=chart.getDatasetMeta(0);
+    if(!meta||!meta.data.length) return;
+    const ohlcv=chart._ohlcv;
+    const candleW=Math.max((x.width/ohlcv.length)*0.65,2.5);
+
+    ohlcv.forEach((c,i)=>{
+      if(i>=meta.data.length) return;
+      const px=meta.data[i].x;
+      const oY=y.getPixelForValue(c.o);
+      const cY=y.getPixelForValue(c.c);
+      const hY=y.getPixelForValue(c.h);
+      const lY=y.getPixelForValue(c.l);
+      const bull=c.c>=c.o;
+      const col=bull?BULL_COL:BEAR_COL;
+
+      ctx.save();
+      /* Wick */
+      ctx.strokeStyle=col+'99';
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(px,hY);ctx.lineTo(px,lY);ctx.stroke();
+      /* Body */
+      const top=Math.min(oY,cY);
+      const h=Math.max(Math.abs(cY-oY),1.5);
+      if(bull){
+        ctx.strokeStyle=col;ctx.lineWidth=1;
+        ctx.strokeRect(px-candleW/2,top,candleW,h);
+        ctx.fillStyle=col+'33';
+        ctx.fillRect(px-candleW/2,top,candleW,h);
+      }else{
+        ctx.fillStyle=col+'cc';
+        ctx.fillRect(px-candleW/2,top,candleW,h);
+      }
+      ctx.restore();
+    });
+  }
+};
+Chart.register(CandlePlugin);
+
+/* ── Custom Tooltip ── */
+const tooltipEl=document.getElementById('zec-tooltip');
+let currentFibs={};
+
+function showTooltip(chart,event){
+  const pts=chart.getElementsAtEventForMode(event,'index',{intersect:false},true);
+  if(!pts.length){hideTooltip();return;}
+  const i=pts[0].index;
+  const c=chart._ohlcv?.[i];
+  if(!c){hideTooltip();return;}
+
+  const labels=chart.data.labels;
+  document.getElementById('tt-date').textContent=labels[i]||'';
+  document.getElementById('tt-o').textContent='$'+c.o.toFixed(2);
+  document.getElementById('tt-h').textContent='$'+c.h.toFixed(2);
+  document.getElementById('tt-l').textContent='$'+c.l.toFixed(2);
+  const cEl=document.getElementById('tt-c');
+  cEl.textContent='$'+c.c.toFixed(2);
+  cEl.style.color=c.c>=c.o?GR:RD;
+
+  /* Fibonacci rows */
+  const FIB_COLORS={0:'#94a3b8',.236:'#7dd3fc',.382:AM,.5:'#fb923c',.618:GR,.786:PU,1:'#94a3b8'};
+  const fibsHtml=Object.entries(currentFibs).map(([lvl,price])=>{
+    const dist=((c.c-price)/price*100);
+    const sign=dist>=0?'+':'';
+    const col=FIB_COLORS[parseFloat(lvl)]||SL;
+    const near=Math.abs(dist)<3?'◀':'';
+    return`<div class="tt-fib-row">
+      <span style="color:${col}">Fib ${lvl}</span>
+      <b>$${price.toFixed(2)}</b>
+      <div class="tt-dist" style="color:${dist>=0?GR:RD}">${sign}${dist.toFixed(1)}% ${near}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('tt-fibs').innerHTML=fibsHtml;
+
+  /* Position tooltip */
+  const canvasRect=chart.canvas.getBoundingClientRect();
+  const containerRect=chart.canvas.parentElement.getBoundingClientRect();
+  const mouseX=event.clientX-containerRect.left;
+  const mouseY=event.clientY-containerRect.top;
+  const ttW=tooltipEl.offsetWidth||200;
+  const ttH=tooltipEl.offsetHeight||220;
+  let left=mouseX+12,top=mouseY-ttH/2;
+  if(left+ttW>containerRect.width-10) left=mouseX-ttW-12;
+  if(top<0) top=0;
+  tooltipEl.style.left=left+'px';
+  tooltipEl.style.top=top+'px';
+  tooltipEl.style.display='block';
+}
+function hideTooltip(){tooltipEl.style.display='none';}
+
+/* ── Math helpers ── */
+function calcEMA(arr,p){
+  if(arr.length<p) return arr.map(()=>null);
+  const k=2/(p+1),r=Array(p-1).fill(null);
+  let e=arr.slice(0,p).reduce((a,b)=>a+b,0)/p; r.push(e);
+  for(let i=p;i<arr.length;i++){e=arr[i]*k+e*(1-k);r.push(e);}
+  return r;
+}
+function calcRSI(arr,p=14){
+  if(arr.length<p+1) return arr.map(()=>null);
+  const r=Array(p).fill(null); let g=0,l=0;
+  for(let i=1;i<=p;i++){const d=arr[i]-arr[i-1];d>0?g+=d:l-=d;}
+  let ag=g/p,al=l/p; r.push(al===0?100:100-100/(1+ag/al));
+  for(let i=p+1;i<arr.length;i++){
+    const d=arr[i]-arr[i-1];
+    ag=(ag*(p-1)+(d>0?d:0))/p; al=(al*(p-1)+(d<0?-d:0))/p;
+    r.push(al===0?100:100-100/(1+ag/al));
+  }
+  return r;
+}
 function swingL(a,w=4){const r=[];for(let i=w;i<a.length-w;i++){let ok=true;for(let j=1;j<=w;j++)if(a[i]>=a[i-j]||a[i]>=a[i+j]){ok=false;break;}if(ok)r.push(i);}return r;}
 function swingH(a,w=4){const r=[];for(let i=w;i<a.length-w;i++){let ok=true;for(let j=1;j<=w;j++)if(a[i]<=a[i-j]||a[i]<=a[i+j]){ok=false;break;}if(ok)r.push(i);}return r;}
-function detectDiv(prices,rsiArr){const rC=rsiArr.map(v=>v??50),pS=prices.slice(-60),rS=rC.slice(-60);const sl=swingL(pS,3),sh=swingH(pS,3);if(sl.length>=2){const[a,b]=sl.slice(-2);if(pS[b]<pS[a]&&rS[b]>rS[a])return{t:'bull',m:'Divergencia alcista: precio baja mínimos, RSI sube mínimos'};}if(sh.length>=2){const[a,b]=sh.slice(-2);if(pS[b]>pS[a]&&rS[b]<rS[a])return{t:'bear',m:'Divergencia bajista: precio sube máximos, RSI baja máximos'};}return null;}
+function detectDiv(prices,rsiArr){
+  const rC=rsiArr.map(v=>v??50),pS=prices.slice(-60),rS=rC.slice(-60);
+  const sl=swingL(pS,3),sh=swingH(pS,3);
+  if(sl.length>=2){const[a,b]=sl.slice(-2);if(pS[b]<pS[a]&&rS[b]>rS[a])return{t:'bull',m:'Divergencia alcista: precio baja mínimos, RSI sube mínimos'};}
+  if(sh.length>=2){const[a,b]=sh.slice(-2);if(pS[b]>pS[a]&&rS[b]<rS[a])return{t:'bear',m:'Divergencia bajista: precio sube máximos, RSI baja máximos'};}
+  return null;
+}
 function fibL(h,l){const r=h-l;return{0:l,.236:l+.236*r,.382:l+.382*r,.5:l+.5*r,.618:l+.618*r,.786:l+.786*r,1:h};}
 function fibE(h,l){const r=h-l;return{'1.0':h,'1.272':h+.272*r,'1.414':h+.414*r,'1.618':h+.618*r,'2.0':h+r,'2.618':h+1.618*r};}
-function aggW(p,v,l){const wp=[],wv=[],wl=[];for(let i=6;i<p.length;i+=7){wp.push(p[i]);wv.push(v.slice(i-6,i+1).reduce((a,b)=>a+b,0));wl.push(l[i]);}return{p:wp,v:wv,l:wl};}
-async function fetchData(){const r=await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ZEC&tsym=USD&limit=600');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(d.Response==='Error')throw new Error(d.Message||'API error');return d.Data.Data;}
+function aggW(data){
+  const wp=[],wl=[];
+  for(let i=6;i<data.length;i+=7){
+    wp.push({o:data[i-6].open,h:Math.max(...data.slice(i-6,i+1).map(d=>d.high)),l:Math.min(...data.slice(i-6,i+1).map(d=>d.low)),c:data[i].close,v:data.slice(i-6,i+1).reduce((a,b)=>a+b.volumeto,0)});
+    wl.push(new Date(data[i].time*1000).toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
+  }
+  return{ohlcv:wp,labels:wl};
+}
+
+/* ── Data fetch ── */
+async function fetchData(){
+  const r=await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ZEC&tsym=USD&limit=600');
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const d=await r.json();
+  if(d.Response==='Error') throw new Error(d.Message||'API error');
+  return d.Data.Data;
+}
+
+/* ── Analysis ── */
 function analyze(data,tf){
-  const aP=data.map(d=>d.close),aV=data.map(d=>d.volumeto);
-  const aL=data.map(d=>new Date(d.time*1000).toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
-  let prices,vols,labels;
-  if(tf==='weekly'){const w=aggW(aP,aV,aL);prices=w.p;vols=w.v;labels=w.l;}
-  else{prices=aP.slice(-120);vols=aV.slice(-120);labels=aL.slice(-120);}
-  const cur=prices[prices.length-1],prev=prices[prices.length-2];
-  const chg=((cur-prev)/prev)*100,hi=Math.max(...prices),lo=Math.min(...prices);
+  let ohlcv,labels;
+  if(tf==='weekly'){
+    const w=aggW(data); ohlcv=w.ohlcv; labels=w.labels;
+  }else{
+    const slice=data.slice(-120);
+    ohlcv=slice.map(d=>({o:d.open,h:d.high,l:d.low,c:d.close,v:d.volumeto}));
+    labels=slice.map(d=>new Date(d.time*1000).toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
+  }
+
+  const closes=ohlcv.map(c=>c.c);
+  const vols=ohlcv.map(c=>c.v);
+  const cur=closes[closes.length-1],prev=closes[closes.length-2];
+  const chg=((cur-prev)/prev)*100;
+  const hi=Math.max(...ohlcv.map(c=>c.h)),lo=Math.min(...ohlcv.map(c=>c.l));
   const fibs=fibL(hi,lo),exts=fibE(hi,lo);
-  const e500all=calcEMA(aP,500),e500c=e500all[e500all.length-1];
-  const e500sl=tf==='daily'?e500all.slice(-120):null,e500d=e500c?((cur-e500c)/e500c*100):null;
-  const e50=calcEMA(prices,Math.min(50,prices.length-2)),e20=calcEMA(prices,Math.min(20,prices.length-2)),e200=calcEMA(prices,Math.min(200,prices.length-2));
-  const rsiArr=calcRSI(prices),rsiC=rsiArr[rsiArr.length-1];
+
+  /* EMA 500 from full dataset */
+  const allCloses=data.map(d=>d.close);
+  const e500all=calcEMA(allCloses,500);
+  const e500c=e500all[e500all.length-1];
+  const e500sl=tf==='daily'?e500all.slice(-120):null;
+  const e500d=e500c?((cur-e500c)/e500c*100):null;
+
+  const e50=calcEMA(closes,Math.min(50,closes.length-2));
+  const e20=calcEMA(closes,Math.min(20,closes.length-2));
+  const e200=calcEMA(closes,Math.min(200,closes.length-2));
+  const rsiArr=calcRSI(closes);
+  const rsiC=rsiArr[rsiArr.length-1];
   const e50c=e50[e50.length-1],e20c=e20[e20.length-1];
-  const rv=vols.slice(-7).reduce((a,b)=>a+b,0)/7,pv=vols.slice(-14,-7).reduce((a,b)=>a+b,0)/7,volR=pv>0?rv/pv:1;
+
+  const rv=vols.slice(-7).reduce((a,b)=>a+b,0)/7;
+  const pv=vols.slice(-14,-7).reduce((a,b)=>a+b,0)/7;
+  const volR=pv>0?rv/pv:1;
+
   const fibZone=cur>=fibs[.382]&&cur<=fibs[.618];
   const nFib=[0,.236,.382,.5,.618,.786,1].reduce((b,r)=>Math.abs(fibs[r]-cur)<Math.abs(fibs[b]-cur)?r:b,0);
-  const aboveE50=e50c?cur>e50c:false,hi30=Math.max(...prices.slice(-30)),belowHi30=cur<hi30*.95;
-  const div=detectDiv(prices,rsiArr);
-  return{prices,vols,labels,fibs,exts,cur,prev,chg,hi,lo,e500sl,e500c,e500d,e50,e20,e200,rsiArr,rsiC,volR,fibZone,nFib,aboveE50,belowHi30,div,tf,e50c,e20c};
+  const aboveE50=e50c?cur>e50c:false;
+  const hi30=Math.max(...closes.slice(-30));
+  const belowHi30=cur<hi30*.95;
+  const div=detectDiv(closes,rsiArr);
+
+  /* Macro state based on EMA500 distance */
+  let macroState,macroCol;
+  if(e500d===null){macroState='N/A';macroCol=SL;}
+  else if(e500d<-20){macroState='Bajista';macroCol=RD;}
+  else if(e500d<20){macroState='Neutral';macroCol=SL;}
+  else if(e500d<60){macroState='Alcista';macroCol=GR;}
+  else{macroState='Extendido';macroCol=AM;}
+
+  return{ohlcv,labels,closes,vols,fibs,exts,cur,prev,chg,hi,lo,
+    e500sl,e500c,e500d,e50,e20,e200,rsiArr,rsiC,
+    volR,fibZone,nFib,aboveE50,belowHi30,div,tf,e50c,e20c,
+    macroState,macroCol};
 }
+
 function getConds(s){return[
-  {l:'RSI < 45 — zona de acumulación',     ok:s.rsiC!==null&&s.rsiC<45},
-  {l:'Precio entre Fib 0.382 y 0.618',     ok:s.fibZone},
-  {l:'Volumen creciente (ratio ≥ 1.1)',     ok:s.volR>=1.1},
-  {l:'Precio sobre EMA 50',                ok:s.aboveE50},
-  {l:'Precio menor al 95% del máximo 30d', ok:s.belowHi30},
-  {l:'Divergencia alcista RSI detectada',  ok:s.div?.t==='bull'},
+  {l:'RSI < 45 — zona de acumulación',           ok:s.rsiC!==null&&s.rsiC<45},
+  {l:'Precio entre Fib 0.382 y 0.618 (soporte)', ok:s.fibZone},
+  {l:'Volumen creciente (ratio ≥ 1.1)',           ok:s.volR>=1.1},
+  {l:'Precio sobre EMA 50',                       ok:s.aboveE50},
+  {l:'Precio menor al 95% del máximo 30d',        ok:s.belowHi30},
+  {l:'Divergencia alcista RSI detectada',         ok:s.div?.t==='bull'},
 ];}
-function getScore(s){const cs=getConds(s),p=cs.filter(c=>c.ok).length,t=cs.length;let sig,col;if(p>=6){sig='Compra fuerte';col=GR;}else if(p>=4){sig='Señal de compra';col='#86efac';}else if(p>=3){sig='Observar';col=AM;}else if(p>=2){sig='Cautela';col='#fb923c';}else{sig='Esperar';col=SL;}return{p,t,sig,col,cs};}
+
+function getScore(s){
+  const cs=getConds(s),p=cs.filter(c=>c.ok).length,t=cs.length;
+  let sig,col;
+  if(p>=6){sig='Compra fuerte';col=GR;}
+  else if(p>=4){sig='Señal de compra';col='#86efac';}
+  else if(p>=3){sig='Observar';col=AM;}
+  else if(p>=2){sig='Cautela';col='#fb923c';}
+  else{sig='Esperar';col=SL;}
+  return{p,t,sig,col,cs};
+}
+
+/* ── Render ── */
 function renderAll(s,sc){
   document.getElementById('price-main').textContent='$'+s.cur.toFixed(2);
-  const ce=document.getElementById('price-chg');ce.textContent=(s.chg>=0?'+':'')+s.chg.toFixed(2)+'% (24h)';ce.style.color=s.chg>=0?GR:RD;
-  if(s.e500c)document.getElementById('ema500-note').textContent='EMA 500: $'+s.e500c.toFixed(2)+(s.e500d>=0?' — +':' — ')+s.e500d.toFixed(1)+'%';
-  const b=document.getElementById('sig-badge');b.textContent=sc.sig+' · '+sc.p+' de '+sc.t;b.style.cssText=`padding:7px 18px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}15;color:${sc.col};border:1px solid ${sc.col}30`;
-  document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .7s,background .7s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
+  const ce=document.getElementById('price-chg');
+  ce.textContent=(s.chg>=0?'+':'')+s.chg.toFixed(2)+'% (24h)';
+  ce.style.color=s.chg>=0?GR:RD;
+  if(s.e500c) document.getElementById('ema500-note').textContent=
+    'EMA 500: $'+s.e500c.toFixed(2)+' — '+(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'% del precio actual';
+
+  const b=document.getElementById('sig-badge');
+  b.textContent=sc.sig+' · '+sc.p+' de '+sc.t;
+  b.style.cssText=`padding:7px 20px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
+
+  /* Update tooltip border color to match signal */
+  tooltipEl.style.borderColor=sc.col;
+
+  document.getElementById('score-bar').style.cssText=
+    `height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
   document.getElementById('upd-time').textContent='Actualizado '+new Date().toLocaleTimeString('es-CO');
-  const r=s.rsiC,rc=r<30?GR:r<45?'#86efac':r>70?RD:'var(--text)';
-  document.getElementById('m-rsi').textContent=r!==null?r.toFixed(1):'—';document.getElementById('m-rsi').style.color=rc;document.getElementById('m-rsi-s').textContent=r<30?'Sobreventa':r<45?'Zona compra':r>70?'Sobrecompra':'Neutral';
-  document.getElementById('m-fib').textContent=s.nFib.toString();document.getElementById('m-fib').style.color=s.fibZone?GR:'var(--text)';document.getElementById('m-fib-s').textContent=s.fibZone?'En zona soporte':'Fuera de zona';
-  if(s.tf==='weekly'){document.getElementById('ema-lbl').textContent='vs EMA 20s';const d=s.e20c?((s.cur-s.e20c)/s.e20c*100):null;document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';document.getElementById('m-ema').style.color=d>=0?GR:RD;document.getElementById('m-ema-s').textContent=d>=0?'Sobre EMA 20s':'Bajo EMA 20s';}
-  else{document.getElementById('ema-lbl').textContent='vs EMA 500';document.getElementById('m-ema').textContent=s.e500d!==null?(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'%':'—';document.getElementById('m-ema').style.color=s.e500d>=0?GR:RD;document.getElementById('m-ema-s').textContent=s.e500d>=0?'Tendencia macro ↑':'Bajo EMA 500';}
-  document.getElementById('m-vol').textContent=s.volR.toFixed(2)+'×';document.getElementById('m-vol').style.color=s.volR>=1.1?GR:s.volR>=.9?AM:RD;document.getElementById('m-vol-s').textContent=s.volR>=1.1?'Vol en alza':s.volR>=.9?'Estable':'Cayendo';
-  const db=document.getElementById('div-banner');if(s.div){const iB=s.div.t==='bull';db.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5;background:${iB?'#0a160a':'#160a0a'};border:1px solid ${iB?GR+'33':RD+'33'};color:${iB?GR:RD}`;db.textContent=s.div.m;document.getElementById('div-tag').style.color=iB?GR:RD;document.getElementById('div-tag').textContent=iB?'Alcista detectada':'Bajista detectada';}else{db.style.display='none';document.getElementById('div-tag').textContent='Sin divergencia';document.getElementById('div-tag').style.color='#2a2a2d';}
-  renderPC(s);renderRC(s);renderExt(s);renderConds(s,sc);
+
+  /* Metrics */
+  const r=s.rsiC,rc=r<30?GR:r<45?'#86efac':r>70?RD:s.text;
+  document.getElementById('m-rsi').textContent=r!==null?r.toFixed(1):'—';
+  document.getElementById('m-rsi').style.color=rc;
+  document.getElementById('m-rsi-s').textContent=r<30?'Sobreventa':r<45?'Zona de compra':r>70?'Sobrecompra':'Neutral';
+
+  document.getElementById('m-fib').textContent=s.nFib.toString();
+  document.getElementById('m-fib').style.color=s.fibZone?GR:'var(--text)';
+  document.getElementById('m-fib-s').textContent=s.fibZone?'En zona soporte':'Fuera de zona';
+
+  if(s.tf==='weekly'){
+    document.getElementById('ema-lbl').textContent='vs EMA 20s';
+    const d=s.e20c?((s.cur-s.e20c)/s.e20c*100):null;
+    document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';
+    document.getElementById('m-ema').style.color=d>=0?GR:RD;
+    document.getElementById('m-ema-s').textContent=d>=0?'Sobre EMA 20s':'Bajo EMA 20s';
+  }else{
+    document.getElementById('ema-lbl').textContent='vs EMA 500';
+    document.getElementById('m-ema').textContent=s.e500d!==null?(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'%':'—';
+    document.getElementById('m-ema').style.color=s.e500d>=0?GR:RD;
+    document.getElementById('m-ema-s').textContent=
+      s.e500d>60?'Muy extendido':s.e500d>20?'Tendencia macro ↑':s.e500d>-20?'Zona neutral':'Bajo EMA 500';
+  }
+
+  document.getElementById('m-vol').textContent=s.volR.toFixed(2)+'×';
+  document.getElementById('m-vol').style.color=s.volR>=1.1?GR:s.volR>=.9?AM:RD;
+  document.getElementById('m-vol-s').textContent=s.volR>=1.1?'Vol en alza':s.volR>=.9?'Estable':'Cayendo';
+
+  document.getElementById('m-macro').textContent=s.macroState;
+  document.getElementById('m-macro').style.color=s.macroCol;
+  const macroSub=s.e500d!==null?(s.e500d>60?'Esperar retroceso':s.e500d>20?'Óptimo ↑':s.e500d>-20?'Consolidando':'En desventaja'):'—';
+  document.getElementById('m-macro-s').textContent=macroSub;
+  document.getElementById('macro-card').style.borderColor=s.macroCol+'44';
+
+  /* Divergence */
+  const db=document.getElementById('div-banner');
+  if(s.div){
+    const iB=s.div.t==='bull';
+    db.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5;background:${iB?'#0a180a':'#180a0a'};border:1px solid ${iB?GR+'33':RD+'33'};color:${iB?GR:RD}`;
+    db.textContent=s.div.m;
+    document.getElementById('div-tag').style.color=iB?GR:RD;
+    document.getElementById('div-tag').textContent=iB?'Alcista detectada':'Bajista detectada';
+  }else{
+    db.style.display='none';
+    document.getElementById('div-tag').textContent='Sin divergencia';
+    document.getElementById('div-tag').style.color=SL;
+  }
+
+  /* Store fibs for tooltip */
+  currentFibs=s.fibs;
+
+  renderPriceChart(s);
+  renderRSIChart(s);
+  renderExtensions(s);
+  renderConds(s,sc);
 }
-function renderPC(s){
-  const ctx=document.getElementById('cPrice').getContext('2d');if(cP)cP.destroy();
-  const FC={'.382':AM+'55','.618':GR+'55','.786':PU+'55'};
-  const fDS=Object.entries(FC).map(([r,c])=>({label:'Fib '+r,data:Array(s.prices.length).fill(s.fibs[parseFloat(r)]),borderColor:c,borderWidth:1,borderDash:[5,5],pointRadius:0,fill:false,tension:0}));
-  const ds=[{label:'ZEC/USD',data:s.prices,borderColor:G,borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(201,168,76,0.04)',tension:.3},{label:'EMA 50',data:s.e50,borderColor:BL+'77',borderWidth:1.2,pointRadius:0,fill:false,tension:.3,borderDash:[8,4]},...fDS];
-  if(s.tf==='daily'&&s.e500sl){ds.splice(2,0,{label:'EMA 500',data:s.e500sl,borderColor:PU+'77',borderWidth:1.5,pointRadius:0,fill:false,tension:0,borderDash:[3,5]});ds.splice(3,0,{label:'EMA 200',data:s.e200,borderColor:'#f4724477',borderWidth:1,pointRadius:0,fill:false,tension:0,borderDash:[6,4]});}
-  if(s.tf==='weekly')ds.splice(2,0,{label:'EMA 20s',data:s.e20,borderColor:PU+'77',borderWidth:1.2,pointRadius:0,fill:false,tension:0,borderDash:[6,4]});
-  cP=new Chart(ctx,{type:'line',data:{labels:s.labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#131315',borderColor:'#252528',borderWidth:1,titleColor:SL,bodyColor:'#ddd9d0',callbacks:{label:c=>c.parsed.y?' '+c.dataset.label+' $'+c.parsed.y.toFixed(2):null}}},scales:{x:{ticks:{color:'#2a2a2d',font:{size:10},maxTicksLimit:6,maxRotation:0},grid:{color:'#1c1c1f'}},y:{ticks:{color:'#2a2a2d',font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:'#1c1c1f'}}}}});
+
+function renderPriceChart(s){
+  const canvas=document.getElementById('cPrice');
+  if(cP)cP.destroy();
+
+  const n=s.closes.length;
+  const FCS={'.382':AM+'44','.618':GR+'44','.786':PU+'44'};
+  const fibDS=Object.entries(FCS).map(([rv,col])=>({
+    label:'Fib '+rv,
+    data:Array(n).fill(s.fibs[parseFloat(rv)]),
+    borderColor:col,borderWidth:1,borderDash:[6,5],pointRadius:0,fill:false,tension:0
+  }));
+
+  const ds=[
+    /* Invisible reference dataset for candlestick plugin positioning */
+    {label:'_ref',data:s.closes,borderWidth:0,pointRadius:0,backgroundColor:'transparent',borderColor:'transparent'},
+    {label:'EMA 50',data:s.e50,borderColor:BL+'88',borderWidth:1.5,pointRadius:0,fill:false,tension:.4,borderDash:[8,4]},
+    ...fibDS
+  ];
+  if(s.tf==='daily'&&s.e500sl){
+    ds.splice(1,0,{label:'EMA 500',data:s.e500sl,borderColor:PU+'88',borderWidth:1.5,pointRadius:0,fill:false,tension:.4,borderDash:[3,5]});
+    ds.splice(2,0,{label:'EMA 200',data:s.e200,borderColor:'#f4724466',borderWidth:1.2,pointRadius:0,fill:false,tension:.4,borderDash:[6,4]});
+  }
+  if(s.tf==='weekly'){
+    ds.splice(1,0,{label:'EMA 20s',data:s.e20,borderColor:PU+'88',borderWidth:1.5,pointRadius:0,fill:false,tension:.4,borderDash:[6,4]});
+  }
+
+  cP=new Chart(canvas,{
+    type:'line',
+    data:{labels:s.labels,datasets:ds},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{enabled:false},
+      },
+      scales:{
+        x:{ticks:{color:'#3a3a42',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#18181c'}},
+        y:{ticks:{color:'#3a3a42',font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:'#18181c'}}
+      }
+    }
+  });
+
+  /* Attach OHLCV data for candlestick plugin */
+  cP._ohlcv=s.ohlcv;
+
+  /* Custom tooltip events */
+  canvas.onmousemove=(e)=>showTooltip(cP,e);
+  canvas.onmouseleave=()=>hideTooltip();
+  canvas.ontouchmove=(e)=>{e.preventDefault();showTooltip(cP,e.touches[0]);};
+  canvas.ontouchend=()=>setTimeout(hideTooltip,1500);
+
+  /* Legend */
+  const li=s.tf==='daily'
+    ?[[BULL_COL,'Vela alcista'],[BEAR_COL,'Vela bajista'],[BL,'EMA 50'],[PU,'EMA 500'],['#f47244','EMA 200'],[AM,'Fib .382'],[GR,'Fib .618']]
+    :[[BULL_COL,'Vela alcista'],[BEAR_COL,'Vela bajista'],[BL,'EMA 50'],[PU,'EMA 20s'],[AM,'Fib .382'],[GR,'Fib .618']];
+  document.getElementById('pchart-leg').innerHTML=li.map(([c,l])=>
+    `<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:${SL}">
+      <span style="width:12px;height:2px;background:${c};display:inline-block;border-radius:1px"></span>${l}
+    </span>`).join('');
+  document.getElementById('pchart-title').textContent=s.tf==='daily'
+    ?'Velas diarias · EMA 50 · EMA 200 · EMA 500 · Fibonacci'
+    :'Velas semanales · EMA 20s · EMA 50s · Fibonacci';
   document.getElementById('fib-hl').textContent='H $'+s.hi.toFixed(2)+' · L $'+s.lo.toFixed(2);
-  const li=s.tf==='daily'?[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 500'],['#f47244','EMA 200'],[AM,'Fib .382'],[GR,'Fib .618']]:[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 20s'],[AM,'Fib .382'],[GR,'Fib .618']];
-  document.getElementById('pchart-leg').innerHTML=li.map(([c,l])=>`<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:${SL}"><span style="width:12px;height:2px;background:${c};display:inline-block;border-radius:1px"></span>${l}</span>`).join('');
-  document.getElementById('pchart-title').textContent=s.tf==='daily'?'Precio · EMA 50 · EMA 200 · EMA 500 · Fibonacci':'Precio semanal · EMA 20s · EMA 50s · Fibonacci';
 }
-function renderRC(s){const ctx=document.getElementById('cRSI').getContext('2d');if(cR)cR.destroy();cR=new Chart(ctx,{type:'line',data:{labels:s.labels,datasets:[{label:'RSI 14',data:s.rsiArr,borderColor:G,borderWidth:1.5,pointRadius:0,fill:false,tension:.3},{data:Array(s.prices.length).fill(70),borderColor:'#f8717122',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},{data:Array(s.prices.length).fill(30),borderColor:'#4ade8022',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},{data:Array(s.prices.length).fill(50),borderColor:'#2a2a2d',borderWidth:1,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#131315',borderColor:'#252528',borderWidth:1,titleColor:SL,bodyColor:'#ddd9d0'}},scales:{x:{ticks:{color:'#2a2a2d',font:{size:10},maxTicksLimit:6,maxRotation:0},grid:{color:'#1c1c1f'}},y:{min:0,max:100,ticks:{color:'#2a2a2d',font:{size:10},stepSize:25},grid:{color:'#1c1c1f'}}}}});}
-function renderExt(s){const EC={'1.0':'#94a3b8','1.272':BL,'1.414':PU,'1.618':GR,'2.0':AM,'2.618':RD};document.getElementById('fib-ext').innerHTML=Object.entries(s.exts).map(([r,p])=>{const c=EC[r]||SL,pct=((p-s.cur)/s.cur*100);return`<div style="background:var(--card2);border:1px solid var(--b1);border-radius:9px;padding:8px 10px"><div style="font-size:9px;color:${c};letter-spacing:.06em;margin-bottom:4px">Fib ${r}</div><div class="mono" style="font-size:13px;color:var(--text)">$${p.toFixed(2)}</div><div style="font-size:9px;color:${SL};margin-top:2px">+${pct.toFixed(0)}%</div></div>`;}).join('');}
-function renderConds(s,sc){document.getElementById('conditions').innerHTML=sc.cs.map(c=>`<div class="cond-row"><div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${c.ok?GR:SL}"></div><span style="font-size:13px;color:${c.ok?'var(--text)':'#3a3a3d'}">${c.l}</span><span style="margin-left:auto;font-size:11px;color:${c.ok?GR:SL};letter-spacing:.04em">${c.ok?'activa':'—'}</span></div>`).join('');document.getElementById('cond-bar').style.cssText=`height:100%;border-radius:2px;transition:width .6s,background .6s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;document.getElementById('score-lbl').textContent=sc.p+' de '+sc.t+' condiciones activas';}
+
+function renderRSIChart(s){
+  if(cR)cR.destroy();
+  const n=s.closes.length;
+  cR=new Chart(document.getElementById('cRSI'),{
+    type:'line',
+    data:{labels:s.labels,datasets:[
+      {label:'RSI 14',data:s.rsiArr,borderColor:G,borderWidth:1.5,pointRadius:0,fill:false,tension:.35},
+      {data:Array(n).fill(70),borderColor:RD+'22',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
+      {data:Array(n).fill(30),borderColor:GR+'22',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
+      {data:Array(n).fill(50),borderColor:'#2a2a32',borderWidth:1,pointRadius:0,fill:false},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{
+        x:{ticks:{color:'#3a3a42',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#18181c'}},
+        y:{min:0,max:100,ticks:{color:'#3a3a42',font:{size:10},stepSize:25},grid:{color:'#18181c'}}
+      }
+    }
+  });
+}
+
+function renderExtensions(s){
+  const EC={'1.0':'#94a3b8','1.272':BL,'1.414':PU,'1.618':GR,'2.0':AM,'2.618':RD};
+  document.getElementById('fib-ext').innerHTML=Object.entries(s.exts).map(([rv,p])=>{
+    const c=EC[rv]||SL,pct=((p-s.cur)/s.cur*100);
+    return`<div style="background:var(--card2);border:1px solid ${c}33;border-radius:9px;padding:8px 10px">
+      <div style="font-size:9px;color:${c};letter-spacing:.06em;margin-bottom:4px">Fib ${rv}</div>
+      <div class="mono" style="font-size:13px;color:var(--text)">$${p.toFixed(2)}</div>
+      <div style="font-size:9px;color:${SL};margin-top:2px">+${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderConds(s,sc){
+  document.getElementById('conditions').innerHTML=sc.cs.map(c=>
+    `<div class="cond-row">
+      <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${c.ok?GR:SL}"></div>
+      <span style="font-size:13px;color:${c.ok?'var(--text)':'#3c3c44'}">${c.l}</span>
+      <span style="margin-left:auto;font-size:11px;color:${c.ok?GR:SL};letter-spacing:.04em">${c.ok?'activa':'—'}</span>
+    </div>`
+  ).join('');
+  document.getElementById('cond-bar').style.cssText=
+    `height:100%;border-radius:2px;transition:width .6s,background .6s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
+  document.getElementById('score-lbl').textContent=sc.p+' de '+sc.t+' condiciones activas';
+}
+
+/* ── Email ── */
 async function sendEmail(s,sc,isTest){
-  const pk=document.getElementById('ej-pk').value.trim(),sid=document.getElementById('ej-sid').value.trim(),tid=document.getElementById('ej-tid').value.trim(),em=document.getElementById('ej-email').value.trim(),st=document.getElementById('email-st');
+  const pk=document.getElementById('ej-pk').value.trim();
+  const sid=document.getElementById('ej-sid').value.trim();
+  const tid=document.getElementById('ej-tid').value.trim();
+  const em=document.getElementById('ej-email').value.trim();
+  const st=document.getElementById('email-st');
   if(!pk||!sid||!tid||!em){st.style.color=RD;st.textContent='Completa los 4 campos.';return;}
   st.style.color=SL;st.textContent='Enviando...';
   try{
     window.emailjs.init({publicKey:pk});
-    const targets=s?Object.entries(s.exts).map(([r,p])=>'Fib '+r+': $'+p.toFixed(2)).join(' | '):'N/A';
+    const targets=s?Object.entries(s.exts).map(([rv,p])=>'Fib '+rv+': $'+p.toFixed(2)).join(' | '):'N/A';
     await window.emailjs.send(sid,tid,{
-      to_email:em, signal:s?sc.sig:'Prueba de conexion', price:s?'$'+s.cur.toFixed(2):'$0.00',
-      rsi:s&&s.rsiC!==null?s.rsiC.toFixed(1):'N/A', ema_dist:s&&s.e500d!==null?s.e500d.toFixed(1)+'%':'N/A',
-      conditions:s?sc.p+' de '+sc.t:'—',   /* FIX: sin barra, sin codificacion HTML */
-      fib_support:s?s.nFib.toString():'—', targets,
-      divergence:s&&s.div?s.div.m:'Ninguna',
+      to_email:em, signal:s?sc.sig:'Prueba de conexion',
+      price:s?'$'+s.cur.toFixed(2):'$0.00',
+      rsi:s&&s.rsiC!==null?s.rsiC.toFixed(1):'N/A',
+      ema_dist:s&&s.e500d!==null?s.e500d.toFixed(1)+'%':'N/A',
+      conditions:s?sc.p+' de '+sc.t:'—',
+      fib_support:s?s.nFib.toString():'—',
+      targets, divergence:s&&s.div?s.div.m:'Ninguna',
       timeframe:s?(s.tf==='daily'?'Diario':'Semanal'):'—',
       timestamp:new Date().toLocaleString('es-CO'),
     });
-    st.style.color=GR;st.textContent=isTest?'Prueba enviada correctamente.':'Alerta enviada.';
+    st.style.color=GR;
+    st.textContent=isTest?'Prueba enviada correctamente.':'Alerta enviada.';
     setTimeout(()=>{st.textContent='';},8000);
-  }catch(e){st.style.color=RD;st.textContent='Error: '+(e.text||e.message||JSON.stringify(e));}
+  }catch(e){
+    st.style.color=RD;
+    st.textContent='Error: '+(e.text||e.message||JSON.stringify(e));
+  }
 }
 function testEmail(){sendEmail(stats,stats?getScore(stats):null,true);}
-function setTF(t){tf=t;document.getElementById('btn-d').className='tf-btn'+(t==='daily'?' on':'');document.getElementById('btn-w').className='tf-btn'+(t==='weekly'?' on':'');if(raw){stats=analyze(raw,t);renderAll(stats,getScore(stats));}}
+
+/* ── TF toggle ── */
+function setTF(t){
+  tf=t;
+  document.getElementById('btn-d').className='tf-btn'+(t==='daily'?' on':'');
+  document.getElementById('btn-w').className='tf-btn'+(t==='weekly'?' on':'');
+  if(raw){stats=analyze(raw,t);renderAll(stats,getScore(stats));}
+}
+
+/* ── Main refresh ── */
 async function refresh(){
   document.getElementById('sig-badge').textContent='Actualizando...';
-  try{raw=await fetchData();stats=analyze(raw,tf);const sc=getScore(stats);renderAll(stats,sc);const th=parseInt(document.getElementById('et').value);if(sc.p>=th&&sc.p>lastAlerted){lastAlerted=sc.p;sendEmail(stats,sc,false);}}
-  catch(e){document.getElementById('price-main').textContent='Error';document.getElementById('sig-badge').textContent='Sin conexion — reintentando...';console.error(e);setTimeout(refresh,2*60*1000);}
+  try{
+    raw=await fetchData();
+    stats=analyze(raw,tf);
+    const sc=getScore(stats);
+    renderAll(stats,sc);
+    const th=parseInt(document.getElementById('et').value);
+    if(sc.p>=th&&sc.p>lastAlerted){lastAlerted=sc.p;sendEmail(stats,sc,false);}
+  }catch(e){
+    document.getElementById('price-main').textContent='Error';
+    document.getElementById('sig-badge').textContent='Sin conexion — reintentando...';
+    console.error(e);
+    setTimeout(refresh,2*60*1000);
+  }
 }
+
 refresh();
 setInterval(refresh,5*60*1000);
 </script>
