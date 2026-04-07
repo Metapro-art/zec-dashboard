@@ -1,0 +1,29 @@
+name: ZEC Alert Automatico
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'   # cada 4 horas, todos los dias
+  workflow_dispatch:          # tambien se puede lanzar manualmente desde GitHub
+
+jobs:
+  check-zec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install node-fetch nodemailer
+
+      - name: Correr analisis ZEC y enviar alerta
+        run: node check-zec.js
+        env:
+          EMAIL_USER:     ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS:     ${{ secrets.EMAIL_PASS }}
+          EMAIL_TO:       ${{ secrets.EMAIL_TO }}
+          MIN_CONDITIONS: ${{ secrets.MIN_CONDITIONS }}
