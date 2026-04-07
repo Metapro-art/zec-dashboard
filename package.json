@@ -1,0 +1,10 @@
+{
+  "name": "zec-alert",
+  "version": "1.0.0",
+  "description": "ZEC Zcash automatic alert via GitHub Actions",
+  "main": "check-zec.js",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.9.9"
+  }
+}
