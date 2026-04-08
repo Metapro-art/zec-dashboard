@@ -13,7 +13,7 @@
 :root{
   --bg:#0a0a0b;--card:#121214;--card2:#0d0d0f;
   --b1:#222226;--b2:#1a1a1e;
-  --text:#e0dcd3;--muted:#606068;--muted2:#404048;
+  --text:#eae6dd;--muted:#888890;--muted2:#606068;
   --gold:#C9A84C;--green:#4ade80;--red:#f87171;
   --amber:#fbbf24;--blue:#60a5fa;--purple:#c084fc;
 }
@@ -27,8 +27,8 @@ body{padding:env(safe-area-inset-top,0) 0 0 0}
 .tf-btn.on{background:var(--gold);color:#0a0a0b;border-color:var(--gold)}
 .cond-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2)}
 .cond-row:last-child{border-bottom:none}
-.slbl{font-size:9px;color:var(--muted);letter-spacing:.05em}
-.zbtn{font-size:12px;padding:4px 11px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:var(--muted);font-family:inherit;transition:all .15s}
+.slbl{font-size:9px;color:#707078;letter-spacing:.05em}
+.zbtn{font-size:12px;padding:4px 11px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:#808088;font-family:inherit;transition:all .15s}
 .zbtn:hover{border-color:var(--gold);color:var(--gold)}
 .mg5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .fg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
@@ -47,17 +47,17 @@ body{padding:env(safe-area-inset-top,0) 0 0 0}
 #ztt{
   position:absolute;pointer-events:none;z-index:99;
   background:#0d0d11;border:1.5px solid var(--gold);
-  border-radius:10px;padding:10px 14px;min-width:190px;
+  border-radius:9px;padding:8px 11px;min-width:160px;max-width:200px;
   font-family:'Palatino Linotype',Palatino,Georgia,serif;
-  font-size:12px;color:var(--text);display:none;
-  box-shadow:0 4px 24px rgba(0,0,0,.6);
+  font-size:11px;color:var(--text);display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
 }
-#ztt .zt{font-size:9px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:7px}
-#ztt .zr{display:flex;justify-content:space-between;align-items:center;padding:2px 0;gap:8px}
+#ztt .zt{font-size:9px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:5px}
+#ztt .zr{display:flex;justify-content:space-between;align-items:center;padding:1px 0;gap:6px}
 #ztt .zr span{font-size:10px;color:var(--muted);white-space:nowrap}
-#ztt .zr b{font-family:'Courier New',monospace;font-size:11px;white-space:nowrap}
-#ztt .zr em{font-family:'Courier New',monospace;font-size:10px;font-style:normal;white-space:nowrap}
-#ztt .zsep{height:1px;background:var(--b1);margin:6px 0}
+#ztt .zr b{font-family:'Courier New',monospace;font-size:10px;white-space:nowrap}
+#ztt .zr em{font-family:'Courier New',monospace;font-size:9px;font-style:normal;white-space:nowrap}
+#ztt .zsep{height:1px;background:var(--b1);margin:5px 0}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid #C9A84C33;border-top-color:#C9A84C;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
@@ -67,9 +67,9 @@ body{padding:env(safe-area-inset-top,0) 0 0 0}
 
   <div id="ztt">
     <div class="zt" id="ztt-date"></div>
-    <div class="zr"><span>Precio cierre</span><b id="ztt-price"></b></div>
+    <div class="zr"><span>Precio</span><b id="ztt-price"></b></div>
     <div class="zsep"></div>
-    <div class="zt" style="margin-top:2px">Distancia a niveles Fibonacci</div>
+    <div class="zt" style="margin-top:1px">Fib más cercanos</div>
     <div id="ztt-fibs"></div>
   </div>
 
@@ -148,6 +148,27 @@ body{padding:env(safe-area-inset-top,0) 0 0 0}
     </div>
   </div>
 
+  <!-- Fib retrocesos -->
+  <div class="card" style="margin-bottom:1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px">
+      <span class="lbl" style="margin-bottom:0">Retrocesos Fibonacci · Niveles de soporte</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="fib-hl" style="font-size:10px;color:var(--muted)"></span>
+        <div style="display:flex;gap:4px">
+          <button class="zbtn" id="fw-30" onclick="setFibWindow(30)" style="font-size:9px;padding:3px 8px">30d</button>
+          <button class="zbtn on" id="fw-60" onclick="setFibWindow(60)" style="font-size:9px;padding:3px 8px;border-color:var(--gold);color:var(--gold)">60d</button>
+          <button class="zbtn" id="fw-90" onclick="setFibWindow(90)" style="font-size:9px;padding:3px 8px">90d</button>
+        </div>
+      </div>
+    </div>
+    <div id="fib-ret" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px"></div>
+    <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.6">
+      <span style="color:#C9A84C">★★</span> = nivel óptimo de compra (0.618 · proporción áurea) &nbsp;
+      <span style="color:#C9A84C">★</span> = buen soporte (0.382 · 0.786) &nbsp;
+      <span style="color:var(--muted)">sin estrella</span> = soporte débil
+    </div>
+  </div>
+
   <!-- Fib extensions -->
   <div class="card" style="margin-bottom:1rem">
     <div class="lbl" style="margin-bottom:.75rem">Extensiones Fibonacci · Targets de salida</div>
@@ -180,7 +201,7 @@ body{padding:env(safe-area-inset-top,0) 0 0 0}
 <script>
 const G='#C9A84C',GR='#4ade80',RD='#f87171',AM='#fbbf24',BL='#60a5fa',PU='#c084fc',SL='#606068';
 const FIB_COLORS={0:'#94a3b8',.236:'#7dd3fc',.382:AM,.5:'#fb923c',.618:GR,.786:PU,1:'#94a3b8'};
-let cP=null,cR=null,raw=null,stats=null,tf='daily';
+let cP=null,cR=null,raw=null,stats=null,tf='daily',fibWindow=60;
 
 /* ── Crosshair plugin ── */
 const CrosshairPlugin={
@@ -285,10 +306,10 @@ function analyze(data,livePrice,tf){
   const prev=allCloses[allCloses.length-2];
   const chg=((cur-prev)/prev)*100;
 
-  /* Fibs on last 120 daily hi/lo */
-  const d120=data.slice(-120);
-  const hi=Math.max(...d120.map(d=>d.high));
-  const lo=Math.min(...d120.map(d=>d.low));
+  /* Fibs on selected window (fibWindow days) — SHORT window for relevant support/resistance */
+  const dFib=data.slice(-fibWindow);
+  const hi=Math.max(...dFib.map(d=>d.high));
+  const lo=Math.min(...dFib.map(d=>d.low));
   const fibs=fibL(hi,lo),exts=fibE(hi,lo);
 
   const e50=calcEMA(closes,Math.min(50,closes.length-2));
@@ -306,7 +327,7 @@ function analyze(data,livePrice,tf){
   const fibZone=cur>=fibs[.382]&&cur<=fibs[.618];
   const nFib=[0,.236,.382,.5,.618,.786,1].reduce((b,rv2)=>Math.abs(fibs[rv2]-cur)<Math.abs(fibs[b]-cur)?rv2:b,0);
   const aboveE50=e50c?cur>e50c:false;
-  const hi30=Math.max(...d120.slice(-30).map(d=>d.high));
+  const hi30=Math.max(...dFib.slice(-30).map(d=>d.high));
   const belowHi30=cur<hi30*.95;
   const div=detectDiv(closes,rsiArr);
 
@@ -380,15 +401,20 @@ function bindChartEvents(chart,canvas){
     const pe=document.getElementById('ztt-price');
     pe.textContent='$'+price.toFixed(2);pe.style.color=G;
 
-    const fibHtml=Object.entries(_fibs).map(([lvl,fp])=>{
-      const d=((price-fp)/fp*100),sign=d>=0?'+':'',col=d>=0?GR:RD;
-      const near=Math.abs(d)<2.5?'◀':'';
-      return`<div class="zr">
-        <span style="color:${FIB_COLORS[parseFloat(lvl)]||SL}">Fib ${lvl}</span>
-        <b>$${fp.toFixed(2)}</b>
-        <em style="color:${col}">${sign}${d.toFixed(1)}% ${near}</em>
-      </div>`;
-    }).join('');
+    const fibHtml=Object.entries(_fibs)
+      /* Sort by proximity to current price, take 3 closest */
+      .map(([lvl,fp])=>({lvl,fp,dist:Math.abs(price-fp)}))
+      .sort((a,b)=>a.dist-b.dist)
+      .slice(0,3)
+      .map(({lvl,fp})=>{
+        const d=((price-fp)/fp*100),sign=d>=0?'+':'',col=d>=0?GR:RD;
+        const near=Math.abs(d)<2.5?'◀':'';
+        return`<div class="zr">
+          <span style="color:${FIB_COLORS[parseFloat(lvl)]||SL}">Fib ${lvl}</span>
+          <b>$${fp.toFixed(2)}</b>
+          <em style="color:${col}">${sign}${d.toFixed(1)}% ${near}</em>
+        </div>`;
+      }).join('');
     document.getElementById('ztt-fibs').innerHTML=fibHtml;
 
     /* Position tooltip */
@@ -420,39 +446,44 @@ function renderPriceChart(s){
   _fibs=s.fibs;
   const n=s.closes.length;
 
+  /* Right breathing room — 8 empty slots so last day isn't flush against edge */
+  const PAD=8;
+  const padLabels=[...s.labels,...Array(PAD).fill('')];
+  function padData(arr){return [...arr,...Array(PAD).fill(null)];}
+
   const fibDS=Object.entries(FIB_COLORS)
     .filter(([rv])=>parseFloat(rv)>0&&parseFloat(rv)<1)
     .map(([rv,col])=>({
-      label:'Fib '+rv,data:Array(n).fill(s.fibs[parseFloat(rv)]),
-      borderColor:col+'55',borderWidth:1,borderDash:[6,5],
+      label:'Fib '+rv,data:padData(Array(n).fill(s.fibs[parseFloat(rv)])),
+      borderColor:col+'88',borderWidth:1.5,borderDash:[6,5],
       pointRadius:0,fill:false,tension:0,spanGaps:true
     }));
 
   const ds=[
-    {label:'ZEC/USD',data:s.closes,borderColor:G,borderWidth:2,
+    {label:'ZEC/USD',data:padData(s.closes),borderColor:G,borderWidth:2.5,
      pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:G,
      pointHoverBorderColor:'#0a0a0b',pointHoverBorderWidth:2,
-     fill:false,tension:.3,spanGaps:true},
-    {label:'EMA 50',data:s.e50,borderColor:BL+'99',borderWidth:1.5,
+     fill:false,tension:.3,spanGaps:false},
+    {label:'EMA 50',data:padData(s.e50),borderColor:BL+'cc',borderWidth:2,
      pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:BL,
-     fill:false,tension:.4,borderDash:[8,4],spanGaps:true},
+     fill:false,tension:.4,borderDash:[8,4],spanGaps:false},
     ...fibDS
   ];
 
   if(s.tf==='daily'&&s.e500sl){
-    ds.splice(2,0,{label:'EMA 500',data:s.e500sl,borderColor:PU+'99',borderWidth:1.5,
+    ds.splice(2,0,{label:'EMA 500',data:padData(s.e500sl),borderColor:PU+'cc',borderWidth:2,
       pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:PU,
-      fill:false,tension:.4,borderDash:[3,6],spanGaps:true});
-    ds.splice(3,0,{label:'EMA 200',data:s.e200,borderColor:'#f4724477',borderWidth:1.2,
-      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:true});
+      fill:false,tension:.4,borderDash:[3,6],spanGaps:false});
+    ds.splice(3,0,{label:'EMA 200',data:padData(s.e200),borderColor:'#f47244bb',borderWidth:1.8,
+      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
   }
   if(s.tf==='weekly'){
-    ds.splice(2,0,{label:'EMA 20s',data:s.e20,borderColor:PU+'99',borderWidth:1.5,
-      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:true});
+    ds.splice(2,0,{label:'EMA 20s',data:padData(s.e20),borderColor:PU+'cc',borderWidth:2,
+      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
   }
 
   cP=new Chart(canvas,{
-    type:'line',data:{labels:s.labels,datasets:ds},
+    type:'line',data:{labels:padLabels,datasets:ds},
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
@@ -467,8 +498,8 @@ function renderPriceChart(s){
         crosshair:{}
       },
       scales:{
-        x:{ticks:{color:'#404048',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#18181c'}},
-        y:{ticks:{color:'#404048',font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:'#18181c'}}
+        x:{ticks:{color:'#686870',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#1e1e22'}},
+        y:{ticks:{color:'#686870',font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:'#1e1e22'}}
       }
     }
   });
@@ -479,8 +510,8 @@ function renderPriceChart(s){
     ?[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 500'],['#f47244','EMA 200'],[AM,'Fib .382'],[GR,'Fib .618']]
     :[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 20s'],[AM,'Fib .382'],[GR,'Fib .618']];
   document.getElementById('pchart-leg').innerHTML=li.map(([c,l])=>
-    `<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:${SL}">
-      <span style="width:14px;height:2px;background:${c};display:inline-block;border-radius:1px"></span>${l}
+    `<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#909098">
+      <span style="width:16px;height:2.5px;background:${c};display:inline-block;border-radius:1px"></span>${l}
     </span>`).join('');
   document.getElementById('pchart-title').textContent=s.tf==='daily'
     ?'Precio · EMA 50 · EMA 200 · EMA 500 · Fibonacci'
@@ -491,15 +522,51 @@ function renderPriceChart(s){
 function renderRSIChart(s){
   if(cR)cR.destroy();
   const n=s.closes.length;
+
+  /* Zone fill plugin — draws red zone above 70, green zone below 30 */
+  const RSIZonePlugin={
+    id:'rsiZones',
+    beforeDraw(chart){
+      const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
+      if(!y) return;
+      const y70=y.getPixelForValue(70);
+      const y30=y.getPixelForValue(30);
+      ctx.save();
+      /* Red zone: 70–100 (sobrecompra) */
+      ctx.fillStyle='rgba(248,113,113,0.10)';
+      ctx.fillRect(left,top,right-left,y70-top);
+      /* Green zone: 0–30 (sobreventa) */
+      ctx.fillStyle='rgba(74,222,128,0.10)';
+      ctx.fillRect(left,y30,right-left,bottom-y30);
+      /* Labels */
+      ctx.font='bold 9px Courier New';
+      ctx.fillStyle='rgba(248,113,113,0.70)';
+      ctx.textAlign='right';
+      ctx.fillText('SOBRECOMPRA 70',right-4,y70-4);
+      ctx.fillStyle='rgba(74,222,128,0.70)';
+      ctx.fillText('SOBREVENTA 30',right-4,y30+11);
+      ctx.restore();
+    }
+  };
+
   cR=new Chart(document.getElementById('cRSI'),{
-    type:'line',data:{labels:s.labels,datasets:[
-      {label:'RSI 14',data:s.rsiArr,borderColor:G,borderWidth:1.5,
+    type:'line',
+    data:{labels:s.labels,datasets:[
+      /* RSI line — gold, thick */
+      {label:'RSI 14',data:s.rsiArr,borderColor:G,borderWidth:2,
        pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:G,
        fill:false,tension:.35},
-      {data:Array(n).fill(70),borderColor:RD+'22',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
-      {data:Array(n).fill(30),borderColor:GR+'22',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
-      {data:Array(n).fill(50),borderColor:'#2a2a32',borderWidth:1,pointRadius:0,fill:false},
+      /* Overbought 70 — solid red */
+      {data:Array(n).fill(70),borderColor:'#f87171',borderWidth:1.5,
+       borderDash:[5,4],pointRadius:0,fill:false},
+      /* Oversold 30 — solid green */
+      {data:Array(n).fill(30),borderColor:'#4ade80',borderWidth:1.5,
+       borderDash:[5,4],pointRadius:0,fill:false},
+      /* Mid 50 */
+      {data:Array(n).fill(50),borderColor:'#38383e',borderWidth:1,
+       pointRadius:0,fill:false},
     ]},
+    plugins:[RSIZonePlugin],
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
@@ -508,25 +575,41 @@ function renderRSIChart(s){
         tooltip:{
           enabled:true,
           backgroundColor:'#0d0d11',
-          borderColor:G+'55',borderWidth:1,
-          titleColor:SL,bodyColor:G,
+          borderColor:G+'66',borderWidth:1,
+          titleColor:'#888890',bodyColor:G,
           titleFont:{size:9},bodyFont:{family:'Courier New',size:12},
           callbacks:{
             title:items=>items[0]?.label||'',
             label:item=>{
               const v=item.raw;
-              if(v===70||v===30||v===50) return null;
-              return 'RSI: '+v?.toFixed(1);
+              if(v===70||v===30||v===50)return null;
+              return ' RSI: '+v?.toFixed(1);
             }
           }
-        }
+        },
+        rsiZones:{}
       },
       scales:{
-        x:{ticks:{color:'#404048',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#18181c'}},
-        y:{min:0,max:100,ticks:{color:'#404048',font:{size:10},stepSize:25},grid:{color:'#18181c'}}
+        x:{ticks:{color:'#686870',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#1e1e22'}},
+        y:{min:0,max:100,ticks:{color:'#686870',font:{size:10},stepSize:25},grid:{color:'#1e1e22'}}
       }
     }
   });
+}
+
+function renderFibRet(s){
+  const labels={0:'0 · Mínimo',.236:'0.236',.382:'0.382 ★',.5:'0.5',.618:'0.618 ★★',.786:'0.786 ★',1:'1 · Máximo'};
+  document.getElementById('fib-hl').textContent='H $'+s.hi.toFixed(2)+' · L $'+s.lo.toFixed(2);
+  document.getElementById('fib-ret').innerHTML=Object.entries(s.fibs).map(([lvl,price])=>{
+    const fl=parseFloat(lvl),col=FIB_COLORS[fl]||SL;
+    const dist=((s.cur-price)/price*100),isNear=Math.abs(dist)<3;
+    return`<div style="background:${isNear?col+'22':'var(--card2)'};border:1px solid ${isNear?col+'77':col+'33'};border-radius:9px;padding:8px 9px;transition:all .3s">
+      <div style="font-size:9px;color:${col};letter-spacing:.05em;margin-bottom:4px;line-height:1.3">${labels[fl]||'Fib '+lvl}</div>
+      <div class="mono" style="font-size:12px;color:var(--text)">$${price.toFixed(2)}</div>
+      <div style="font-size:9px;font-family:'Courier New',monospace;color:${dist>=0?GR:RD};margin-top:3px">${dist>=0?'+':''}${dist.toFixed(1)}%</div>
+      ${isNear?`<div style="font-size:8px;color:${col};margin-top:3px;letter-spacing:.04em">◀ PRECIO</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function renderExtensions(s){
@@ -611,12 +694,24 @@ function renderAll(s,sc){
 
   renderPriceChart(s);
   renderRSIChart(s);
+  renderFibRet(s);
   renderExtensions(s);
   renderConds(s,sc);
 }
 
 function zoomChart(f){if(cP)cP.zoom(f);}
 function resetZoom(){if(cP)cP.resetZoom();}
+
+function setFibWindow(w){
+  fibWindow=w;
+  [30,60,90].forEach(n=>{
+    const b=document.getElementById('fw-'+n);
+    if(!b)return;
+    if(n===w){b.style.borderColor='var(--gold)';b.style.color='var(--gold)';}
+    else{b.style.borderColor='var(--b1)';b.style.color='#808088';}
+  });
+  if(raw&&stats){stats=analyze(raw,stats.cur,tf);renderAll(stats,getScore(stats));}
+}
 
 function setTF(t){
   tf=t;
