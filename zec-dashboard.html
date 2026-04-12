@@ -2,85 +2,129 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a0b">
+<meta name="theme-color" content="#080809">
 <title>ZEC · Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0a0a0b;--card:#121214;--card2:#0d0d0f;
-  --b1:#222226;--b2:#1a1a1e;
-  --text:#eae6dd;--muted:#888890;--muted2:#606068;
-  --gold:#C9A84C;--green:#4ade80;--red:#f87171;
-  --amber:#fbbf24;--blue:#60a5fa;--purple:#c084fc;
+  --bg:#080809;--card:#101012;--card2:#0c0c0e;
+  --b1:#1e1e22;--b2:#161618;
+  --text:#ebe7de;--muted:#80808a;--muted2:#505058;
+  --gold:#C9A84C;--green:#3fd672;--red:#f06060;
+  --amber:#f0b429;--blue:#4da6ff;--purple:#b57cff;--teal:#2ec4b6;
 }
 html,body{background:var(--bg);color:var(--text);font-family:'Palatino Linotype',Palatino,Georgia,serif;min-height:100vh;overflow-x:hidden}
-body{padding:env(safe-area-inset-top,0) 0 0 0}
-.shell{max-width:1020px;margin:0 auto;padding:1rem .875rem 2.5rem}
+body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
+.shell{max-width:980px;margin:0 auto;padding:.875rem .875rem 2rem}
+
+/* Typography */
 .mono{font-family:'Courier New',Courier,monospace}
-.card{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:1rem}
-.lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.tf-btn{font-size:10px;padding:6px 15px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
-.tf-btn.on{background:var(--gold);color:#0a0a0b;border-color:var(--gold)}
+.lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.slbl{font-size:9px;color:var(--muted2);letter-spacing:.05em}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:1rem}
+.card-sm{background:var(--card2);border:1px solid var(--b1);border-radius:10px;padding:.75rem}
+
+/* Buttons */
+.tf-btn{font-size:10px;padding:6px 14px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
+.tf-btn.on{background:var(--gold);color:#080809;border-color:var(--gold)}
+.zbtn{font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:var(--muted);font-family:inherit;transition:all .15s}
+.zbtn:hover{border-color:var(--gold);color:var(--gold)}
+.zbtn.on{border-color:var(--gold);color:var(--gold)}
+
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.g7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+
+/* Chart heights */
+.ch{position:relative;height:270px;cursor:crosshair}
+.rh{position:relative;height:120px}
+.mh{position:relative;height:105px}
+
+/* Conditions */
 .cond-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2)}
 .cond-row:last-child{border-bottom:none}
-.slbl{font-size:9px;color:#707078;letter-spacing:.05em}
-.zbtn{font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:#808088;font-family:inherit;transition:all .15s}
-.zbtn:hover{border-color:var(--gold);color:var(--gold)}
-.mg5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.fg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
-.ch{position:relative;height:280px;cursor:crosshair}
-.rh{position:relative;height:130px}
-.mh{position:relative;height:110px}
-@media(max-width:580px){
-  .mg5{grid-template-columns:1fr 1fr}
-  .fg{grid-template-columns:repeat(3,1fr)}
-  #price-main{font-size:34px !important}
-  .hdr{flex-direction:column !important}
-  .hdr-r{align-items:flex-start !important}
-  .ch{height:200px}.rh{height:95px}.mh{height:90px}
-  #fib-ret{grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:5px !important}
-  #fib-ret>div{padding:6px 7px !important}
-}
-#ztt{position:absolute;pointer-events:none;z-index:99;background:#0d0d11;border:1.5px solid var(--gold);border-radius:9px;padding:8px 11px;min-width:160px;max-width:200px;font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:11px;color:var(--text);display:none;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+
+/* Spinner */
+.spin{display:inline-block;width:11px;height:11px;border:2px solid #C9A84C33;border-top-color:#C9A84C;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Input */
+input[type=number]{background:var(--card2);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:13px;padding:7px 10px;border-radius:7px;outline:none;width:100%}
+input[type=number]:focus{border-color:#C9A84C55}
+
+/* Tooltip */
+#ztt{position:absolute;pointer-events:none;z-index:99;background:#0c0c0f;border:1.5px solid var(--gold);border-radius:9px;padding:8px 11px;min-width:155px;max-width:195px;font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:11px;color:var(--text);display:none;box-shadow:0 4px 20px rgba(0,0,0,.7)}
 #ztt .zt{font-size:9px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:5px}
 #ztt .zr{display:flex;justify-content:space-between;align-items:center;padding:1px 0;gap:6px}
 #ztt .zr span{font-size:10px;color:var(--muted);white-space:nowrap}
 #ztt .zr b{font-family:'Courier New',monospace;font-size:10px;white-space:nowrap}
 #ztt .zr em{font-family:'Courier New',monospace;font-size:9px;font-style:normal;white-space:nowrap}
 #ztt .zsep{height:1px;background:var(--b1);margin:5px 0}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid #C9A84C33;border-top-color:#C9A84C;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes sp{to{transform:rotate(360deg)}}
-input[type=number]{background:var(--card2);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:13px;padding:7px 10px;border-radius:7px;outline:none;width:100%}
-input[type=number]:focus{border-color:#C9A84C55}
+
+/* Weight badges */
+.wbadge{font-size:9px;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;letter-spacing:.03em;white-space:nowrap}
+
+/* Progress bar */
+.pbar-wrap{height:3px;border-radius:2px;overflow:hidden;background:var(--b2)}
+.pbar-fill{height:100%;border-radius:2px;transition:width .8s,background .8s}
+
+/* RESPONSIVE — mobile first */
+@media(max-width:600px){
+  .shell{padding:.75rem .75rem 1.5rem}
+  .g4,.g5{grid-template-columns:1fr 1fr}
+  .g6{grid-template-columns:repeat(3,1fr)}
+  .g7{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .g7>div{padding:6px 6px !important;font-size:10px}
+  .ch{height:195px}
+  .rh{height:90px}
+  .mh{height:85px}
+  #price-main{font-size:36px !important}
+  .hdr{flex-direction:column !important}
+  .hdr-r{align-items:flex-start !important;gap:7px !important}
+  .halving-grid{grid-template-columns:1fr 1fr !important}
+  .mcap-grid{grid-template-columns:1fr 1fr !important}
+  .conf-grid{grid-template-columns:1fr !important}
+  .zbtn-group{flex-wrap:wrap !important}
+}
+@media(max-width:380px){
+  .g7{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
 <div class="shell">
 
+<!-- TOOLTIP -->
 <div id="ztt">
   <div class="zt" id="ztt-date"></div>
   <div class="zr"><span>Precio</span><b id="ztt-price"></b></div>
   <div class="zsep"></div>
-  <div class="zt" style="margin-top:1px">Fib más cercanos</div>
+  <div class="zt" style="margin-top:1px">Fib cercanos</div>
   <div id="ztt-fibs"></div>
 </div>
 
-<!-- HEADER -->
+<!-- ═══ HEADER ═══ -->
 <div class="hdr" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1rem">
   <div>
     <div class="lbl" style="margin-bottom:3px">Zcash · USD · Análisis técnico</div>
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-      <span id="price-main" class="mono" style="font-size:44px;color:var(--text);letter-spacing:-.02em;line-height:1">—</span>
+      <span id="price-main" class="mono" style="font-size:42px;color:var(--text);letter-spacing:-.02em;line-height:1">—</span>
       <span id="price-chg" style="font-size:13px"></span>
     </div>
     <div id="ema500-note" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
   </div>
   <div class="hdr-r" style="display:flex;flex-direction:column;align-items:flex-end;gap:9px">
-    <div id="sig-badge" style="padding:7px 20px;border-radius:8px;font-size:13px;background:#1a1a1e;color:var(--muted);border:1px solid var(--b1);white-space:nowrap">Cargando...</div>
+    <div id="sig-badge" style="padding:7px 18px;border-radius:8px;font-size:13px;background:#1a1a1e;color:var(--muted);border:1px solid var(--b1);white-space:nowrap">Cargando...</div>
     <div style="display:flex;gap:6px">
       <button id="btn-d" class="tf-btn on" onclick="setTF('daily')">DIARIO</button>
       <button id="btn-w" class="tf-btn" onclick="setTF('weekly')">SEMANAL</button>
@@ -91,8 +135,12 @@ input[type=number]:focus{border-color:#C9A84C55}
 
 <!-- SCORE BAR -->
 <div style="margin-bottom:1rem">
-  <div style="height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-bottom:6px">
-    <div id="score-bar" style="height:100%;border-radius:2px;transition:width .8s,background .8s;width:0"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+    <span id="score-pts" style="font-size:11px;color:var(--muted)"></span>
+    <span id="score-max" style="font-size:10px;color:var(--muted2)"></span>
+  </div>
+  <div class="pbar-wrap" style="height:4px;margin-bottom:5px">
+    <div id="score-bar" class="pbar-fill" style="width:0"></div>
   </div>
   <div style="display:flex;justify-content:space-between;padding:0 1px">
     <span class="slbl">Esperar</span><span class="slbl">Cautela</span>
@@ -100,8 +148,8 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
 </div>
 
-<!-- 5 METRIC CARDS -->
-<div class="mg5" style="margin-bottom:1rem">
+<!-- ═══ 5 METRIC CARDS ═══ -->
+<div class="g5" style="margin-bottom:1rem">
   <div class="card"><div class="lbl">RSI 14</div><div id="m-rsi" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-rsi-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
   <div class="card"><div class="lbl">Soporte Fib</div><div id="m-fib" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-fib-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
   <div class="card" id="ema-card"><div id="ema-lbl" class="lbl">vs EMA 500</div><div id="m-ema" class="mono" style="font-size:22px;color:var(--text)">—</div><div id="m-ema-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
@@ -112,10 +160,10 @@ input[type=number]:focus{border-color:#C9A84C55}
 <!-- DIVERGENCE BANNER -->
 <div id="div-banner" style="display:none;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5"></div>
 
-<!-- PRICE CHART -->
+<!-- ═══ PRICE CHART ═══ -->
 <div class="card" style="margin-bottom:1rem;position:relative">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px">
-    <span id="pchart-title" class="lbl" style="margin-bottom:0">Precio · EMA 50 · EMA 200 · EMA 500 · Fibonacci</span>
+    <span id="pchart-title" class="lbl" style="margin-bottom:0">Precio · EMAs · Fibonacci</span>
     <div style="display:flex;align-items:center;gap:5px">
       <span id="fib-hl2" style="font-size:10px;color:var(--muted);margin-right:4px"></span>
       <button class="zbtn" onclick="zoomChart(1.3)">+</button>
@@ -123,21 +171,21 @@ input[type=number]:focus{border-color:#C9A84C55}
       <button class="zbtn" onclick="resetZoom()">↺</button>
     </div>
   </div>
-  <div class="ch"><canvas id="cPrice" role="img" aria-label="Precio ZEC con EMAs y Fibonacci"></canvas></div>
+  <div class="ch"><canvas id="cPrice" role="img" aria-label="Precio ZEC"></canvas></div>
   <div id="pchart-leg" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:.625rem"></div>
-  <div style="font-size:10px;color:var(--muted2);margin-top:5px">Rueda del mouse = zoom · Arrastra = mover</div>
+  <div style="font-size:10px;color:var(--muted2);margin-top:4px">Rueda = zoom · Arrastra = mover</div>
 </div>
 
-<!-- RSI -->
+<!-- ═══ RSI ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
     <span class="lbl" style="margin-bottom:0">RSI 14 · Divergencias</span>
     <span id="div-tag" style="font-size:11px;color:var(--muted)"></span>
   </div>
-  <div class="rh" style="position:relative"><canvas id="cRSI" role="img" aria-label="RSI 14"></canvas></div>
+  <div class="rh"><canvas id="cRSI" role="img" aria-label="RSI 14"></canvas></div>
 </div>
 
-<!-- MACD -->
+<!-- ═══ MACD ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
     <span class="lbl" style="margin-bottom:0">MACD (12,26,9) · Momentum</span>
@@ -145,263 +193,296 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
   <div class="mh"><canvas id="cMACD" role="img" aria-label="MACD"></canvas></div>
   <div style="display:flex;gap:14px;margin-top:.5rem">
-    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:#60a5fa;display:inline-block;border-radius:1px"></span>MACD</span>
-    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:#f87171;display:inline-block;border-radius:1px;border-top:1px dashed #f87171;background:none;border-bottom:none;border-left:none;border-right:none"></span>Señal</span>
-    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:10px;height:8px;background:#4ade8044;border-radius:2px;display:inline-block"></span>Histograma</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:var(--blue);display:inline-block;border-radius:1px"></span>MACD</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:var(--red);display:inline-block;border-radius:1px;border-top:1px dashed var(--red);height:0px"></span>Señal</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:10px;height:8px;background:var(--green);opacity:.4;border-radius:2px;display:inline-block"></span>Hist</span>
   </div>
 </div>
 
-<!-- OBV -->
+<!-- ═══ OBV ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-    <span class="lbl" style="margin-bottom:0">OBV · On Balance Volume · Acumulación institucional</span>
+    <span class="lbl" style="margin-bottom:0">OBV · Acumulación institucional</span>
     <span id="obv-tag" style="font-size:11px;color:var(--muted)"></span>
   </div>
   <div class="mh"><canvas id="cOBV" role="img" aria-label="OBV"></canvas></div>
 </div>
 
-<!-- CONFLUENCIA -->
-<div class="card" style="margin-bottom:1rem" id="conf-card">
-  <div class="lbl" style="margin-bottom:.875rem">Confluencia diario + semanal · Señal combinada</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.875rem">
-    <div style="background:var(--card2);border-radius:9px;padding:.75rem">
-      <div class="lbl" style="margin-bottom:6px">Diario (120 velas)</div>
-      <div id="cf-d-detail" style="font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.6"></div>
-      <div id="cf-d-sig" style="font-size:14px;font-weight:500"></div>
-      <div style="height:3px;border-radius:2px;margin-top:8px;background:var(--b1);overflow:hidden"><div id="cf-d-fill" style="height:100%;border-radius:2px;transition:width .6s;width:0"></div></div>
-      <div id="cf-d-lbl" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+<!-- ═══ HALVING CYCLE ═══ -->
+<div class="card" style="margin-bottom:1rem" id="halving-card">
+  <div class="lbl" style="margin-bottom:.875rem">Ciclo de Halving · ZEC (840,000 bloques)</div>
+  <div class="halving-grid g4" style="margin-bottom:.875rem">
+    <div class="card-sm" style="text-align:center">
+      <div class="lbl" style="margin-bottom:4px">Halving</div>
+      <div class="mono" style="font-size:12px;color:var(--gold)">2do · Nov 2024</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px">Bloque 1,680,000</div>
     </div>
-    <div style="background:var(--card2);border-radius:9px;padding:.75rem">
-      <div class="lbl" style="margin-bottom:6px">Semanal (velas semanales)</div>
-      <div id="cf-w-detail" style="font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.6"></div>
-      <div id="cf-w-sig" style="font-size:14px;font-weight:500"></div>
-      <div style="height:3px;border-radius:2px;margin-top:8px;background:var(--b1);overflow:hidden"><div id="cf-w-fill" style="height:100%;border-radius:2px;transition:width .6s;width:0"></div></div>
-      <div id="cf-w-lbl" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    <div class="card-sm" style="text-align:center">
+      <div class="lbl" style="margin-bottom:4px">Días desde halving</div>
+      <div id="hv-days" class="mono" style="font-size:20px;color:var(--text)">—</div>
+    </div>
+    <div class="card-sm" style="text-align:center">
+      <div class="lbl" style="margin-bottom:4px">Próximo halving</div>
+      <div class="mono" style="font-size:12px;color:var(--muted)">~Nov 2028</div>
+      <div id="hv-next" style="font-size:9px;color:var(--muted);margin-top:2px"></div>
+    </div>
+    <div class="card-sm" style="text-align:center">
+      <div class="lbl" style="margin-bottom:4px">Fase actual</div>
+      <div id="hv-phase" class="mono" style="font-size:13px;color:var(--text)">—</div>
+      <div id="hv-phase-s" style="font-size:9px;color:var(--muted);margin-top:2px"></div>
     </div>
   </div>
-  <div style="background:var(--card2);border-radius:9px;padding:.75rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <div>
-      <div class="lbl" style="margin-bottom:3px">Confluencia total</div>
-      <div id="cf-total" class="mono" style="font-size:28px;color:var(--text)">—</div>
+  <!-- Cycle progress bar -->
+  <div style="margin-bottom:.75rem">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:9px;color:var(--muted)">Halving Nov 2024</span>
+      <span id="hv-pct" style="font-size:9px;color:var(--muted)"></span>
+      <span style="font-size:9px;color:var(--muted)">Halving ~Nov 2028</span>
     </div>
-    <div style="text-align:right">
-      <div id="cf-verdict" style="font-size:14px;font-weight:500"></div>
-      <div id="cf-note" style="font-size:10px;color:var(--muted);margin-top:3px;max-width:220px;text-align:right;line-height:1.5"></div>
+    <div class="pbar-wrap" style="height:6px;border-radius:3px;position:relative">
+      <div id="hv-bar" class="pbar-fill" style="width:0;border-radius:3px"></div>
+      <!-- Phase markers -->
+      <div style="position:absolute;top:0;left:12.5%;width:1px;height:100%;background:var(--muted2)"></div>
+      <div style="position:absolute;top:0;left:37.5%;width:1px;height:100%;background:var(--muted2)"></div>
+      <div style="position:absolute;top:0;left:62.5%;width:1px;height:100%;background:var(--muted2)"></div>
+      <div style="position:absolute;top:0;left:87.5%;width:1px;height:100%;background:var(--muted2)"></div>
     </div>
+    <div style="display:flex;justify-content:space-between;margin-top:3px;padding:0 0">
+      <span style="font-size:8px;color:var(--muted2)">Corrección</span>
+      <span style="font-size:8px;color:var(--muted2)">Acumulación</span>
+      <span style="font-size:8px;color:var(--muted2)">Bull run</span>
+      <span style="font-size:8px;color:var(--muted2)">Techo</span>
+      <span style="font-size:8px;color:var(--muted2)">Bear</span>
+    </div>
+  </div>
+  <div id="hv-note" style="font-size:11px;color:var(--muted);line-height:1.6;padding:.625rem .875rem;background:var(--card2);border-radius:8px;border:1px solid var(--b1)"></div>
+</div>
+
+<!-- ═══ MARKET CAP CONTEXT ═══ -->
+<div class="card" style="margin-bottom:1rem">
+  <div class="lbl" style="margin-bottom:.875rem">Contexto de mercado · Capitalización</div>
+  <div class="mcap-grid g4" style="margin-bottom:.875rem">
+    <div class="card-sm">
+      <div class="lbl" style="margin-bottom:4px">ZEC Cap actual</div>
+      <div id="mc-zec" class="mono" style="font-size:14px;color:var(--text)">—</div>
+      <div id="mc-zec-s" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+    <div class="card-sm">
+      <div class="lbl" style="margin-bottom:4px">Market total crypto</div>
+      <div id="mc-total" class="mono" style="font-size:14px;color:var(--text)">—</div>
+      <div id="mc-dom" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+    <div class="card-sm" id="mc-2t-card">
+      <div class="lbl" style="margin-bottom:4px">ZEC si mercado = $1.8T</div>
+      <div id="mc-18t" class="mono" style="font-size:14px;color:var(--amber)">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">misma dominancia</div>
+    </div>
+    <div class="card-sm" id="mc-2t-card2">
+      <div class="lbl" style="margin-bottom:4px">ZEC si mercado = $2T</div>
+      <div id="mc-2t" class="mono" style="font-size:14px;color:var(--gold)">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">objetivo institucional</div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:.625rem .875rem;background:var(--card2);border-radius:8px;border:1px solid var(--b1)">
+    Referencia: acumulación institucional históricamente inicia cuando market cap total cae a $1.8–2T.
+    ZEC mantiene ~0.15% de dominancia. Precio implicado a esos niveles se calcula con dominancia actual.
   </div>
 </div>
 
-<!-- FIB RETROCESOS -->
+<!-- ═══ CONFLUENCIA D+S ═══ -->
+<div class="card" style="margin-bottom:1rem" id="conf-card">
+  <div class="lbl" style="margin-bottom:.875rem">Confluencia diario + semanal</div>
+  <div class="conf-grid g2" style="margin-bottom:.875rem">
+    <div class="card-sm">
+      <div class="lbl" style="margin-bottom:5px">Diario (120 velas)</div>
+      <div id="cf-d-detail" style="font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.5"></div>
+      <div id="cf-d-sig" style="font-size:14px;font-weight:500"></div>
+      <div class="pbar-wrap" style="margin-top:8px"><div id="cf-d-fill" class="pbar-fill" style="width:0"></div></div>
+      <div id="cf-d-lbl" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+    <div class="card-sm">
+      <div class="lbl" style="margin-bottom:5px">Semanal</div>
+      <div id="cf-w-detail" style="font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.5"></div>
+      <div id="cf-w-sig" style="font-size:14px;font-weight:500"></div>
+      <div class="pbar-wrap" style="margin-top:8px"><div id="cf-w-fill" class="pbar-fill" style="width:0"></div></div>
+      <div id="cf-w-lbl" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+  </div>
+  <div class="card-sm" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div><div class="lbl" style="margin-bottom:2px">Confluencia total</div>
+    <div id="cf-total" class="mono" style="font-size:28px;color:var(--text)">—</div></div>
+    <div style="text-align:right"><div id="cf-verdict" style="font-size:14px;font-weight:500"></div>
+    <div id="cf-note" style="font-size:10px;color:var(--muted);margin-top:3px;max-width:220px;text-align:right;line-height:1.5"></div></div>
+  </div>
+</div>
+
+<!-- ═══ FIB RETROCESOS ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:8px">
-    <div>
-      <span class="lbl" style="margin-bottom:3px;display:block">Retrocesos Fibonacci · Soporte</span>
-      <span id="fib-hl" style="font-size:10px;color:var(--muted)"></span>
-    </div>
-    <div style="display:flex;gap:4px;flex-wrap:wrap">
+    <div><span class="lbl" style="display:block;margin-bottom:2px">Retrocesos Fibonacci</span>
+    <span id="fib-hl" style="font-size:10px;color:var(--muted)"></span></div>
+    <div class="zbtn-group" style="display:flex;gap:4px">
       <button class="zbtn" id="fw-30" onclick="setFibWindow(30)" style="font-size:9px;padding:3px 8px">30d</button>
-      <button class="zbtn on" id="fw-60" onclick="setFibWindow(60)" style="font-size:9px;padding:3px 8px;border-color:var(--gold);color:var(--gold)">60d</button>
+      <button class="zbtn on" id="fw-60" onclick="setFibWindow(60)" style="font-size:9px;padding:3px 8px">60d</button>
       <button class="zbtn" id="fw-90" onclick="setFibWindow(90)" style="font-size:9px;padding:3px 8px">90d</button>
       <button class="zbtn" id="fw-peak" onclick="setFibWindow('peak')" style="font-size:9px;padding:3px 8px">Last Peak</button>
     </div>
   </div>
   <div id="peak-banner" style="display:none;background:#1a1208;border:1px solid #C9A84C33;border-radius:8px;padding:7px 10px;margin-bottom:.75rem;font-size:11px;color:#C9A84C;line-height:1.6">
-    Ciclo macro: mínimo $55.78 (29 sep 2025) → máximo $698.33 (10 nov 2025)<br>
-    <span style="font-size:10px;color:var(--muted)">0.618 ≈ $301 · 0.786 ≈ $193 — soportes macro del ciclo completo</span>
+    Ciclo completo: $55.78 (29 sep 2025) → $698.33 (10 nov 2025)<br>
+    <span style="font-size:10px;color:var(--muted)">0.618 ≈ $301 · 0.786 ≈ $193 — soportes macro institucionales</span>
   </div>
-  <div id="fib-ret" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px"></div>
-  <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.7;display:flex;flex-wrap:wrap;gap:0 16px">
-    <span><span style="color:#C9A84C">★★</span> = 0.618 · proporción áurea — mejor zona de compra</span>
-    <span><span style="color:#C9A84C">★</span> = 0.382 y 0.786 — buen soporte</span>
-    <span>sin ★ = soporte débil</span>
+  <div id="fib-ret" class="g7"></div>
+  <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.7">
+    <span style="color:var(--gold)">★★</span> 0.618 — proporción áurea, mejor zona de compra &nbsp;
+    <span style="color:var(--gold)">★</span> 0.382 y 0.786 — buen soporte
   </div>
 </div>
 
-<!-- FIB EXTENSIONES -->
+<!-- ═══ FIB EXTENSIONES ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div class="lbl" style="margin-bottom:.75rem">Extensiones Fibonacci · Targets de salida</div>
-  <div id="fib-ext" class="fg"></div>
+  <div id="fib-ext" class="g6"></div>
 </div>
 
-<!-- CONDICIONES -->
+<!-- ═══ CONDICIONES — WEIGHTED ═══ -->
 <div class="card" style="margin-bottom:1rem">
-  <div class="lbl" style="margin-bottom:.75rem">Condiciones activas · <span style="color:var(--gold)">8 indicadores</span></div>
-  <div id="conditions"></div>
-  <div style="margin-top:10px;height:3px;background:var(--card2);border-radius:2px;overflow:hidden">
-    <div id="cond-bar" style="height:100%;border-radius:2px;transition:width .6s,background .6s;width:0"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <span class="lbl" style="margin-bottom:0">Señal ponderada · <span style="color:var(--gold)">indicadores por importancia</span></span>
+    <span id="w-score-detail" style="font-size:10px;color:var(--muted)"></span>
   </div>
-  <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+  <div id="conditions"></div>
+  <div class="pbar-wrap" style="margin-top:10px;height:4px">
+    <div id="cond-bar" class="pbar-fill" style="width:0"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
     <span id="score-lbl" style="font-size:11px;color:var(--muted)"></span>
-    <button onclick="refresh()" style="font-size:11px;padding:5px 14px;border-radius:7px;cursor:pointer;font-family:inherit;background:#1a1a1e;color:var(--muted);border:1px solid var(--b1)">Actualizar</button>
+    <button onclick="refresh()" style="font-size:11px;padding:5px 14px;border-radius:7px;cursor:pointer;font-family:inherit;background:var(--b2);color:var(--muted);border:1px solid var(--b1)">Actualizar</button>
   </div>
 </div>
 
-<!-- CALCULADOR R:R -->
+<!-- ═══ R:R CALCULATOR ═══ -->
 <div class="card" style="margin-bottom:1rem">
   <div class="lbl" style="margin-bottom:.875rem">Calculador Riesgo / Beneficio</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.75rem">
-    <div>
-      <div class="lbl" style="margin-bottom:4px">Precio de entrada ($)</div>
-      <input id="rr-entry" type="number" step="0.01" oninput="calcRR()">
-    </div>
-    <div>
-      <div class="lbl" style="margin-bottom:4px">Stop loss ($)</div>
-      <input id="rr-stop" type="number" step="0.01" oninput="calcRR()">
-      <div id="rr-stop-note" style="font-size:9px;color:var(--muted);margin-top:3px"></div>
-    </div>
+  <div class="g2" style="margin-bottom:.75rem">
+    <div><div class="lbl" style="margin-bottom:4px">Entrada ($)</div><input id="rr-entry" type="number" step="0.01" oninput="calcRR()"></div>
+    <div><div class="lbl" style="margin-bottom:4px">Stop loss ($)</div><input id="rr-stop" type="number" step="0.01" oninput="calcRR()">
+    <div id="rr-stop-note" style="font-size:9px;color:var(--muted);margin-top:3px"></div></div>
   </div>
   <div id="rr-risk" style="font-size:11px;color:var(--muted);margin-bottom:.75rem"></div>
-  <div class="lbl" style="margin-bottom:.625rem">R:R hacia cada extensión Fibonacci</div>
-  <div id="rr-targets" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px"></div>
-  <div style="margin-top:.75rem;font-size:10px;color:var(--muted)">R:R ≥ 3 = excelente &nbsp; R:R ≥ 2 = bueno &nbsp; R:R &lt; 1 = no vale el riesgo</div>
+  <div class="lbl" style="margin-bottom:.625rem">R:R hacia extensiones Fibonacci</div>
+  <div id="rr-targets" class="g3"></div>
+  <div style="margin-top:.75rem;font-size:10px;color:var(--muted)">R:R ≥ 3 = excelente &nbsp; R:R ≥ 2 = bueno &nbsp; R:R &lt; 1 = no recomendable</div>
 </div>
 
 <div style="text-align:center;font-size:10px;color:var(--muted2);padding:.875rem;line-height:1.7">
-  Cel: Chrome → ⋮ → Añadir a pantalla de inicio · Precio actualiza cada 60s · Análisis cada 5 min<br>
-  Alertas automáticas via GitHub Actions (check-zec.js)
+  Cel: Chrome → ⋮ → Añadir a pantalla de inicio<br>
+  Precio: cada 60s · Análisis completo: cada 5 min · Alertas: GitHub Actions
 </div>
 
 </div><!-- shell -->
 
+<!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <script>
-/* ═══════════════════════════════════════════
-   CONSTANTS
-═══════════════════════════════════════════ */
-const G='#C9A84C',GR='#4ade80',RD='#f87171',AM='#fbbf24',BL='#60a5fa',PU='#c084fc',SL='#606068';
+/* ═══════════════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════════════ */
+const G='#C9A84C',GR='#3fd672',RD='#f06060',AM='#f0b429',BL='#4da6ff',PU='#b57cff',SL='#606068',TEAL='#2ec4b6';
+const GRID='#1c1c20',TICK='#686870';
 const FIB_COLORS={0:'#94a3b8',.236:'#7dd3fc',.382:AM,.5:'#fb923c',.618:GR,.786:PU,1:'#94a3b8'};
 const PEAK_LO=55.78,PEAK_HI=698.33;
-const GRID='#1e1e22',TICK='#686870';
+const ZEC_SUPPLY=16_800_000; // approx circulating supply
+const ZEC_HALVING2=new Date('2024-11-18'); // 2nd halving
+const ZEC_HALVING3=new Date('2028-11-01'); // estimated 3rd
 
 let cP=null,cR=null,cM=null,cO=null;
-let raw=null,stats=null,tf='daily',fibWindow=60,livePrice=null;
+let raw=null,stats=null,tf='daily',fibWindow=60,livePrice=null,liveMcap=null;
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    CROSSHAIR PLUGIN
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 Chart.register({
   id:'crosshair',
-  afterDraw(chart){
-    if(!chart._cx)return;
-    const{ctx,chartArea:{left,right,top,bottom}}=chart;
-    ctx.save();
-    ctx.strokeStyle='rgba(201,168,76,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-    ctx.beginPath();ctx.moveTo(chart._cx,top);ctx.lineTo(chart._cx,bottom);ctx.stroke();
-    if(chart._cy){ctx.beginPath();ctx.moveTo(left,chart._cy);ctx.lineTo(right,chart._cy);ctx.stroke();}
+  afterDraw(ch){
+    if(!ch._cx)return;
+    const{ctx,chartArea:{left,right,top,bottom}}=ch;
+    ctx.save();ctx.strokeStyle='rgba(201,168,76,0.32)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(ch._cx,top);ctx.lineTo(ch._cx,bottom);ctx.stroke();
+    if(ch._cy){ctx.beginPath();ctx.moveTo(left,ch._cy);ctx.lineTo(right,ch._cy);ctx.stroke();}
     ctx.restore();
   }
 });
 
-/* ═══════════════════════════════════════════
-   MATH — all verified correct
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   MATH — verified correct
+═══════════════════════════════════════════════ */
 function calcEMA(arr,p){
-  /* Standard Wilder EMA. Returns array same length as arr, nulls where not enough data. */
   if(!arr||arr.length<p)return(arr||[]).map(()=>null);
   const k=2/(p+1),r=Array(p-1).fill(null);
-  let e=arr.slice(0,p).reduce((a,b)=>a+b,0)/p;
-  r.push(e);
+  let e=arr.slice(0,p).reduce((a,b)=>a+b,0)/p;r.push(e);
   for(let i=p;i<arr.length;i++){e=arr[i]*k+e*(1-k);r.push(e);}
   return r;
 }
 
 function calcRSI(arr,p=14){
-  /* Wilder RSI. Returns array same length, nulls for first p bars. */
   if(!arr||arr.length<p+1)return(arr||[]).map(()=>null);
-  const r=Array(p).fill(null);
-  let g=0,l=0;
+  const r=Array(p).fill(null);let g=0,l=0;
   for(let i=1;i<=p;i++){const d=arr[i]-arr[i-1];d>0?g+=d:l-=d;}
-  let ag=g/p,al=l/p;
-  r.push(al===0?100:100-100/(1+ag/al));
+  let ag=g/p,al=l/p;r.push(al===0?100:100-100/(1+ag/al));
   for(let i=p+1;i<arr.length;i++){
     const d=arr[i]-arr[i-1];
-    ag=(ag*(p-1)+(d>0?d:0))/p;
-    al=(al*(p-1)+(d<0?-d:0))/p;
+    ag=(ag*(p-1)+(d>0?d:0))/p;al=(al*(p-1)+(d<0?-d:0))/p;
     r.push(al===0?100:100-100/(1+ag/al));
   }
   return r;
 }
 
 function calcMACD(closes){
-  /*
-    Standard MACD(12,26,9).
-    Key fix: signal line EMA is calculated ONLY on valid MACD values
-    (not on fake zeros), to avoid distortion in early bars.
-  */
-  const e12=calcEMA(closes,12);
-  const e26=calcEMA(closes,26);
+  const e12=calcEMA(closes,12),e26=calcEMA(closes,26);
   const macd=e12.map((v,i)=>(v!==null&&e26[i]!==null)?v-e26[i]:null);
-
-  /* Find first valid MACD index */
-  const firstValid=macd.findIndex(v=>v!==null);
-  if(firstValid<0)return{macd,signal:macd.map(()=>null),hist:macd.map(()=>null)};
-
-  /* Calculate EMA(9) only on valid MACD values */
-  const validMacd=macd.slice(firstValid);
-  const signalValid=calcEMA(validMacd,9);
-
-  /* Reconstruct full-length signal array with nulls prefix */
-  const signal=[...Array(firstValid).fill(null),...signalValid];
-  const hist=macd.map((v,i)=>(v!==null&&signal[i]!==null)?v-signal[i]:null);
-
-  return{macd,signal,hist};
+  const first=macd.findIndex(v=>v!==null);
+  if(first<0)return{macd,signal:macd.map(()=>null),hist:macd.map(()=>null)};
+  const signal=[...Array(first).fill(null),...calcEMA(macd.slice(first),9)];
+  return{macd,signal,hist:macd.map((v,i)=>(v!==null&&signal[i]!==null)?v-signal[i]:null)};
 }
 
 function calcOBV(closes,vols){
-  /* Standard OBV: cumulative volume direction. */
-  const obv=[0];
+  const o=[0];
   for(let i=1;i<closes.length;i++){
-    const prev=obv[obv.length-1];
-    if(closes[i]>closes[i-1])obv.push(prev+vols[i]);
-    else if(closes[i]<closes[i-1])obv.push(prev-vols[i]);
-    else obv.push(prev);
+    const p=o[o.length-1];
+    if(closes[i]>closes[i-1])o.push(p+vols[i]);
+    else if(closes[i]<closes[i-1])o.push(p-vols[i]);
+    else o.push(p);
   }
-  return obv;
+  return o;
 }
 
-function obvSlopeLinReg(obv,period=14){
-  /* Linear regression slope on last N OBV values. Positive = accumulation. */
-  const r=obv.slice(-period);
-  const n=r.length;if(n<2)return 0;
-  const sx=n*(n-1)/2,sy=r.reduce((a,b)=>a+b,0);
-  const sxy=r.reduce((a,v,i)=>a+i*v,0);
-  const sx2=n*(n-1)*(2*n-1)/6;
-  const denom=n*sx2-sx*sx;
-  return denom===0?0:(n*sxy-sx*sy)/denom;
-}
-
-function swingL(a,w=4){
-  const r=[];
-  for(let i=w;i<a.length-w;i++){
-    let ok=true;
-    for(let j=1;j<=w;j++)if(a[i]>=a[i-j]||a[i]>=a[i+j]){ok=false;break;}
-    if(ok)r.push(i);
-  }
-  return r;
+function linregSlope(arr,n=14){
+  const r=arr.slice(-n),len=r.length;if(len<2)return 0;
+  const sx=len*(len-1)/2,sy=r.reduce((a,b)=>a+b,0);
+  const sxy=r.reduce((a,v,i)=>a+i*v,0),sx2=len*(len-1)*(2*len-1)/6;
+  const d=len*sx2-sx*sx;return d===0?0:(len*sxy-sx*sy)/d;
 }
 
 function detectDiv(prices,rsiArr){
-  const rC=rsiArr.map(v=>v??50);
-  const pS=prices.slice(-60),rS=rC.slice(-60);
-  const sl=swingL(pS,3);
-  if(sl.length>=2){
-    const[a,b]=sl.slice(-2);
-    if(pS[b]<pS[a]&&rS[b]>rS[a])
-      return{t:'bull',m:'Divergencia alcista: precio hace mínimos más bajos, RSI hace mínimos más altos'};
-  }
-  const sh=[];
-  for(let i=4;i<pS.length-4;i++){
+  const rC=rsiArr.map(v=>v??50),pS=prices.slice(-60),rS=rC.slice(-60);
+  const sl=[];
+  for(let i=3;i<pS.length-3;i++){
     let ok=true;
-    for(let j=1;j<=4;j++)if(pS[i]<=pS[i-j]||pS[i]<=pS[i+j]){ok=false;break;}
+    for(let j=1;j<=3;j++)if(pS[i]>=pS[i-j]||pS[i]>=pS[i+j]){ok=false;break;}
+    if(ok)sl.push(i);
+  }
+  if(sl.length>=2){const[a,b]=sl.slice(-2);if(pS[b]<pS[a]&&rS[b]>rS[a])return{t:'bull',m:'Divergencia alcista: precio hace mínimos más bajos, RSI hace mínimos más altos'};}
+  const sh=[];
+  for(let i=3;i<pS.length-3;i++){
+    let ok=true;
+    for(let j=1;j<=3;j++)if(pS[i]<=pS[i-j]||pS[i]<=pS[i+j]){ok=false;break;}
     if(ok)sh.push(i);
   }
-  if(sh.length>=2){
-    const[a,b]=sh.slice(-2);
-    if(pS[b]>pS[a]&&rS[b]<rS[a])
-      return{t:'bear',m:'Divergencia bajista: precio hace máximos más altos, RSI hace máximos más bajos'};
-  }
+  if(sh.length>=2){const[a,b]=sh.slice(-2);if(pS[b]>pS[a]&&rS[b]<rS[a])return{t:'bear',m:'Divergencia bajista: precio hace máximos más altos, RSI hace máximos más bajos'};}
   return null;
 }
 
@@ -409,12 +490,6 @@ function fibL(h,l){const r=h-l;return{0:l,.236:l+.236*r,.382:l+.382*r,.5:l+.5*r,
 function fibE(h,l){const r=h-l;return{'1.0':h,'1.272':h+.272*r,'1.414':h+.414*r,'1.618':h+.618*r,'2.0':h+r,'2.618':h+1.618*r};}
 
 function aggWeekly(data){
-  /*
-    Aggregate daily candles into weekly candles.
-    Each week: open=first day close (approximation), close=last day close,
-    high=max, low=min, vol=sum of week's volume.
-    Uses last 7 days per week regardless of calendar alignment.
-  */
   const closes=[],vols=[],labels=[],highs=[],lows=[];
   for(let i=6;i<data.length;i+=7){
     const sl=data.slice(i-6,i+1);
@@ -422,15 +497,182 @@ function aggWeekly(data){
     highs.push(Math.max(...sl.map(d=>d.high)));
     lows.push(Math.min(...sl.map(d=>d.low)));
     vols.push(sl.reduce((a,b)=>a+b.volumeto,0));
-    labels.push(new Date(sl[sl.length-1].time*1000)
-      .toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
+    labels.push(new Date(sl[sl.length-1].time*1000).toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
   }
   return{closes,highs,lows,vols,labels};
 }
 
-/* ═══════════════════════════════════════════
-   API — price refresh separate from data
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   WEIGHTED SCORING SYSTEM
+   Institutional-weighted: macro > momentum > confirming
+═══════════════════════════════════════════════ */
+function buildWeightedConds(params){
+  const{rsi,cur,e50c,e200c,volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi,
+        peakFibZone618,peakFibZone786,halvingPhase,wRsi,wMacdAbove,wObvRising}=params;
+
+  return[
+    /* ── MACRO / INSTITUTIONAL (alta ponderación) ── */
+    {
+      cat:'Macro',
+      l:'Precio en zona Last Peak Fib 0.618–0.786',
+      detail:'Zona de acumulación institucional del ciclo completo',
+      w:3,ok:peakFibZone618||peakFibZone786,
+      col:GR
+    },
+    {
+      cat:'Macro',
+      l:'Fase de acumulación post-halving',
+      detail:'6–18 meses después del halving = ventana histórica de compra',
+      w:2,ok:halvingPhase==='accumulation',
+      col:TEAL
+    },
+    {
+      cat:'Macro',
+      l:'Precio sobre EMA 200 semanal',
+      detail:'Línea de referencia institucional — tendencia macro intacta',
+      w:2,ok:e200c?cur>e200c:false,
+      col:BL
+    },
+    /* ── MOMENTUM (ponderación media-alta) ── */
+    {
+      cat:'Momentum',
+      l:'MACD cruce alcista bajo cero (señal fuerte)',
+      detail:'Mejor señal de MACD: cruce + histograma negativo = momentum girando',
+      w:2,ok:macdBullish===true,
+      col:AM
+    },
+    {
+      cat:'Momentum',
+      l:'RSI semanal < 45',
+      detail:'Timeframe semanal en zona de acumulación',
+      w:2,ok:wRsi!==null&&wRsi<45,
+      col:GR
+    },
+    {
+      cat:'Momentum',
+      l:'OBV en alza — acumulación activa',
+      detail:'Dinero entrando en silencio (institucional)',
+      w:2,ok:obvRising&&wObvRising,
+      col:TEAL
+    },
+    /* ── CONFIRMADORES (ponderación normal) ── */
+    {
+      cat:'Confirma',
+      l:'RSI diario < 45',
+      detail:'Zona de acumulación en timeframe diario',
+      w:1,ok:rsi!==null&&rsi<45,
+      col:GR
+    },
+    {
+      cat:'Confirma',
+      l:'Precio entre Fib 0.382 y 0.618 (60d)',
+      detail:'Soporte técnico en retroceso de corto plazo',
+      w:1,ok:fibZone,
+      col:AM
+    },
+    {
+      cat:'Confirma',
+      l:'Volumen creciente (ratio ≥ 1.1)',
+      detail:'Volumen validando el movimiento',
+      w:1,ok:volR>=1.1,
+      col:BL
+    },
+    {
+      cat:'Confirma',
+      l:'Precio bajo el 95% del máximo 30d',
+      detail:'Sin sobrecompra de corto plazo',
+      w:1,ok:belowHi,
+      col:SL
+    },
+    {
+      cat:'Confirma',
+      l:'Divergencia alcista RSI',
+      detail:'Agotamiento vendedor — señal de reversión',
+      w:1,ok:div?.t==='bull',
+      col:PU
+    },
+    {
+      cat:'Confirma',
+      l:'MACD sobre línea de señal',
+      detail:'Momentum positivo confirmado',
+      w:1,ok:macdAbove,
+      col:AM
+    },
+  ];
+}
+
+function scoreFromConds(conds){
+  const earned=conds.reduce((a,c)=>a+(c.ok?c.w:0),0);
+  const max=conds.reduce((a,c)=>a+c.w,0);
+  const pct=max>0?earned/max:0;
+  let sig,col;
+  if(pct>=.80){sig='Compra fuerte';col=GR;}
+  else if(pct>=.58){sig='Señal de compra';col='#5ecc7b';}
+  else if(pct>=.40){sig='Observar';col=AM;}
+  else if(pct>=.24){sig='Cautela';col='#f0834f';}
+  else{sig='Esperar';col=SL;}
+  return{earned,max,pct,sig,col};
+}
+
+/* Lightweight score for confluence panels (no halving/peak/weekly) */
+function quickScore({rsi,cur,e50c,volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi}){
+  const conds=[
+    {w:2,ok:rsi!==null&&rsi<45},
+    {w:2,ok:macdBullish},
+    {w:2,ok:obvRising},
+    {w:1,ok:fibZone},
+    {w:1,ok:volR>=1.1},
+    {w:1,ok:e50c?cur>e50c:false},
+    {w:1,ok:belowHi},
+    {w:1,ok:div?.t==='bull'},
+    {w:1,ok:macdAbove},
+  ];
+  const earned=conds.reduce((a,c)=>a+(c.ok?c.w:0),0);
+  const max=conds.reduce((a,c)=>a+c.w,0);
+  const pct=max>0?earned/max:0;
+  let sig,col;
+  if(pct>=.78){sig='Compra fuerte';col=GR;}
+  else if(pct>=.56){sig='Señal de compra';col='#5ecc7b';}
+  else if(pct>=.38){sig='Observar';col=AM;}
+  else if(pct>=.22){sig='Cautela';col='#f0834f';}
+  else{sig='Esperar';col=SL;}
+  return{earned,max,pct,sig,col};
+}
+
+/* ═══════════════════════════════════════════════
+   HALVING CYCLE
+═══════════════════════════════════════════════ */
+function getHalvingInfo(){
+  const now=new Date();
+  const totalCycle=ZEC_HALVING3-ZEC_HALVING2;
+  const elapsed=now-ZEC_HALVING2;
+  const pct=Math.min(elapsed/totalCycle,1);
+  const daysSince=Math.floor(elapsed/(1000*60*60*24));
+  const daysToNext=Math.max(0,Math.floor((ZEC_HALVING3-now)/(1000*60*60*24)));
+
+  let phase,phaseColor,phaseNote,halvingPhaseKey;
+  if(daysSince<180){
+    phase='Corrección post-halving';phaseColor=RD;halvingPhaseKey='correction';
+    phaseNote='Fase 1/5: corrección típica tras el halving (0–6 meses). Precio puede seguir presionado. El mercado digiere la reducción de oferta.';
+  }else if(daysSince<540){
+    phase='Acumulación institucional';phaseColor=TEAL;halvingPhaseKey='accumulation';
+    phaseNote='Fase 2/5: ventana histórica de acumulación (6–18 meses). Las instituciones acumulan silenciosamente. Zona óptima para entrada gradual.';
+  }else if(daysSince<900){
+    phase='Bull run';phaseColor=GR;halvingPhaseKey='bull';
+    phaseNote='Fase 3/5: bull run histórico (18–30 meses). Momentum alcista fuerte. Gestionar posición y mover stops.';
+  }else if(daysSince<1260){
+    phase='Techo de ciclo';phaseColor=AM;halvingPhaseKey='top';
+    phaseNote='Fase 4/5: zona de techo y distribución (30–42 meses). Reducir exposición gradualmente.';
+  }else{
+    phase='Bear market';phaseColor=RD;halvingPhaseKey='bear';
+    phaseNote='Fase 5/5: bear market pre-halving (42–48 meses). Acumular sólo en niveles extremos de sobreventa.';
+  }
+  return{daysSince,daysToNext,pct,phase,phaseColor,phaseNote,halvingPhaseKey};
+}
+
+/* ═══════════════════════════════════════════════
+   API
+═══════════════════════════════════════════════ */
 async function fetchHistorical(){
   const r=await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ZEC&tsym=USD&limit=2000');
   if(!r.ok)throw new Error('HTTP '+r.status);
@@ -441,84 +683,74 @@ async function fetchHistorical(){
 
 async function fetchLive(){
   try{
-    /* pricemultifull gives us price + 24h change in one call */
-    const r=await fetch('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ZEC&tsyms=USD');
+    const r=await fetch('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ZEC,BTC&tsyms=USD');
     if(!r.ok)return null;
     const d=await r.json();
-    const raw2=d.RAW?.ZEC?.USD;
-    if(!raw2)return null;
-    return{price:raw2.PRICE,chg24:raw2.CHANGEPCT24HOUR,vol24:raw2.VOLUME24HOURTO};
+    const zec=d.RAW?.ZEC?.USD;
+    const btc=d.RAW?.BTC?.USD;
+    if(!zec)return null;
+    /* Estimate total market cap: BTC + altcoins */
+    /* BTC dominance ≈ 52-56%. Use BTC mcap / 0.54 as total estimate */
+    const btcMcap=btc?.MKTCAP||0;
+    const totalMcapEst=btcMcap>0?btcMcap/0.54:0;
+    return{
+      price:zec.PRICE,
+      chg24:zec.CHANGEPCT24HOUR,
+      mcap:zec.MKTCAP||(zec.PRICE*ZEC_SUPPLY),
+      totalMcap:totalMcapEst,
+      supply:zec.SUPPLY||ZEC_SUPPLY
+    };
   }catch{return null;}
 }
 
-/* ═══════════════════════════════════════════
-   SCORING — common function used by analyze and confluence
-═══════════════════════════════════════════ */
-function scoreTimeframe({rsi,cur,e50c,volR,macdAbove,obvRising,div,fibZone,belowHi}){
-  const conds=[
-    {l:'RSI < 45',ok:rsi!==null&&rsi<45},
-    {l:'Fib 0.382–0.618',ok:fibZone},
-    {l:'Volumen creciente',ok:volR>=1.1},
-    {l:'Sobre EMA 50',ok:e50c?cur>e50c:false},
-    {l:'Bajo máximo 30d',ok:belowHi},
-    {l:'Div. alcista RSI',ok:div?.t==='bull'},
-    {l:'MACD > señal',ok:macdAbove},
-    {l:'OBV en alza',ok:obvRising},
-  ];
-  const p=conds.filter(c=>c.ok).length,t=conds.length;
-  let sig,col;
-  if(p>=7){sig='Compra fuerte';col=GR;}
-  else if(p>=5){sig='Señal de compra';col='#86efac';}
-  else if(p>=4){sig='Observar';col=AM;}
-  else if(p>=3){sig='Cautela';col='#fb923c';}
-  else{sig='Esperar';col=SL;}
-  return{p,t,sig,col,conds,rsi,macdAbove,obvRising};
-}
-
-/* ═══════════════════════════════════════════
-   ANALYZE — single source of truth for both TFs
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   ANALYZE
+═══════════════════════════════════════════════ */
 function analyze(data,curPrice,tf){
-  /* ── EMA 500 always on full 2000-day dataset for accuracy ── */
-  const allCloses=data.map(d=>d.close);
-  const e500all=calcEMA(allCloses,500);
+  const allC=data.map(d=>d.close);
+
+  /* EMA 500 on full 2000-day set */
+  const e500all=calcEMA(allC,500);
   const e500c=e500all[e500all.length-1];
 
-  /* ── Slice for display based on timeframe ── */
+  /* Slice by TF */
   let closes,vols,labels,highs,lows,e500sl=null;
   if(tf==='weekly'){
-    const w=aggWeekly(data);
-    closes=w.closes;vols=w.vols;labels=w.labels;
-    highs=w.highs;lows=w.lows;
+    const w=aggWeekly(data);closes=w.closes;vols=w.vols;labels=w.labels;highs=w.highs;lows=w.lows;
   }else{
     const sl=data.slice(-120);
-    closes=sl.map(d=>d.close);
-    vols=sl.map(d=>d.volumeto);
-    highs=sl.map(d=>d.high);
-    lows=sl.map(d=>d.low);
-    labels=sl.map(d=>new Date(d.time*1000)
-      .toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
+    closes=sl.map(d=>d.close);vols=sl.map(d=>d.volumeto);
+    highs=sl.map(d=>d.high);lows=sl.map(d=>d.low);
+    labels=sl.map(d=>new Date(d.time*1000).toLocaleDateString('es-CO',{month:'short',day:'numeric'}));
     e500sl=e500all.slice(-120);
   }
 
-  /* ── Current price: always use live price ── */
-  const cur=curPrice||allCloses[allCloses.length-1];
-  const prevClose=allCloses[allCloses.length-2];
-  const chg=((cur-prevClose)/prevClose)*100;
+  const cur=curPrice||allC[allC.length-1];
+  const chg=((cur-allC[allC.length-2])/allC[allC.length-2])*100;
+  const e500d=e500c?((cur-e500c)/e500c*100):null;
 
-  /* ── EMAs for chart ── */
+  /* EMAs for display */
   const e50arr=calcEMA(closes,Math.min(50,closes.length-2));
   const e20arr=calcEMA(closes,Math.min(20,closes.length-2));
   const e200arr=calcEMA(closes,Math.min(200,closes.length-2));
   const e50c=e50arr[e50arr.length-1];
   const e20c=e20arr[e20arr.length-1];
-  const e500d=e500c?((cur-e500c)/e500c*100):null;
+  const e200c=e200arr[e200arr.length-1];
 
-  /* ── RSI ── */
+  /* Weekly EMA 200 — always compute from weekly data */
+  const wData=aggWeekly(data);
+  const wE200arr=calcEMA(wData.closes,Math.min(200,wData.closes.length-2));
+  const wE200c=wE200arr[wE200arr.length-1]; /* THE institutional reference */
+
+  /* RSI */
   const rsiArr=calcRSI(closes);
   const rsiC=rsiArr[rsiArr.length-1];
 
-  /* ── MACD ── */
+  /* Weekly RSI */
+  const wRsiArr=calcRSI(wData.closes);
+  const wRsiC=wRsiArr[wRsiArr.length-1];
+
+  /* MACD */
   const macdData=calcMACD(closes);
   const macdC=macdData.macd[macdData.macd.length-1];
   const sigC=macdData.signal[macdData.signal.length-1];
@@ -526,160 +758,134 @@ function analyze(data,curPrice,tf){
   const sigPrev=macdData.signal[macdData.signal.length-2];
   const macdAbove=macdC!==null&&sigC!==null&&macdC>sigC;
   const macdCross=macdAbove&&macdPrev!==null&&sigPrev!==null&&macdPrev<=sigPrev;
-  const macdBullish=macdAbove&&macdC<0; /* Gold: bullish cross below zero */
+  const macdBullish=macdCross&&macdC<0; /* Best signal: cross below zero */
 
-  /* ── OBV ── */
+  /* Weekly MACD */
+  const wMacdData=calcMACD(wData.closes);
+  const wMacdC=wMacdData.macd[wMacdData.macd.length-1];
+  const wSigC=wMacdData.signal[wMacdData.signal.length-1];
+  const wMacdAbove=wMacdC!==null&&wSigC!==null&&wMacdC>wSigC;
+  const wMacdBullish=wMacdAbove&&wMacdC<0;
+
+  /* OBV */
   const obvArr=calcOBV(closes,vols);
-  const obvSl=obvSlopeLinReg(obvArr,14);
-  const obvRising=obvSl>0;
+  const obvRising=linregSlope(obvArr,14)>0;
+  const wObv=calcOBV(wData.closes,wData.vols);
+  const wObvRising=linregSlope(wObv,10)>0;
 
-  /* ── Volume ratio ── */
+  /* Volume */
   const rv=vols.slice(-7).reduce((a,b)=>a+b,0)/7;
   const pv=vols.slice(-14,-7).reduce((a,b)=>a+b,0)/7;
   const volR=pv>0?rv/pv:1;
 
-  /* ── Fibonacci ── */
+  /* Fibonacci */
   let fibHi,fibLo;
   if(fibWindow==='peak'){fibHi=PEAK_HI;fibLo=PEAK_LO;}
-  else{
-    const dFib=data.slice(-fibWindow);
-    fibHi=Math.max(...dFib.map(d=>d.high));
-    fibLo=Math.min(...dFib.map(d=>d.low));
-  }
+  else{const dF=data.slice(-fibWindow);fibHi=Math.max(...dF.map(d=>d.high));fibLo=Math.min(...dF.map(d=>d.low));}
   const fibs=fibL(fibHi,fibLo),exts=fibE(fibHi,fibLo);
   const fibZone=cur>=fibs[.382]&&cur<=fibs[.618];
-  const nFib=[0,.236,.382,.5,.618,.786,1]
-    .reduce((b,rv2)=>Math.abs(fibs[rv2]-cur)<Math.abs(fibs[b]-cur)?rv2:b,0);
+  const nFib=[0,.236,.382,.5,.618,.786,1].reduce((b,rv2)=>Math.abs(fibs[rv2]-cur)<Math.abs(fibs[b]-cur)?rv2:b,0);
 
-  /* ── Highs for "below 30d high" ── */
+  /* Last Peak Fibonacci zones */
+  const pkFibs=fibL(PEAK_HI,PEAK_LO);
+  const peakFibZone618=cur>=pkFibs[.618]*0.97&&cur<=pkFibs[.618]*1.03;
+  const peakFibZone786=cur>=pkFibs[.786]*0.97&&cur<=pkFibs[.786]*1.03;
+
+  /* Hi30 */
   const win=fibWindow==='peak'?60:fibWindow;
-  const dRecent=data.slice(-Math.max(win,30));
-  const hi30=Math.max(...dRecent.slice(-30).map(d=>d.high));
+  const dR=data.slice(-Math.max(win,30));
+  const hi30=Math.max(...dR.slice(-30).map(d=>d.high));
   const belowHi30=cur<hi30*.95;
 
-  /* ── Divergence ── */
+  /* Divergence */
   const div=detectDiv(closes,rsiArr);
 
-  /* ── Swing low for stop-loss suggestion ── */
-  const dailyCloses30=data.slice(-30).map(d=>d.close);
-  const swingIdx=swingL(dailyCloses30,3);
-  const swingStop=swingIdx.length>0
-    ?dailyCloses30[swingIdx[swingIdx.length-1]]
-    :Math.min(...data.slice(-10).map(d=>d.low));
+  /* Halving */
+  const halvInfo=getHalvingInfo();
 
-  /* ── Score current TF ── */
-  const scoreResult=scoreTimeframe({rsi:rsiC,cur,e50c,volR,macdAbove,obvRising,div,fibZone,belowHi:belowHi30});
+  /* Swing low for stop-loss */
+  const sl30=data.slice(-30).map(d=>d.close);
+  const swIdx=[];
+  for(let i=3;i<sl30.length-3;i++){let ok=true;for(let j=1;j<=3;j++)if(sl30[i]>=sl30[i-j]||sl30[i]>=sl30[i+j]){ok=false;break;}if(ok)swIdx.push(i);}
+  const swingStop=swIdx.length>0?sl30[swIdx[swIdx.length-1]]:Math.min(...data.slice(-10).map(d=>d.low));
 
-  /* ── Confluence: always compute BOTH daily and weekly regardless of current TF ── */
+  /* Build weighted conditions */
+  const conds=buildWeightedConds({
+    rsi:rsiC,cur,e50c:tf==='weekly'?e20c:e50c,e200c:wE200c,
+    volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi:belowHi30,
+    peakFibZone618,peakFibZone786,halvingPhase:halvInfo.halvingPhaseKey,
+    wRsi:wRsiC,wMacdAbove,wObvRising
+  });
+  const sc=scoreFromConds(conds);
+
+  /* Confluence */
   const dSlice=data.slice(-120);
-  const wData=aggWeekly(data);
-
-  /* Daily confluence */
   const dc=dSlice.map(d=>d.close),dv=dSlice.map(d=>d.volumeto);
   const dRsi=calcRSI(dc);const dRsiC=dRsi[dRsi.length-1];
-  const dE50=calcEMA(dc,Math.min(50,dc.length-2));const dE50c=dE50[dE50.length-1];
+  const dE50=calcEMA(dc,50);const dE50c=dE50[dE50.length-1];
   const dVr=(dv.slice(-7).reduce((a,b)=>a+b,0)/7)/((dv.slice(-14,-7).reduce((a,b)=>a+b,0)/7)||1);
   const dMacd=calcMACD(dc);
-  const dMacdAbove=dMacd.macd[dMacd.macd.length-1]!==null&&dMacd.signal[dMacd.signal.length-1]!==null
-    &&dMacd.macd[dMacd.macd.length-1]>dMacd.signal[dMacd.signal.length-1];
-  const dObv=calcOBV(dc,dv);const dObvRising=obvSlopeLinReg(dObv,14)>0;
+  const dMacdAbove=dMacd.macd[dMacd.macd.length-1]!==null&&dMacd.signal[dMacd.signal.length-1]!==null&&dMacd.macd[dMacd.macd.length-1]>dMacd.signal[dMacd.signal.length-1];
+  const dMacdBullish=dMacdAbove&&dMacd.macd[dMacd.macd.length-1]<0;
+  const dObv=calcOBV(dc,dv);const dObvRising=linregSlope(dObv,14)>0;
   const dDiv=detectDiv(dc,dRsi);
-  const dFibZone=cur>=fibs[.382]&&cur<=fibs[.618];
-  const dBelowHi=cur<hi30*.95;
-  const confD=scoreTimeframe({rsi:dRsiC,cur,e50c:dE50c,volR:dVr,macdAbove:dMacdAbove,obvRising:dObvRising,div:dDiv,fibZone:dFibZone,belowHi:dBelowHi});
+  const confD=quickScore({rsi:dRsiC,cur,e50c:dE50c,volR:dVr,macdAbove:dMacdAbove,macdBullish:dMacdBullish,obvRising:dObvRising,div:dDiv,fibZone,belowHi:belowHi30});
 
-  /* Weekly confluence */
-  const wc=wData.closes,wv=wData.vols;
-  const wRsi=calcRSI(wc);const wRsiC=wRsi[wRsi.length-1];
-  /* Weekly EMA: use EMA(20) ≈ 20 weeks ≈ 5 months as "medium term" */
-  const wE20=calcEMA(wc,Math.min(20,wc.length-2));const wE20c=wE20[wE20.length-1];
-  /* Weekly volume: last 4 weeks vs prior 4 weeks */
-  const wVr=(wv.slice(-4).reduce((a,b)=>a+b,0)/4)/((wv.slice(-8,-4).reduce((a,b)=>a+b,0)/4)||1);
-  const wMacd=calcMACD(wc);
-  const wMacdAbove=wMacd.macd[wMacd.macd.length-1]!==null&&wMacd.signal[wMacd.signal.length-1]!==null
-    &&wMacd.macd[wMacd.macd.length-1]>wMacd.signal[wMacd.signal.length-1];
-  const wObv=calcOBV(wc,wv);const wObvRising=obvSlopeLinReg(wObv,10)>0;
-  const wDiv=detectDiv(wc,wRsi);
-  /* Weekly hi30 = last 12 weekly candles' high */
+  const wE20arr=calcEMA(wData.closes,Math.min(20,wData.closes.length-2));
+  const wE20c=wE20arr[wE20arr.length-1];
+  const wVr=(wData.vols.slice(-4).reduce((a,b)=>a+b,0)/4)/((wData.vols.slice(-8,-4).reduce((a,b)=>a+b,0)/4)||1);
+  const wDiv=detectDiv(wData.closes,wRsiArr);
   const wHi12=Math.max(...wData.highs.slice(-12));
-  const wBelowHi=cur<wHi12*.95;
-  const confW=scoreTimeframe({rsi:wRsiC,cur,e50c:wE20c,volR:wVr,macdAbove:wMacdAbove,obvRising:wObvRising,div:wDiv,fibZone,belowHi:wBelowHi});
-
-  /* ── Macro state ── */
-  let macroState,macroCol;
-  if(e500d===null){macroState='N/A';macroCol=SL;}
-  else if(e500d<-20){macroState='Bajista';macroCol=RD;}
-  else if(e500d<20){macroState='Neutral';macroCol=SL;}
-  else if(e500d<60){macroState='Alcista';macroCol=GR;}
-  else{macroState='Extendido';macroCol=AM;}
+  const confW=quickScore({rsi:wRsiC,cur,e50c:wE20c,volR:wVr,macdAbove:wMacdAbove,macdBullish:wMacdBullish,obvRising:wObvRising,div:wDiv,fibZone,belowHi:cur<wHi12*.95});
 
   return{
-    /* Chart data */
-    closes,vols,labels,highs,lows,
-    /* Price */
-    cur,chg,
-    /* EMAs */
-    e50arr,e20arr,e200arr,e500sl,e50c,e20c,e500c,e500d,
-    /* RSI */
-    rsiArr,rsiC,div,
-    /* MACD */
+    closes,vols,labels,highs,lows,cur,chg,
+    e50arr,e20arr,e200arr,e500sl,e50c,e20c,e200c,e500c,e500d,wE200c,
+    rsiArr,rsiC,wRsiArr,wRsiC,div,
     macdData,macdAbove,macdCross,macdBullish,
-    /* OBV */
-    obvArr,obvSl,obvRising,
-    /* Fibonacci */
+    wMacdAbove,wMacdBullish,
+    obvArr,obvRising,wObvRising,
     fibs,exts,fibZone,nFib,fibHi,fibLo,
-    /* Conditions */
+    pkFibs,peakFibZone618,peakFibZone786,
     volR,belowHi30,swingStop,
-    /* Score */
-    scoreResult,
-    /* Confluence */
-    confD,confW,
-    /* Macro */
-    macroState,macroCol,
-    /* Meta */
+    halvInfo,
+    conds,sc,confD,confW,
+    macroState:e500d===null?'N/A':e500d<-20?'Bajista':e500d<20?'Neutral':e500d<60?'Alcista':'Extendido',
+    macroCol:e500d===null?SL:e500d<-20?RD:e500d<20?SL:e500d<60?GR:AM,
     tf
   };
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    TOOLTIP
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 let _fibs={};
 const ztt=document.getElementById('ztt');
 
-function bindTooltip(chart,canvas){
+function bindTT(chart,canvas){
   const wrap=canvas.closest('.card');
-  if(!wrap._zttBound){wrap.style.position='relative';wrap.appendChild(ztt);wrap._zttBound=true;}
+  if(!wrap._b){wrap.style.position='relative';wrap.appendChild(ztt);wrap._b=true;}
   function onM(e){
     const rect=canvas.getBoundingClientRect();
-    const cx=(e.clientX||e.touches?.[0]?.clientX)||0;
-    const cy=(e.clientY||e.touches?.[0]?.clientY)||0;
-    const mx=cx-rect.left,my=cy-rect.top;
-    const ca=chart.chartArea;
-    if(mx<ca.left||mx>ca.right||my<ca.top||my>ca.bottom){
-      chart._cx=null;chart._cy=null;chart.update('none');ztt.style.display='none';return;
-    }
+    const cx=(e.clientX||e.touches?.[0]?.clientX)||0,cy=(e.clientY||e.touches?.[0]?.clientY)||0;
+    const mx=cx-rect.left,my=cy-rect.top,ca=chart.chartArea;
+    if(mx<ca.left||mx>ca.right||my<ca.top||my>ca.bottom){chart._cx=null;chart._cy=null;chart.update('none');ztt.style.display='none';return;}
     chart._cx=mx;chart._cy=my;chart.update('none');
     const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
     if(!pts.length){ztt.style.display='none';return;}
-    const i=pts[0].index;
-    const price=chart.data.datasets[0].data[i];
+    const i=pts[0].index,price=chart.data.datasets[0].data[i];
     if(price==null){ztt.style.display='none';return;}
     document.getElementById('ztt-date').textContent=chart.data.labels[i]||'';
     const pe=document.getElementById('ztt-price');pe.textContent='$'+price.toFixed(2);pe.style.color=G;
     document.getElementById('ztt-fibs').innerHTML=
-      Object.entries(_fibs)
-      .map(([lvl,fp])=>({lvl,fp,dist:Math.abs(price-fp)}))
-      .sort((a,b)=>a.dist-b.dist).slice(0,3)
-      .map(({lvl,fp})=>{
-        const d=((price-fp)/fp*100),col=d>=0?GR:RD,near=Math.abs(d)<2.5?'◀':'';
-        return`<div class="zr"><span style="color:${FIB_COLORS[parseFloat(lvl)]||SL}">Fib ${lvl}</span><b>$${fp.toFixed(2)}</b><em style="color:${col}">${d>=0?'+':''}${d.toFixed(1)}% ${near}</em></div>`;
+      Object.entries(_fibs).map(([lvl,fp])=>({lvl,fp,d:Math.abs(price-fp)}))
+      .sort((a,b)=>a.d-b.d).slice(0,3)
+      .map(({lvl,fp})=>{const d=((price-fp)/fp*100),c=d>=0?GR:RD;
+        return`<div class="zr"><span style="color:${FIB_COLORS[parseFloat(lvl)]||SL}">Fib ${lvl}</span><b>$${fp.toFixed(2)}</b><em style="color:${c}">${d>=0?'+':''}${d.toFixed(1)}%</em></div>`;
       }).join('');
-    const wr=wrap.getBoundingClientRect();
-    const tw=ztt.offsetWidth||180,th2=ztt.offsetHeight||180;
+    const wr=wrap.getBoundingClientRect(),tw=ztt.offsetWidth||180,th2=ztt.offsetHeight||180;
     let lx=mx+14,ty=my-th2/2;
-    if(lx+tw>wr.width-4)lx=mx-tw-14;
-    if(ty<0)ty=0;if(ty+th2>wr.height)ty=wr.height-th2;
+    if(lx+tw>wr.width-4)lx=mx-tw-14;if(ty<0)ty=0;if(ty+th2>wr.height)ty=wr.height-th2;
     ztt.style.left=lx+'px';ztt.style.top=ty+'px';ztt.style.display='block';
   }
   function onL(){chart._cx=null;chart._cy=null;chart.update('none');setTimeout(()=>{ztt.style.display='none';},180);}
@@ -689,103 +895,81 @@ function bindTooltip(chart,canvas){
   canvas.addEventListener('touchend',()=>setTimeout(onL,1500));
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    CHART RENDERS
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
+function pad(a,n=8){return[...(a||[]),...Array(n).fill(null)];}
+
 function renderPriceChart(s){
   if(cP)cP.destroy();
   _fibs=s.fibs;
-  const PAD=8;
-  const n=s.closes.length;
+  const PAD=8,n=s.closes.length;
   const padL=[...s.labels,...Array(PAD).fill('')];
-  const pd=a=>[...(a||[]),...Array(PAD).fill(null)];
-
-  const fibDS=Object.entries(FIB_COLORS)
-    .filter(([rv])=>parseFloat(rv)>0&&parseFloat(rv)<1)
-    .map(([rv,col])=>({
-      label:'Fib '+rv,data:pd(Array(n).fill(s.fibs[parseFloat(rv)])),
-      borderColor:col+'88',borderWidth:1.5,borderDash:[6,5],
-      pointRadius:0,fill:false,tension:0,spanGaps:false
-    }));
-
+  const fibDS=Object.entries(FIB_COLORS).filter(([rv])=>parseFloat(rv)>0&&parseFloat(rv)<1)
+    .map(([rv,col])=>({label:'Fib '+rv,data:pad(Array(n).fill(s.fibs[parseFloat(rv)]),PAD),borderColor:col+'88',borderWidth:1.5,borderDash:[6,5],pointRadius:0,fill:false,tension:0,spanGaps:false}));
   const ds=[
-    {label:'ZEC',data:pd(s.closes),borderColor:G,borderWidth:2.5,
-     pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:G,pointHoverBorderColor:'#0a0a0b',pointHoverBorderWidth:2,
-     fill:false,tension:.3,spanGaps:false},
-    {label:'EMA 50',data:pd(s.e50arr),borderColor:BL+'cc',borderWidth:2,
-     pointRadius:0,fill:false,tension:.4,borderDash:[8,4],spanGaps:false},
+    {label:'ZEC',data:pad(s.closes,PAD),borderColor:G,borderWidth:2.5,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:G,fill:false,tension:.3,spanGaps:false},
+    {label:'EMA 50',data:pad(s.e50arr,PAD),borderColor:BL+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[8,4],spanGaps:false},
     ...fibDS
   ];
+  /* Daily: EMA 200, EMA 500 */
   if(s.tf==='daily'&&s.e500sl){
-    ds.splice(2,0,{label:'EMA 500',data:pd(s.e500sl),borderColor:PU+'cc',borderWidth:2,
-      pointRadius:0,fill:false,tension:.4,borderDash:[3,6],spanGaps:false});
-    ds.splice(3,0,{label:'EMA 200',data:pd(s.e200arr),borderColor:'#f47244bb',borderWidth:1.8,
-      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
+    ds.splice(2,0,{label:'EMA 500',data:pad(s.e500sl,PAD),borderColor:PU+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[3,6],spanGaps:false});
+    ds.splice(3,0,{label:'EMA 200',data:pad(s.e200arr,PAD),borderColor:'#f47244bb',borderWidth:1.6,pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
   }
+  /* Weekly: EMA 20w, EMA 200w (institutional) */
   if(s.tf==='weekly'){
-    ds.splice(2,0,{label:'EMA 20s',data:pd(s.e20arr),borderColor:PU+'cc',borderWidth:2,
-      pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
+    ds.splice(2,0,{label:'EMA 20s',data:pad(s.e20arr,PAD),borderColor:PU+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
+    /* EMA 200 weekly — needs to be computed for weekly closes length */
+    const wData=aggWeekly(raw);
+    const wE200=calcEMA(wData.closes,Math.min(200,wData.closes.length-2));
+    ds.splice(3,0,{label:'EMA 200s',data:pad(wE200,PAD),borderColor:TEAL+'cc',borderWidth:2,pointRadius:0,fill:false,tension:.4,borderDash:[4,5],spanGaps:false});
   }
-
   const canvas=document.getElementById('cPrice');
   cP=new Chart(canvas,{type:'line',data:{labels:padL,datasets:ds},options:{
     responsive:true,maintainAspectRatio:false,animation:false,
     interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:false},tooltip:{enabled:false},
-      zoom:{zoom:{wheel:{enabled:true,speed:0.08},pinch:{enabled:true},mode:'x'},
-            pan:{enabled:true,mode:'x'},limits:{x:{minRange:10}}},
+      zoom:{zoom:{wheel:{enabled:true,speed:0.08},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:10}}},
       crosshair:{}},
-    scales:{
-      x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-      y:{ticks:{color:TICK,font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:GRID}}
-    }
+    scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
+            y:{ticks:{color:TICK,font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:GRID}}}
   }});
-  bindTooltip(cP,canvas);
-
+  bindTT(cP,canvas);
   const li=s.tf==='daily'
     ?[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 500'],['#f47244','EMA 200'],[AM,'Fib .382'],[GR,'Fib .618']]
-    :[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 20s'],[AM,'Fib .382'],[GR,'Fib .618']];
+    :[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 20s'],[TEAL,'EMA 200s ★'],[AM,'Fib .382'],[GR,'Fib .618']];
   document.getElementById('pchart-leg').innerHTML=li.map(([c,l])=>
-    `<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)">
-      <span style="width:16px;height:2.5px;background:${c};display:inline-block;border-radius:1px"></span>${l}
-    </span>`).join('');
-  document.getElementById('pchart-title').textContent=s.tf==='daily'
-    ?'Precio · EMA 50 · EMA 200 · EMA 500 · Fibonacci'
-    :'Precio semanal · EMA 20s · EMA 50s · Fibonacci';
+    `<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:16px;height:2.5px;background:${c};display:inline-block;border-radius:1px"></span>${l}</span>`).join('');
+  document.getElementById('pchart-title').textContent=s.tf==='daily'?'Precio · EMA 50/200/500 · Fibonacci':'Precio semanal · EMA 20s · EMA 200s (institucional) · Fibonacci';
   document.getElementById('fib-hl2').textContent='H $'+s.fibHi.toFixed(2)+' · L $'+s.fibLo.toFixed(2);
 }
 
 function renderRSI(s){
   if(cR)cR.destroy();
   const n=s.closes.length;
-  const RSIZone={
-    id:'rsizone',
-    beforeDraw(ch){
-      const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=ch;
-      if(!y)return;
-      const y70=y.getPixelForValue(70),y30=y.getPixelForValue(30);
-      ctx.save();
-      ctx.fillStyle='rgba(248,113,113,0.09)';ctx.fillRect(left,top,right-left,y70-top);
-      ctx.fillStyle='rgba(74,222,128,0.09)';ctx.fillRect(left,y30,right-left,bottom-y30);
-      ctx.font='bold 9px Courier New';ctx.textAlign='right';
-      ctx.fillStyle='rgba(248,113,113,0.75)';ctx.fillText('SOBRECOMPRA 70',right-4,y70-4);
-      ctx.fillStyle='rgba(74,222,128,0.75)';ctx.fillText('SOBREVENTA 30',right-4,y30+11);
-      ctx.restore();
-    }
-  };
-  cR=new Chart(document.getElementById('cRSI'),{
-    type:'line',
+  const ZP={id:'rsizone',beforeDraw(ch){
+    const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=ch;if(!y)return;
+    const y70=y.getPixelForValue(70),y30=y.getPixelForValue(30);
+    ctx.save();
+    ctx.fillStyle='rgba(240,96,96,0.09)';ctx.fillRect(left,top,right-left,y70-top);
+    ctx.fillStyle='rgba(63,214,114,0.09)';ctx.fillRect(left,y30,right-left,bottom-y30);
+    ctx.font='bold 9px Courier New';ctx.textAlign='right';
+    ctx.fillStyle='rgba(240,96,96,0.78)';ctx.fillText('SOBRECOMPRA 70',right-4,y70-4);
+    ctx.fillStyle='rgba(63,214,114,0.78)';ctx.fillText('SOBREVENTA 30',right-4,y30+11);
+    ctx.restore();
+  }};
+  cR=new Chart(document.getElementById('cRSI'),{type:'line',
     data:{labels:s.labels,datasets:[
       {data:s.rsiArr,borderColor:G,borderWidth:2,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:G,fill:false,tension:.35},
       {data:Array(n).fill(70),borderColor:RD,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
       {data:Array(n).fill(30),borderColor:GR,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
       {data:Array(n).fill(50),borderColor:'#38383e',borderWidth:1,pointRadius:0,fill:false},
-    ]},
-    plugins:[RSIZone],
+    ]},plugins:[ZP],
     options:{responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},rsizone:{},
-        tooltip:{enabled:true,backgroundColor:'#0d0d11',borderColor:G+'55',borderWidth:1,
+        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'55',borderWidth:1,
           titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:12},
           callbacks:{title:i=>i[0]?.label||'',label:i=>{const v=i.raw;if(v===70||v===30||v===50)return null;return' RSI: '+v?.toFixed(1);}}}},
       scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
@@ -798,95 +982,118 @@ function renderRSI(s){
 
 function renderMACD(s){
   if(cM)cM.destroy();
-  const PAD=8;
-  const padL=[...s.labels,...Array(PAD).fill('')];
-  const pd=a=>[...(a||[]),...Array(PAD).fill(null)];
+  const PAD=8,padL=[...s.labels,...Array(PAD).fill('')];
   const{macd,signal,hist}=s.macdData;
-  const histColors=[...hist.map((v,i)=>{
-    if(v===null)return'transparent';
-    const bull=v>=0;
-    const prev=hist[i-1];
-    const strong=prev!==null&&((bull&&v>prev)||(!bull&&v<prev));
-    return bull?(strong?GR:GR+'66'):(strong?RD:RD+'66');
-  }),...Array(PAD).fill('transparent')];
-
-  cM=new Chart(document.getElementById('cMACD'),{
-    type:'bar',
+  const hcol=[...hist.map((v,i)=>{if(v===null)return'transparent';const bull=v>=0,prev=hist[i-1];const str=prev!==null&&((bull&&v>prev)||(!bull&&v<prev));return bull?(str?GR:GR+'66'):(str?RD:RD+'66');}),
+    ...Array(PAD).fill('transparent')];
+  cM=new Chart(document.getElementById('cMACD'),{type:'bar',
     data:{labels:padL,datasets:[
-      {type:'line',label:'MACD',data:pd(macd),borderColor:BL,borderWidth:1.8,pointRadius:0,fill:false,tension:.3,order:1,spanGaps:false},
-      {type:'line',label:'Señal',data:pd(signal),borderColor:RD,borderWidth:1.5,pointRadius:0,fill:false,tension:.3,borderDash:[4,3],order:2,spanGaps:false},
-      {type:'bar',label:'Hist',data:pd(hist),backgroundColor:histColors,borderColor:'transparent',order:3},
+      {type:'line',label:'MACD',data:pad(macd,PAD),borderColor:BL,borderWidth:1.8,pointRadius:0,fill:false,tension:.3,order:1,spanGaps:false},
+      {type:'line',label:'Señal',data:pad(signal,PAD),borderColor:RD,borderWidth:1.5,pointRadius:0,fill:false,tension:.3,borderDash:[4,3],order:2,spanGaps:false},
+      {type:'bar',label:'Hist',data:pad(hist,PAD),backgroundColor:hcol,borderColor:'transparent',order:3},
     ]},
     options:{responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},
-        tooltip:{enabled:true,backgroundColor:'#0d0d11',borderColor:BL+'44',borderWidth:1,
-          titleColor:TICK,bodyColor:BL,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:BL+'44',borderWidth:1,titleColor:TICK,bodyColor:BL,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
           callbacks:{title:i=>i[0]?.label||'',label:i=>i.datasetIndex===2?null:' '+i.dataset.label+': '+i.parsed.y?.toFixed(3)}}},
       scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
               y:{ticks:{color:TICK,font:{size:10}},grid:{color:GRID}}}
     }
   });
-  const mc=macd[macd.length-1],sc=signal[signal.length-1];
+  const mc=macd[macd.length-1],sc2=signal[signal.length-1];
   const tag=document.getElementById('macd-tag');
-  if(mc!==null&&sc!==null){
-    tag.textContent=s.macdCross?'▲ Cruce alcista reciente':s.macdAbove?'MACD sobre señal':'MACD bajo señal';
-    tag.style.color=s.macdCross?GR:s.macdAbove?'#86efac':RD;
+  if(mc!==null&&sc2!==null){
     if(s.macdBullish){tag.textContent='▲▲ Cruce alcista bajo cero — señal fuerte';tag.style.color=GR;}
+    else if(s.macdCross){tag.textContent='▲ Cruce alcista reciente';tag.style.color='#5ecc7b';}
+    else if(s.macdAbove){tag.textContent='MACD sobre señal (+'+(mc-sc2).toFixed(3)+')';tag.style.color='#5ecc7b';}
+    else{tag.textContent='MACD bajo señal ('+(mc-sc2).toFixed(3)+')';tag.style.color=RD;}
   }
 }
 
 function renderOBV(s){
   if(cO)cO.destroy();
-  const PAD=8;
-  const padL=[...s.labels,...Array(PAD).fill('')];
-  const obvM=[...s.obvArr.map(v=>v/1e6),...Array(PAD).fill(null)];
-  cO=new Chart(document.getElementById('cOBV'),{
-    type:'line',
-    data:{labels:padL,datasets:[{
-      data:obvM,borderColor:s.obvRising?GR:RD,borderWidth:1.8,
-      pointRadius:0,fill:true,
-      backgroundColor:s.obvRising?'rgba(74,222,128,0.06)':'rgba(248,113,113,0.06)',
-      tension:.3,spanGaps:false
-    }]},
+  const PAD=8,padL=[...s.labels,...Array(PAD).fill('')];
+  cO=new Chart(document.getElementById('cOBV'),{type:'line',
+    data:{labels:padL,datasets:[{data:pad(s.obvArr.map(v=>v/1e6),PAD),borderColor:s.obvRising?GR:RD,borderWidth:1.8,pointRadius:0,fill:true,backgroundColor:s.obvRising?'rgba(63,214,114,0.06)':'rgba(240,96,96,0.06)',tension:.3,spanGaps:false}]},
     options:{responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},
-        tooltip:{enabled:true,backgroundColor:'#0d0d11',borderColor:GR+'44',borderWidth:1,
-          titleColor:TICK,bodyColor:s.obvRising?GR:RD,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:GR+'44',borderWidth:1,titleColor:TICK,bodyColor:s.obvRising?GR:RD,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
           callbacks:{title:i=>i[0]?.label||'',label:i=>' OBV: '+i.parsed.y?.toFixed(2)+'M'}}},
       scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
               y:{ticks:{color:TICK,font:{size:10},callback:v=>v.toFixed(0)+'M'},grid:{color:GRID}}}
     }
   });
-  document.getElementById('obv-tag').textContent=s.obvRising?'Acumulación activa ↑':'Distribución / salida ↓';
+  document.getElementById('obv-tag').textContent=s.obvRising?`Acumulación activa ↑ · Semanal: ${s.wObvRising?'↑':'↓'}`:`Distribución ↓ · Semanal: ${s.wObvRising?'↑':'↓'}`;
   document.getElementById('obv-tag').style.color=s.obvRising?GR:RD;
 }
 
-function renderConfluence(s){
-  function fillCard(idPfx,sc,detail){
-    document.getElementById(idPfx+'-detail').textContent=detail;
-    document.getElementById(idPfx+'-sig').textContent=sc.sig;
-    document.getElementById(idPfx+'-sig').style.color=sc.col;
-    document.getElementById(idPfx+'-fill').style.cssText=`height:100%;border-radius:2px;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col};transition:width .6s`;
-    document.getElementById(idPfx+'-lbl').textContent=sc.p+' de '+sc.t+' condiciones';
-  }
-  fillCard('cf-d',s.confD,
-    `RSI ${s.confD.rsi?.toFixed(1)||'—'} · MACD ${s.confD.macdAbove?'↑':'↓'} · OBV ${s.confD.obvRising?'↑':'↓'}`);
-  fillCard('cf-w',s.confW,
-    `RSI ${s.confW.rsi?.toFixed(1)||'—'} · MACD ${s.confW.macdAbove?'↑':'↓'} · OBV ${s.confW.obvRising?'↑':'↓'}`);
+/* ═══════════════════════════════════════════════
+   PANEL RENDERS
+═══════════════════════════════════════════════ */
+function renderHalving(s){
+  const h=s.halvInfo;
+  document.getElementById('hv-days').textContent=h.daysSince;
+  document.getElementById('hv-days').style.color=h.phaseColor;
+  document.getElementById('hv-next').textContent=h.daysToNext+' días restantes';
+  document.getElementById('hv-phase').textContent=h.phase;
+  document.getElementById('hv-phase').style.color=h.phaseColor;
+  document.getElementById('hv-phase-s').textContent=h.halvingPhaseKey==='accumulation'?'✓ Fase de compra':'';
+  document.getElementById('hv-pct').textContent=(h.pct*100).toFixed(1)+'% del ciclo';
+  document.getElementById('hv-bar').style.cssText=`height:100%;border-radius:3px;width:${(h.pct*100).toFixed(1)}%;background:${h.phaseColor}`;
+  document.getElementById('hv-note').textContent=h.phaseNote;
+  document.getElementById('halving-card').style.borderColor=h.phaseColor+'44';
+}
 
-  const total=s.confD.p+s.confW.p,maxT=s.confD.t+s.confW.t;
-  const pct=Math.round(total/maxT*100);
+function renderMcap(s){
+  const price=s.cur;
+  const mcap=liveMcap?.mcap||(price*ZEC_SUPPLY);
+  const totalMcap=liveMcap?.totalMcap||0;
+  const supply=liveMcap?.supply||ZEC_SUPPLY;
+  const dom=totalMcap>0?mcap/totalMcap:null;
+
+  const fmt=v=>{if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';return'$'+v.toFixed(0);}; 
+
+  document.getElementById('mc-zec').textContent=fmt(mcap);
+  document.getElementById('mc-zec-s').textContent='~'+Math.round(supply/1e6)+'M ZEC · $'+price.toFixed(2);
+
+  if(totalMcap>0){
+    document.getElementById('mc-total').textContent=fmt(totalMcap);
+    document.getElementById('mc-dom').textContent=`ZEC dominancia: ${dom?(dom*100).toFixed(3):'~0.15'}%`;
+    const d=dom||0.0015;
+    const p18t=1.8e12*d/supply;
+    const p2t=2e12*d/supply;
+    document.getElementById('mc-18t').textContent='$'+p18t.toFixed(2);
+    document.getElementById('mc-2t').textContent='$'+p2t.toFixed(2);
+  }else{
+    /* Fallback: use approximate 0.15% dominance */
+    const d=0.0015;
+    document.getElementById('mc-total').textContent='Calculando...';
+    document.getElementById('mc-dom').textContent='dominancia aprox. ~0.15%';
+    document.getElementById('mc-18t').textContent='$'+(1.8e12*d/supply).toFixed(2);
+    document.getElementById('mc-2t').textContent='$'+(2e12*d/supply).toFixed(2);
+  }
+}
+
+function renderConfluence(s){
+  function fill(pfx,sc,detail){
+    document.getElementById(pfx+'-detail').textContent=detail;
+    document.getElementById(pfx+'-sig').textContent=sc.sig;document.getElementById(pfx+'-sig').style.color=sc.col;
+    document.getElementById(pfx+'-fill').style.cssText=`height:100%;border-radius:2px;width:${(sc.pct*100).toFixed(0)}%;background:${sc.col};transition:width .6s`;
+    document.getElementById(pfx+'-lbl').textContent=sc.earned+' de '+sc.max+' pts';
+  }
+  fill('cf-d',s.confD,`RSI ${s.rsiC?.toFixed(1)||'—'} · MACD ${s.macdAbove?'↑':'↓'} · OBV ${s.obvRising?'↑':'↓'}`);
+  fill('cf-w',s.confW,`RSI ${s.wRsiC?.toFixed(1)||'—'} · MACD ${s.wMacdAbove?'↑':'↓'} · OBV ${s.wObvRising?'↑':'↓'}`);
+  const avg=(s.confD.pct+s.confW.pct)/2;
+  const pct=Math.round(avg*100);
   let verdict,col,note;
-  if(pct>=80){verdict='Confluencia muy alta';col=GR;note='Ambos timeframes alineados alcistas — señal de alta confianza';}
-  else if(pct>=62){verdict='Confluencia buena';col='#86efac';note='Mayoría de condiciones activas en diario y semanal';}
-  else if(pct>=44){verdict='Confluencia parcial';col=AM;note='Timeframes divergentes — señal de confianza media';}
-  else{verdict='Sin confluencia';col=SL;note='Diario y semanal no coinciden — mejor esperar alineación';}
-  document.getElementById('cf-total').textContent=pct+'%';
-  document.getElementById('cf-total').style.color=col;
-  document.getElementById('cf-verdict').textContent=verdict;
-  document.getElementById('cf-verdict').style.color=col;
+  if(pct>=78){verdict='Confluencia muy alta';col=GR;note='Ambos timeframes alcistas — señal de alta confianza';}
+  else if(pct>=56){verdict='Confluencia buena';col='#5ecc7b';note='Mayoría de condiciones alineadas en D y S';}
+  else if(pct>=38){verdict='Confluencia parcial';col=AM;note='Timeframes divergentes — señal de confianza media';}
+  else{verdict='Sin confluencia';col=SL;note='Diario y semanal no coinciden — esperar alineación';}
+  document.getElementById('cf-total').textContent=pct+'%';document.getElementById('cf-total').style.color=col;
+  document.getElementById('cf-verdict').textContent=verdict;document.getElementById('cf-verdict').style.color=col;
   document.getElementById('cf-note').textContent=note;
   document.getElementById('conf-card').style.borderColor=col+'44';
 }
@@ -895,13 +1102,12 @@ function renderFibRet(s){
   const labels={0:'0 · Mínimo',.236:'0.236',.382:'0.382 ★',.5:'0.5',.618:'0.618 ★★',.786:'0.786 ★',1:'1 · Máximo'};
   document.getElementById('fib-hl').textContent=fibWindow==='peak'
     ?'H $'+PEAK_HI.toFixed(2)+' (10 nov 2025) · L $'+PEAK_LO.toFixed(2)+' (29 sep 2025)'
-    :'H $'+s.fibHi.toFixed(2)+' · L $'+s.fibLo.toFixed(2)+' (últimos '+fibWindow+'d)';
-
+    :'H $'+s.fibHi.toFixed(2)+' · L $'+s.fibLo.toFixed(2)+' ('+fibWindow+'d)';
   document.getElementById('fib-ret').innerHTML=Object.entries(s.fibs).map(([lvl,price])=>{
     const fl=parseFloat(lvl),col=FIB_COLORS[fl]||SL;
     const dist=((s.cur-price)/price*100),isNear=Math.abs(dist)<3;
-    const isMacroKey=fibWindow==='peak'&&(fl===0.618||fl===0.786||fl===0.382);
-    return`<div style="background:${isNear?col+'22':isMacroKey?col+'0f':'var(--card2)'};border:1px solid ${isNear?col+'77':isMacroKey?col+'44':col+'22'};border-radius:9px;padding:8px 7px;min-width:0;transition:all .3s">
+    const isMacro=fibWindow==='peak'&&(fl===.618||fl===.786||fl===.382);
+    return`<div style="background:${isNear?col+'22':isMacro?col+'0e':'var(--card2)'};border:1px solid ${isNear?col+'77':isMacro?col+'44':col+'22'};border-radius:9px;padding:8px 7px;min-width:0;transition:all .3s">
       <div style="font-size:8px;color:${col};letter-spacing:.03em;margin-bottom:4px;line-height:1.3;word-break:break-all">${labels[fl]||'Fib '+lvl}</div>
       <div class="mono" style="font-size:11px;color:var(--text)">$${price.toFixed(2)}</div>
       <div style="font-size:9px;font-family:'Courier New',monospace;color:${dist>=0?GR:RD};margin-top:3px">${dist>=0?'+':''}${dist.toFixed(1)}%</div>
@@ -913,35 +1119,49 @@ function renderFibRet(s){
 function renderExtensions(s){
   const EC={'1.0':'#94a3b8','1.272':BL,'1.414':PU,'1.618':GR,'2.0':AM,'2.618':RD};
   document.getElementById('fib-ext').innerHTML=Object.entries(s.exts).map(([rv,p])=>{
-    const c=EC[rv]||SL,pct=((p-s.cur)/s.cur*100);
+    const c=EC[rv]||SL,pct2=((p-s.cur)/s.cur*100);
     return`<div style="background:var(--card2);border:1px solid ${c}33;border-radius:9px;padding:8px 10px">
       <div style="font-size:9px;color:${c};letter-spacing:.06em;margin-bottom:4px">Fib ${rv}</div>
       <div class="mono" style="font-size:13px;color:var(--text)">$${p.toFixed(2)}</div>
-      <div style="font-size:9px;color:${SL};margin-top:2px">+${pct.toFixed(0)}%</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px">+${pct2.toFixed(0)}%</div>
     </div>`;
   }).join('');
 }
 
 function renderConds(s){
-  const sc=s.scoreResult;
-  document.getElementById('conditions').innerHTML=sc.conds.map(c=>
-    `<div class="cond-row">
-      <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${c.ok?GR:SL}"></div>
-      <span style="font-size:13px;color:${c.ok?'var(--text)':'#444450'}">${c.l}</span>
-      <span style="margin-left:auto;font-size:11px;color:${c.ok?GR:SL};letter-spacing:.04em">${c.ok?'activa':'—'}</span>
-    </div>`).join('');
-  document.getElementById('cond-bar').style.cssText=`height:100%;border-radius:2px;transition:width .6s,background .6s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
-  document.getElementById('score-lbl').textContent=sc.p+' de '+sc.t+' condiciones activas';
+  const sc=s.sc;
+  const catColors={Macro:TEAL,Momentum:AM,Confirma:SL};
+  const catLabels={Macro:'Macro/Institucional',Momentum:'Momentum',Confirma:'Confirmadores'};
+  let lastCat='';
+  document.getElementById('conditions').innerHTML=s.conds.map(c=>{
+    let header='';
+    if(c.cat!==lastCat){
+      lastCat=c.cat;
+      header=`<div style="font-size:9px;letter-spacing:.1em;color:${catColors[c.cat]||SL};text-transform:uppercase;padding:10px 0 4px;opacity:.8">${catLabels[c.cat]||c.cat}</div>`;
+    }
+    const wcolor=c.w>=2?'#C9A84C':'var(--muted)';
+    return`${header}<div class="cond-row">
+      <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${c.ok?c.col||GR:SL};${c.ok?'box-shadow:0 0 6px '+c.col+'66':''}" ></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:${c.ok?'var(--text)':'#444450'};line-height:1.3">${c.l}</div>
+        <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+        <span class="wbadge" style="background:${c.ok?c.col+'22':'var(--b2)'};color:${c.ok?c.col:SL}">
+          ${c.ok?'+':' '}${c.w}pt${c.w>1?'s':''}
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('cond-bar').style.cssText=`height:100%;border-radius:2px;transition:width .6s,background .6s;width:${(sc.pct*100).toFixed(0)}%;background:${sc.col}`;
+  document.getElementById('score-lbl').textContent=sc.earned+' pts activos de '+sc.max+' posibles ('+Math.round(sc.pct*100)+'%)';
+  document.getElementById('w-score-detail').textContent='Macro=3pt · Momentum=2pt · Confirma=1pt';
 }
 
 function renderRR(s){
-  const entryEl=document.getElementById('rr-entry');
-  const stopEl=document.getElementById('rr-stop');
-  if(!entryEl.value)entryEl.value=s.cur.toFixed(2);
-  if(!stopEl.value){
-    stopEl.value=s.swingStop.toFixed(2);
-    document.getElementById('rr-stop-note').textContent='Auto: último swing low de los últimos 30 días';
-  }
+  const eEl=document.getElementById('rr-entry'),sEl=document.getElementById('rr-stop');
+  if(!eEl.value)eEl.value=s.cur.toFixed(2);
+  if(!sEl.value){sEl.value=s.swingStop.toFixed(2);document.getElementById('rr-stop-note').textContent='Auto: último swing low 30 días';}
   calcRR();
 }
 
@@ -951,35 +1171,26 @@ function calcRR(){
   const stop=parseFloat(document.getElementById('rr-stop').value)||stats.swingStop;
   const risk=entry-stop;
   const riskEl=document.getElementById('rr-risk');
-  if(risk<=0){
-    riskEl.textContent='⚠ El stop debe estar por debajo del precio de entrada';
-    riskEl.style.color=RD;
-    document.getElementById('rr-targets').innerHTML='';
-    return;
-  }
-  const riskPct=((risk/entry)*100);
-  riskEl.textContent=`Riesgo por unidad: $${risk.toFixed(2)} (${riskPct.toFixed(1)}%) · Stop en $${stop.toFixed(2)}`;
+  if(risk<=0){riskEl.textContent='⚠ Stop debe estar por debajo de la entrada';riskEl.style.color=RD;document.getElementById('rr-targets').innerHTML='';return;}
+  riskEl.textContent=`Riesgo: $${risk.toFixed(2)} (${((risk/entry)*100).toFixed(1)}%) · Stop en $${stop.toFixed(2)}`;
   riskEl.style.color='var(--muted)';
   const EC={'1.0':'#94a3b8','1.272':BL,'1.414':PU,'1.618':GR,'2.0':AM,'2.618':RD};
   document.getElementById('rr-targets').innerHTML=Object.entries(stats.exts).map(([rv,target])=>{
-    const reward=target-entry;
-    if(reward<=0)return'';
-    const rr=reward/risk;
-    const col=rr>=3?GR:rr>=2?'#86efac':rr>=1?AM:RD;
-    const label=rr>=3?'Excelente':rr>=2?'Bueno':rr>=1?'Aceptable':'Bajo';
+    const reward=target-entry;if(reward<=0)return'';
+    const rr=reward/risk,col=rr>=3?GR:rr>=2?'#5ecc7b':rr>=1?AM:RD;
     return`<div style="background:var(--card2);border:1px solid ${EC[rv]||SL}33;border-radius:9px;padding:9px 10px">
       <div style="font-size:9px;color:${EC[rv]||SL};margin-bottom:4px">Fib ${rv}</div>
-      <div class="mono" style="font-size:13px;color:var(--text);margin-bottom:4px">$${target.toFixed(2)}</div>
-      <div style="font-size:12px;font-family:'Courier New',monospace;color:${col};font-weight:500">R:R ${rr.toFixed(1)}</div>
-      <div style="font-size:9px;color:${col};margin-top:2px">${label}</div>
+      <div class="mono" style="font-size:12px;color:var(--text);margin-bottom:4px">$${target.toFixed(2)}</div>
+      <div style="font-size:13px;font-family:'Courier New',monospace;color:${col};font-weight:500">R:R ${rr.toFixed(1)}</div>
+      <div style="font-size:9px;color:${col};margin-top:1px">${rr>=3?'Excelente':rr>=2?'Bueno':rr>=1?'Aceptable':'Bajo'}</div>
     </div>`;
   }).filter(Boolean).join('');
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    RENDER ALL
-═══════════════════════════════════════════ */
-function updatePriceDisplay(cur,chg){
+═══════════════════════════════════════════════ */
+function updateHeader(cur,chg){
   document.getElementById('price-main').textContent='$'+cur.toFixed(2);
   const ce=document.getElementById('price-chg');
   ce.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'% (24h)';
@@ -987,79 +1198,54 @@ function updatePriceDisplay(cur,chg){
 }
 
 function renderAll(s){
-  const sc=s.scoreResult;
-
-  /* Header */
-  updatePriceDisplay(s.cur,s.chg);
+  updateHeader(s.cur,s.chg);
   if(s.e500c)document.getElementById('ema500-note').textContent=
-    `EMA 500: $${s.e500c.toFixed(2)} — precio ${s.e500d>=0?'+':''}${s.e500d.toFixed(1)}% respecto a la media de 500 días`;
+    `EMA 500: $${s.e500c.toFixed(2)} — precio ${s.e500d>=0?'+':''}${s.e500d.toFixed(1)}% vs media 500 días${s.wE200c?' · EMA 200s: $'+s.wE200c.toFixed(2):''}`;
 
-  /* Badge */
+  const sc=s.sc;
   const b=document.getElementById('sig-badge');
-  b.textContent=sc.sig+' · '+sc.p+' de '+sc.t;
-  b.style.cssText=`padding:7px 20px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
-
-  /* Score bar */
-  document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
+  b.textContent=sc.sig+' · '+Math.round(sc.pct*100)+'%';
+  b.style.cssText=`padding:7px 18px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
+  document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.pct*100).toFixed(0)}%;background:${sc.col}`;
+  document.getElementById('score-pts').textContent=sc.sig;document.getElementById('score-pts').style.color=sc.col;
+  document.getElementById('score-max').textContent=sc.earned+'/'+sc.max+' pts ponderados';
   document.getElementById('upd-time').textContent='Actualizado '+new Date().toLocaleTimeString('es-CO');
 
-  /* Metric cards */
-  const r=s.rsiC,rc=r<30?GR:r<45?'#86efac':r>70?RD:'var(--text)';
-  document.getElementById('m-rsi').textContent=r!==null?r.toFixed(1):'—';
-  document.getElementById('m-rsi').style.color=rc;
+  const r=s.rsiC,rc=r<30?GR:r<45?'#5ecc7b':r>70?RD:'var(--text)';
+  document.getElementById('m-rsi').textContent=r!==null?r.toFixed(1):'—';document.getElementById('m-rsi').style.color=rc;
   document.getElementById('m-rsi-s').textContent=r<30?'Sobreventa':r<45?'Zona de compra':r>70?'Sobrecompra':'Neutral';
-
-  document.getElementById('m-fib').textContent=s.nFib.toString();
-  document.getElementById('m-fib').style.color=s.fibZone?GR:'var(--text)';
+  document.getElementById('m-fib').textContent=s.nFib.toString();document.getElementById('m-fib').style.color=s.fibZone?GR:'var(--text)';
   document.getElementById('m-fib-s').textContent=s.fibZone?'En zona soporte':'Fuera de zona';
-
   if(s.tf==='weekly'){
     document.getElementById('ema-lbl').textContent='vs EMA 20s';
-    const dW=s.e20c?((s.cur-s.e20c)/s.e20c*100):null;
-    document.getElementById('m-ema').textContent=dW!==null?(dW>=0?'+':'')+dW.toFixed(1)+'%':'—';
-    document.getElementById('m-ema').style.color=dW>=0?GR:RD;
-    document.getElementById('m-ema-s').textContent=dW>=0?'Sobre EMA 20s':'Bajo EMA 20s';
-    document.getElementById('ema-card').style.borderColor='var(--b1)';
+    const d=s.e20c?((s.cur-s.e20c)/s.e20c*100):null;
+    document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';document.getElementById('m-ema').style.color=d>=0?GR:RD;
+    document.getElementById('m-ema-s').textContent=d>=0?'Sobre EMA 20s':'Bajo EMA 20s';document.getElementById('ema-card').style.borderColor='var(--b1)';
   }else{
     document.getElementById('ema-lbl').textContent='vs EMA 500';
     document.getElementById('m-ema').textContent=s.e500d!==null?(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'%':'—';
     document.getElementById('m-ema').style.color=s.e500d>60?AM:s.e500d>=0?GR:RD;
     document.getElementById('m-ema-s').textContent=s.e500d>60?'Muy extendido — esperar':s.e500d>20?'Tendencia macro ↑':s.e500d>-20?'Zona neutral':'Bajo EMA 500';
-    document.getElementById('ema-card').style.borderColor=s.e500d>60?AM+'66':s.e500d>=0?GR+'33':RD+'44';
+    document.getElementById('ema-card').style.borderColor=s.e500d>60?AM+'55':s.e500d>=0?GR+'33':RD+'44';
   }
-
-  document.getElementById('m-vol').textContent=s.volR.toFixed(2)+'×';
-  document.getElementById('m-vol').style.color=s.volR>=1.1?GR:s.volR>=.9?AM:RD;
+  document.getElementById('m-vol').textContent=s.volR.toFixed(2)+'×';document.getElementById('m-vol').style.color=s.volR>=1.1?GR:s.volR>=.9?AM:RD;
   document.getElementById('m-vol-s').textContent=s.volR>=1.1?'Vol en alza':s.volR>=.9?'Estable':'Cayendo';
-
-  document.getElementById('m-macro').textContent=s.macroState;
-  document.getElementById('m-macro').style.color=s.macroCol;
+  document.getElementById('m-macro').textContent=s.macroState;document.getElementById('m-macro').style.color=s.macroCol;
   document.getElementById('m-macro-s').textContent=s.e500d>60?'Esperar retroceso':s.e500d>20?'Óptimo acumular':s.e500d>-20?'Consolidando':'En desventaja';
   document.getElementById('macro-card').style.borderColor=s.macroCol+'44';
 
-  /* Divergence banner */
   const db=document.getElementById('div-banner');
-  if(s.div){
-    const iB=s.div.t==='bull';
-    db.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5;background:${iB?'#0a180a':'#180a0a'};border:1px solid ${iB?GR+'33':RD+'33'};color:${iB?GR:RD}`;
-    db.textContent=s.div.m;
-  }else{db.style.display='none';}
+  if(s.div){const iB=s.div.t==='bull';db.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;line-height:1.5;background:${iB?'#091209':'#120909'};border:1px solid ${iB?GR+'33':RD+'33'};color:${iB?GR:RD}`;db.textContent=s.div.m;}
+  else{db.style.display='none';}
 
-  /* Charts and panels */
-  renderPriceChart(s);
-  renderRSI(s);
-  renderMACD(s);
-  renderOBV(s);
-  renderConfluence(s);
-  renderFibRet(s);
-  renderExtensions(s);
-  renderConds(s);
-  renderRR(s);
+  renderPriceChart(s);renderRSI(s);renderMACD(s);renderOBV(s);
+  renderHalving(s);renderMcap(s);renderConfluence(s);
+  renderFibRet(s);renderExtensions(s);renderConds(s);renderRR(s);
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    CONTROLS
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 function zoomChart(f){if(cP)cP.zoom(f);}
 function resetZoom(){if(cP)cP.resetZoom();}
 
@@ -1067,49 +1253,42 @@ function setFibWindow(w){
   fibWindow=w;
   ['fw-30','fw-60','fw-90','fw-peak'].forEach(id=>{
     const b=document.getElementById(id);if(!b)return;
-    const active=(id==='fw-'+w)||(w==='peak'&&id==='fw-peak');
-    b.style.borderColor=active?'var(--gold)':'var(--b1)';
-    b.style.color=active?'var(--gold)':'#808088';
+    const on=(id==='fw-'+w)||(w==='peak'&&id==='fw-peak');
+    b.classList.toggle('on',on);b.style.borderColor=on?'var(--gold)':'var(--b1)';b.style.color=on?'var(--gold)':'var(--muted)';
   });
   document.getElementById('peak-banner').style.display=w==='peak'?'block':'none';
-  if(raw)rerender();
+  if(raw){stats=analyze(raw,livePrice,tf);renderAll(stats);}
 }
 
 function setTF(t){
   tf=t;
   document.getElementById('btn-d').className='tf-btn'+(t==='daily'?' on':'');
   document.getElementById('btn-w').className='tf-btn'+(t==='weekly'?' on':'');
-  /* Reset R:R inputs so they refill with correct data */
-  document.getElementById('rr-entry').value='';
-  document.getElementById('rr-stop').value='';
-  if(raw)rerender();
+  document.getElementById('rr-entry').value='';document.getElementById('rr-stop').value='';
+  if(raw){stats=analyze(raw,livePrice,tf);renderAll(stats);}
 }
 
-function rerender(){
-  stats=analyze(raw,livePrice,tf);
-  renderAll(stats);
-}
-
-/* ═══════════════════════════════════════════
-   DATA REFRESH — two-speed:
-   · Price: every 60 seconds (lightweight)
-   · Full analysis: every 5 minutes (historical data)
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   DATA REFRESH
+   · Price: every 60s (lightweight)
+   · Analysis: every 5 min (full historical)
+═══════════════════════════════════════════════ */
 async function refreshPrice(){
   const live=await fetchLive();
   if(!live)return;
-  livePrice=live.price;
-  updatePriceDisplay(live.price,live.chg24);
-  /* Re-run analysis with new live price if we have historical data */
+  livePrice=live.price;liveMcap=live;
+  updateHeader(live.price,live.chg24);
   if(raw){
     stats=analyze(raw,livePrice,tf);
-    /* Update badge and score without re-rendering all charts */
-    const sc=stats.scoreResult;
+    const sc=stats.sc;
     const b=document.getElementById('sig-badge');
-    b.textContent=sc.sig+' · '+sc.p+' de '+sc.t;
-    b.style.cssText=`padding:7px 20px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
-    document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.p/sc.t*100).toFixed(0)}%;background:${sc.col}`;
+    b.textContent=sc.sig+' · '+Math.round(sc.pct*100)+'%';
+    b.style.cssText=`padding:7px 18px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
+    document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.pct*100).toFixed(0)}%;background:${sc.col}`;
+    document.getElementById('score-pts').textContent=sc.sig;document.getElementById('score-pts').style.color=sc.col;
+    document.getElementById('score-max').textContent=sc.earned+'/'+sc.max+' pts ponderados';
     document.getElementById('upd-time').textContent='Precio: '+new Date().toLocaleTimeString('es-CO');
+    renderMcap(stats);
   }
 }
 
@@ -1117,22 +1296,20 @@ async function refresh(){
   document.getElementById('sig-badge').innerHTML='<span class="spin"></span>Cargando...';
   try{
     const[data,live]=await Promise.all([fetchHistorical(),fetchLive()]);
-    raw=data;
-    if(live)livePrice=live.price;
+    raw=data;if(live){livePrice=live.price;liveMcap=live;}
     stats=analyze(raw,livePrice,tf);
     renderAll(stats);
   }catch(e){
     document.getElementById('price-main').textContent='Error';
     document.getElementById('sig-badge').textContent='Sin conexion — reintentando...';
-    console.error('ZEC Dashboard error:',e);
+    console.error('ZEC Dashboard:',e);
     setTimeout(refresh,2*60*1000);
   }
 }
 
-/* Start */
 refresh();
-setInterval(refreshPrice,60*1000);   /* Price every 60s */
-setInterval(refresh,5*60*1000);      /* Full analysis every 5 min */
+setInterval(refreshPrice,60*1000);
+setInterval(refresh,5*60*1000);
 </script>
 </body>
 </html>
