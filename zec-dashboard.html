@@ -101,6 +101,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   .mcap-grid{grid-template-columns:1fr 1fr !important}
   .conf-grid{grid-template-columns:1fr !important}
   .zbtn-group{flex-wrap:wrap !important}
+  .obv-guide{grid-template-columns:1fr !important}
 }
 @media(max-width:380px){
   .g7{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -138,6 +139,9 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div id="upd-time" style="font-size:10px;color:var(--muted2)"></div>
   </div>
 </div>
+
+<!-- EXTENSION WARNING — shown when price is overextended -->
+<div id="ext-warn" style="display:none;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;line-height:1.6"></div>
 
 <!-- SCORE BAR -->
 <div style="margin-bottom:1rem">
@@ -252,8 +256,8 @@ input[type=number]:focus{border-color:#C9A84C55}
     <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2.5px;background:#3fd672;border-radius:1px;display:inline-block"></span>Acumulación normal</span>
   </div>
 
-  <!-- Reading guide -->
-  <div style="background:var(--card2);border-radius:8px;padding:.625rem .875rem;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  /* Reading guide */
+  <div style="background:var(--card2);border-radius:8px;padding:.625rem .875rem;display:grid;grid-template-columns:1fr 1fr;gap:8px" class="obv-guide">
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
       <span style="color:#2ec4b6;font-weight:bold">↑ Divergencia alcista:</span><br>
       Precio baja → OBV sube<br>
@@ -572,111 +576,97 @@ function aggWeekly(data){
    Institutional-weighted: macro > momentum > confirming
 ═══════════════════════════════════════════════ */
 function buildWeightedConds(params){
-  const{rsi,cur,e50c,e200c,volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi,
-        peakFibZone618,peakFibZone786,halvingPhase,wRsi,wMacdAbove,wObvRising}=params;
+  const{rsiD,rsiW,cur,e50c,e200c,volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi,
+        peakFibZone618,peakFibZone786,halvingPhase,wMacdAbove,wObvRising}=params;
 
   return[
     /* ── MACRO / INSTITUTIONAL (alta ponderación) ── */
-    {
-      cat:'Macro',
-      l:'Precio en zona Last Peak Fib 0.618–0.786',
-      detail:'Zona de acumulación institucional del ciclo completo',
-      w:3,ok:peakFibZone618||peakFibZone786,
-      col:GR
-    },
-    {
-      cat:'Macro',
-      l:'Fase de acumulación post-halving',
-      detail:'6–18 meses después del halving = ventana histórica de compra',
-      w:2,ok:halvingPhase==='accumulation',
-      col:TEAL
-    },
-    {
-      cat:'Macro',
-      l:'Precio sobre EMA 200 semanal',
-      detail:'Línea de referencia institucional — tendencia macro intacta',
-      w:2,ok:e200c?cur>e200c:false,
-      col:BL
-    },
+    {cat:'Macro',l:'Precio en zona Last Peak Fib 0.618–0.786',
+     detail:'Zona de acumulación institucional del ciclo completo',
+     w:3,ok:peakFibZone618||peakFibZone786,col:GR},
+    {cat:'Macro',l:'Fase de acumulación post-halving',
+     detail:'6–18 meses después del halving = ventana histórica de compra',
+     w:2,ok:halvingPhase==='accumulation',col:TEAL},
+    {cat:'Macro',l:'Precio sobre EMA 200 semanal',
+     detail:'Línea de referencia institucional — tendencia macro intacta',
+     w:2,ok:e200c?cur>e200c:false,col:BL},
     /* ── MOMENTUM (ponderación media-alta) ── */
-    {
-      cat:'Momentum',
-      l:'MACD cruce alcista bajo cero (señal fuerte)',
-      detail:'Mejor señal de MACD: cruce + histograma negativo = momentum girando',
-      w:2,ok:macdBullish===true,
-      col:AM
-    },
-    {
-      cat:'Momentum',
-      l:'RSI semanal < 45',
-      detail:'Timeframe semanal en zona de acumulación',
-      w:2,ok:wRsi!==null&&wRsi<45,
-      col:GR
-    },
-    {
-      cat:'Momentum',
-      l:'OBV en alza — acumulación activa',
-      detail:'Dinero entrando en silencio (institucional)',
-      w:2,ok:obvRising&&wObvRising,
-      col:TEAL
-    },
+    {cat:'Momentum',l:'MACD cruce alcista bajo cero (señal fuerte)',
+     detail:'Mejor señal de MACD: cruce + histograma negativo = momentum girando',
+     w:2,ok:macdBullish===true,col:AM},
+    {cat:'Momentum',l:'RSI semanal < 45',
+     detail:'Timeframe semanal en zona de acumulación',
+     w:2,ok:rsiW!==null&&rsiW<45,col:GR},
+    {cat:'Momentum',l:'OBV en alza — acumulación activa (D+S)',
+     detail:'Dinero institucional entrando en silencio — diario y semanal',
+     w:2,ok:obvRising&&wObvRising,col:TEAL},
     /* ── CONFIRMADORES (ponderación normal) ── */
-    {
-      cat:'Confirma',
-      l:'RSI diario < 45',
-      detail:'Zona de acumulación en timeframe diario',
-      w:1,ok:rsi!==null&&rsi<45,
-      col:GR
-    },
-    {
-      cat:'Confirma',
-      l:'Precio entre Fib 0.382 y 0.618 (60d)',
-      detail:'Soporte técnico en retroceso de corto plazo',
-      w:1,ok:fibZone,
-      col:AM
-    },
-    {
-      cat:'Confirma',
-      l:'Volumen creciente (ratio ≥ 1.1)',
-      detail:'Volumen validando el movimiento',
-      w:1,ok:volR>=1.1,
-      col:BL
-    },
-    {
-      cat:'Confirma',
-      l:'Precio bajo el 95% del máximo 30d',
-      detail:'Sin sobrecompra de corto plazo',
-      w:1,ok:belowHi,
-      col:SL
-    },
-    {
-      cat:'Confirma',
-      l:'Divergencia alcista RSI',
-      detail:'Agotamiento vendedor — señal de reversión',
-      w:1,ok:div?.t==='bull',
-      col:PU
-    },
-    {
-      cat:'Confirma',
-      l:'MACD sobre línea de señal',
-      detail:'Momentum positivo confirmado',
-      w:1,ok:macdAbove,
-      col:AM
-    },
+    {cat:'Confirma',l:'RSI diario < 45',
+     detail:'Zona de acumulación en timeframe diario',
+     w:1,ok:rsiD!==null&&rsiD<45,col:GR},
+    {cat:'Confirma',l:'Precio entre Fib 0.382 y 0.618 (60d)',
+     detail:'Soporte técnico en retroceso de corto plazo',
+     w:1,ok:fibZone,col:AM},
+    {cat:'Confirma',l:'Volumen creciente (ratio ≥ 1.1)',
+     detail:'Volumen validando el movimiento',
+     w:1,ok:volR>=1.1,col:BL},
+    {cat:'Confirma',l:'Precio bajo el 95% del máximo 30d',
+     detail:'Sin sobrecompra de corto plazo',
+     w:1,ok:belowHi,col:SL},
+    {cat:'Confirma',l:'Divergencia alcista RSI',
+     detail:'Agotamiento vendedor — señal de reversión',
+     w:1,ok:div?.t==='bull',col:PU},
+    {cat:'Confirma',l:'MACD sobre línea de señal',
+     detail:'Momentum positivo confirmado',
+     w:1,ok:macdAbove,col:AM},
   ];
 }
 
-function scoreFromConds(conds){
+function scoreFromConds(conds, extCtx){
+  /*
+    extCtx = { rsi, e500d } — price extension context
+    Rules:
+    - RSI diario > 70  AND  EMA500 dist > 60% → price very extended → cap at "Cautela"
+    - RSI diario > 65  OR   EMA500 dist > 60% → price extended      → cap at "Observar"
+    These caps override the weighted score to avoid false entry signals.
+  */
   const earned=conds.reduce((a,c)=>a+(c.ok?c.w:0),0);
   const max=conds.reduce((a,c)=>a+c.w,0);
   const pct=max>0?earned/max:0;
-  let sig,col;
-  if(pct>=.80){sig='Compra fuerte';col=GR;}
-  else if(pct>=.58){sig='Señal de compra';col='#5ecc7b';}
-  else if(pct>=.40){sig='Observar';col=AM;}
-  else if(pct>=.24){sig='Cautela';col='#f0834f';}
-  else{sig='Esperar';col=SL;}
-  return{earned,max,pct,sig,col};
+
+  const rsi=extCtx?.rsi??50;
+  const e500d=extCtx?.e500d??0;
+  const veryExtended = rsi>70 && e500d>60;
+  const extended     = rsi>65 || e500d>60;
+
+  let sig,col,extWarn=null;
+
+  if(veryExtended){
+    /* Hard cap — structural signal can be good but this is NOT an entry point */
+    sig='Cautela';col='#f0834f';
+    extWarn={
+      level:'high',
+      msg:`RSI diario ${rsi.toFixed(1)} (sobrecompra) + precio ${e500d.toFixed(0)}% sobre EMA 500. Señal estructural válida pero precio muy extendido — esperar retroceso antes de entrar.`
+    };
+  }else if(extended){
+    /* Soft cap — can reach Observar max */
+    const rawSig=pct>=.80?'Compra fuerte':pct>=.58?'Señal de compra':pct>=.40?'Observar':pct>=.24?'Cautela':'Esperar';
+    const needsCap=rawSig==='Compra fuerte'||rawSig==='Señal de compra';
+    sig=needsCap?'Observar':rawSig;
+    col=needsCap?AM:(pct>=.40?AM:pct>=.24?'#f0834f':SL);
+    extWarn={
+      level:'medium',
+      msg:`${rsi>65?`RSI diario ${rsi.toFixed(1)} — zona de sobrecompra. `:''}${e500d>60?`Precio ${e500d.toFixed(0)}% sobre EMA 500 — extendido. `:''}Señal rebajada: esperar pullback para mejor entrada.`
+    };
+  }else{
+    if(pct>=.80){sig='Compra fuerte';col=GR;}
+    else if(pct>=.58){sig='Señal de compra';col='#5ecc7b';}
+    else if(pct>=.40){sig='Observar';col=AM;}
+    else if(pct>=.24){sig='Cautela';col='#f0834f';}
+    else{sig='Esperar';col=SL;}
+  }
+
+  return{earned,max,pct,sig,col,extWarn};
 }
 
 /* Lightweight score for confluence panels (no halving/peak/weekly) */
@@ -874,14 +864,21 @@ function analyze(data,curPrice,tf){
   for(let i=3;i<sl30.length-3;i++){let ok=true;for(let j=1;j<=3;j++)if(sl30[i]>=sl30[i-j]||sl30[i]>=sl30[i+j]){ok=false;break;}if(ok)swIdx.push(i);}
   const swingStop=swIdx.length>0?sl30[swIdx[swIdx.length-1]]:Math.min(...data.slice(-10).map(d=>d.low));
 
+  /* Daily RSI — always from 120-day daily slice regardless of TF */
+  const dSliceRsi=data.slice(-120).map(d=>d.close);
+  const dRsiForScore=calcRSI(dSliceRsi);
+  const rsiD=dRsiForScore[dRsiForScore.length-1]; /* always daily */
+
   /* Build weighted conditions */
   const conds=buildWeightedConds({
-    rsi:rsiC,cur,e50c:tf==='weekly'?e20c:e50c,e200c:wE200c,
+    rsiD,                                        /* always daily RSI */
+    rsiW:wRsiC,                                  /* always weekly RSI */
+    cur,e50c:tf==='weekly'?e20c:e50c,e200c:wE200c,
     volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi:belowHi30,
     peakFibZone618,peakFibZone786,halvingPhase:halvInfo.halvingPhaseKey,
-    wRsi:wRsiC,wMacdAbove,wObvRising
+    wMacdAbove,wObvRising
   });
-  const sc=scoreFromConds(conds);
+  const sc=scoreFromConds(conds,{rsi:rsiD,e500d});
 
   /* Confluence */
   const dSlice=data.slice(-120);
@@ -1501,7 +1498,16 @@ function renderAll(s){
   if(s.e500c)document.getElementById('ema500-note').textContent=
     `EMA 500: $${s.e500c.toFixed(2)} — precio ${s.e500d>=0?'+':''}${s.e500d.toFixed(1)}% vs media 500 días${s.wE200c?' · EMA 200s: $'+s.wE200c.toFixed(2):''}`;
 
+  /* ── Extension warning banner ── */
+  const ew=document.getElementById('ext-warn');
   const sc=s.sc;
+  if(sc.extWarn){
+    const hi=sc.extWarn.level==='high';
+    ew.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;line-height:1.6;background:${hi?'#180e04':'#141004'};border:1.5px solid ${hi?'#f0b42966':'#f0b42933'};color:#f0b429`;
+    ew.innerHTML=`<strong>⚠ Precio extendido — señal rebajada</strong><br><span style="font-size:11px;opacity:.9">${sc.extWarn.msg}</span>`;
+  }else{
+    ew.style.display='none';
+  }
   const b=document.getElementById('sig-badge');
   b.textContent=sc.sig+' · '+Math.round(sc.pct*100)+'%';
   b.style.cssText=`padding:7px 18px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
@@ -1580,12 +1586,22 @@ async function refreshPrice(){
   if(raw){
     stats=analyze(raw,livePrice,tf);
     const sc=stats.sc;
+    /* Badge */
     const b=document.getElementById('sig-badge');
     b.textContent=sc.sig+' · '+Math.round(sc.pct*100)+'%';
     b.style.cssText=`padding:7px 18px;border-radius:8px;font-size:13px;letter-spacing:.03em;white-space:nowrap;background:${sc.col}18;color:${sc.col};border:1px solid ${sc.col}33`;
+    /* Score bar */
     document.getElementById('score-bar').style.cssText=`height:100%;border-radius:2px;transition:width .8s,background .8s;width:${(sc.pct*100).toFixed(0)}%;background:${sc.col}`;
     document.getElementById('score-pts').textContent=sc.sig;document.getElementById('score-pts').style.color=sc.col;
     document.getElementById('score-max').textContent=sc.earned+'/'+sc.max+' pts ponderados';
+    /* Extension warning — update in real time */
+    const ew=document.getElementById('ext-warn');
+    if(sc.extWarn){
+      const hi=sc.extWarn.level==='high';
+      ew.style.cssText=`display:block;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;line-height:1.6;background:${hi?'#180e04':'#141004'};border:1.5px solid ${hi?'#f0b42966':'#f0b42933'};color:#f0b429`;
+      ew.innerHTML=`<strong>⚠ Precio extendido — señal rebajada</strong><br><span style="font-size:11px;opacity:.9">${sc.extWarn.msg}</span>`;
+    }else{ew.style.display='none';}
+    /* Timestamp */
     document.getElementById('upd-time').textContent='Precio: '+new Date().toLocaleTimeString('es-CO');
     renderMcap(stats);
   }

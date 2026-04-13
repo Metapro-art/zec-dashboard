@@ -86,20 +86,18 @@ function getHalvingPhase() {
   return { phase: 'Bear market', key: 'bear', days };
 }
 
-/* ── Weighted scoring (mirrors dashboard buildWeightedConds + scoreFromConds) ── */
+/* ── Weighted scoring with extension cap ── */
 function buildScore(params) {
   const { rsi, cur, e50c, wE200c, volR, macdAbove, macdBullish, obvRising,
-          div, fibZone, belowHi, peakFib618, peakFib786, halvPhase, wRsi, wMacdAbove, wObvRising } = params;
+          div, fibZone, belowHi, peakFib618, peakFib786, halvPhase,
+          wRsi, wMacdAbove, wObvRising, e500d } = params;
   const conds = [
-    // Macro / Institutional (3pts each)
     { cat:'Macro',    l:'Precio en zona Last Peak Fib 0.618–0.786', w:3, ok: peakFib618||peakFib786 },
     { cat:'Macro',    l:'Fase de acumulación post-halving',          w:2, ok: halvPhase==='accumulation' },
     { cat:'Macro',    l:'Precio sobre EMA 200 semanal',              w:2, ok: wE200c ? cur>wE200c : false },
-    // Momentum (2pts each)
     { cat:'Momentum', l:'MACD cruce alcista bajo cero',              w:2, ok: macdBullish===true },
     { cat:'Momentum', l:'RSI semanal < 45',                         w:2, ok: wRsi!==null&&wRsi<45 },
     { cat:'Momentum', l:'OBV en alza (D+S)',                        w:2, ok: obvRising&&wObvRising },
-    // Confirming (1pt each)
     { cat:'Confirma', l:'RSI diario < 45',                          w:1, ok: rsi!==null&&rsi<45 },
     { cat:'Confirma', l:'Fib 0.382–0.618 (60d)',                    w:1, ok: fibZone },
     { cat:'Confirma', l:'Volumen creciente ≥ 1.1x',                 w:1, ok: volR>=1.1 },
@@ -110,13 +108,27 @@ function buildScore(params) {
   const earned = conds.reduce((a,c)=>a+(c.ok?c.w:0), 0);
   const max    = conds.reduce((a,c)=>a+c.w, 0);
   const pct    = max>0 ? earned/max : 0;
-  let signal;
-  if      (pct>=.80) signal='COMPRA FUERTE';
-  else if (pct>=.58) signal='Señal de compra';
-  else if (pct>=.40) signal='Observar';
-  else if (pct>=.24) signal='Cautela';
-  else               signal='Esperar';
-  return { earned, max, pct, signal, conds };
+
+  /* Extension cap — same logic as dashboard */
+  const veryExtended = rsi>70 && (e500d||0)>60;
+  const extended     = rsi>65 || (e500d||0)>60;
+
+  let signal, extNote='';
+  if (veryExtended) {
+    signal='Cautela (precio extendido)';
+    extNote=`⚠ RSI ${rsi?.toFixed(1)} en sobrecompra + ${(e500d||0).toFixed(0)}% sobre EMA 500. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
+  } else if (extended) {
+    const rawSig=pct>=.80?'Compra fuerte':pct>=.58?'Señal de compra':pct>=.40?'Observar':pct>=.24?'Cautela':'Esperar';
+    signal=(rawSig==='Compra fuerte'||rawSig==='Señal de compra')?'Observar (precio extendido)':rawSig;
+    extNote=`${rsi>65?`RSI ${rsi?.toFixed(1)} zona alta. `:''}${(e500d||0)>60?`Precio ${(e500d||0).toFixed(0)}% sobre EMA 500. `:''}Señal rebajada — mejor entrada en pullback.`;
+  } else {
+    if      (pct>=.80) signal='COMPRA FUERTE';
+    else if (pct>=.58) signal='Señal de compra';
+    else if (pct>=.40) signal='Observar';
+    else if (pct>=.24) signal='Cautela';
+    else               signal='Esperar';
+  }
+  return { earned, max, pct, signal, conds, extNote };
 }
 
 /* ── Main ── */
@@ -202,12 +214,15 @@ async function main() {
                    'Sin divergencia';
 
   // Score
+  const e500dVal = e500c ? ((curPrice-e500c)/e500c*100) : 0;
+
   const score = buildScore({
     rsi:dRsiC, cur:curPrice, e50c:dE50c, wE200c,
     volR:dVr, macdAbove:dMacdAbove, macdBullish:dMacdBull,
     obvRising:dObvRising, div:dDiv, fibZone, belowHi,
     peakFib618, peakFib786, halvPhase:halv.key,
-    wRsi:wRsiC, wMacdAbove, wObvRising
+    wRsi:wRsiC, wMacdAbove, wObvRising,
+    e500d:e500dVal
   });
 
   // Weekly score for confluence
@@ -216,7 +231,8 @@ async function main() {
     volR:wVr, macdAbove:wMacdAbove, macdBullish:wMacdBull,
     obvRising:wObvRising, div:wDiv, fibZone, belowHi:curPrice<Math.max(...wData.highs.slice(-12))*.95,
     peakFib618, peakFib786, halvPhase:halv.key,
-    wRsi:wRsiC, wMacdAbove, wObvRising
+    wRsi:wRsiC, wMacdAbove, wObvRising,
+    e500d:e500dVal
   });
 
   const confPct = Math.round(((score.pct+wScore.pct)/2)*100);
@@ -259,6 +275,10 @@ ZEC ALERT — ${new Date().toLocaleString('es-CO')}
 ${score.signal}
 ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posible)
 Confluencia D+S: ${confPct}%
+${score.extNote?'\n⚠ '+score.extNote:''}
+━━━ CONTEXTO DE ENTRADA ━━━━━━━
+RSI diario ${dRsiC?.toFixed(1)} ${dRsiC>70?'— SOBRECOMPRA, no entrar ahora':dRsiC>65?'— elevado, precaución':dRsiC<30?'— SOBREVENTA, zona óptima':dRsiC<45?'— zona de compra ✓':'— neutral'}
+EMA 500: ${e500dVal.toFixed(1)}% ${e500dVal>60?'— MUY EXTENDIDO, esperar pullback':e500dVal>30?'— extendido':e500dVal>0?'— tendencia alcista ✓':'— bajo EMA 500'}
 
 ━━━ PRECIO ━━━━━━━━━━━━━━━━━━━━
 Precio actual:   $${curPrice.toFixed(2)} (${chg24})
