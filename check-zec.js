@@ -9,7 +9,7 @@ const EMAIL_USER     = process.env.EMAIL_USER;
 const EMAIL_PASS     = process.env.EMAIL_PASS;   // Google App Password
 const EMAIL_TO       = process.env.EMAIL_TO;
 // Minimum score PERCENTAGE to trigger email (e.g. 40 = 40% of max weighted score)
-const MIN_PCT        = parseFloat(process.env.MIN_PCT || '40');
+const MIN_PCT = parseFloat(process.env.MIN_PCT || process.env.MIN_CONDITIONS || '58');
 
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
