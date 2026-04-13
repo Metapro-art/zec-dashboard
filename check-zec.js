@@ -55,6 +55,11 @@ function linregSlope(arr,n=14){
   const sx=len*(len-1)/2,sy=r.reduce((a,b)=>a+b,0),sxy=r.reduce((a,v,i)=>a+i*v,0),sx2=len*(len-1)*(2*len-1)/6;
   const d=len*sx2-sx*sx;return d===0?0:(len*sxy-sx*sy)/d;
 }
+function linregSlope(arr,n=14){
+  const r=arr.slice(-n),len=r.length;if(len<2)return 0;
+  const sx=len*(len-1)/2,sy=r.reduce((a,b)=>a+b,0),sxy=r.reduce((a,v,i)=>a+i*v,0),sx2=len*(len-1)*(2*len-1)/6;
+  const d=len*sx2-sx*sx;return d===0?0:(len*sxy-sx*sy)/d;
+}
 function detectDiv(prices,rsiArr){
   const rC=rsiArr.map(v=>v??50),pS=prices.slice(-60),rS=rC.slice(-60);
   const sl=[];for(let i=3;i<pS.length-3;i++){let ok=true;for(let j=1;j<=3;j++)if(pS[i]>=pS[i-j]||pS[i]>=pS[i+j]){ok=false;break;}if(ok)sl.push(i);}
@@ -184,6 +189,18 @@ async function main() {
   // Halving
   const halv = getHalvingPhase();
 
+  // OBV divergence detection (same logic as dashboard)
+  const DIV_WINDOW=20;
+  const dPriceLast=dc.slice(-DIV_WINDOW);
+  const dObvLast=dObv.slice(-DIV_WINDOW);
+  const dPriceSlope=linregSlope(dPriceLast,DIV_WINDOW);
+  const dObvSlope2=linregSlope(dObvLast,DIV_WINDOW);
+  const obvBullDiv=dPriceSlope<0&&dObvSlope2>0;
+  const obvBearDiv=dPriceSlope>0&&dObvSlope2<0;
+  const obvDivText=obvBullDiv?'DIVERGENCIA ALCISTA ★ (precio baja, OBV sube)':
+                   obvBearDiv?'DIVERGENCIA BAJISTA ⚠ (precio sube, OBV baja)':
+                   'Sin divergencia';
+
   // Score
   const score = buildScore({
     rsi:dRsiC, cur:curPrice, e50c:dE50c, wE200c,
@@ -271,6 +288,7 @@ ${targetsText}
 RSI 14:   ${dRsiC?.toFixed(1)} ${dRsiC<30?'(SOBREVENTA)':dRsiC<45?'(zona compra)':''}
 MACD:     ${dMacdAbove?'Sobre señal ↑':'Bajo señal ↓'}${dMacdBull?' ★ CRUCE BAJO CERO':''}
 OBV:      ${dObvRising?'Acumulación ↑':'Distribución ↓'}
+OBV DIV:  ${obvDivText}
 Div RSI:  ${dDiv||'Ninguna'}
 
 ━━━ INDICADORES SEMANAL ━━━━━━
@@ -290,7 +308,7 @@ Señal al ${MIN_PCT}% del score máximo
     await transporter.sendMail({
       from: `"ZEC Alert" <${EMAIL_USER}>`,
       to: EMAIL_TO,
-      subject: `ZEC: ${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)} | ${halv.phase}`,
+      subject: `ZEC: ${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
       text: body
     });
     console.log('✓ Email enviado.');

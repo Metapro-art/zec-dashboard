@@ -58,6 +58,12 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 .spin{display:inline-block;width:11px;height:11px;border:2px solid #C9A84C33;border-top-color:#C9A84C;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:5px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+/* OBV divergence pulse badges */
+@keyframes pulse-bull{0%,100%{box-shadow:0 0 0 0 #2ec4b655}50%{box-shadow:0 0 0 7px #2ec4b600}}
+@keyframes pulse-bear{0%,100%{box-shadow:0 0 0 0 #ff446655}50%{box-shadow:0 0 0 7px #ff446600}}
+.div-bull{animation:pulse-bull 2s ease-in-out infinite;border-color:#2ec4b6 !important;color:#2ec4b6 !important}
+.div-bear{animation:pulse-bear 2s ease-in-out infinite;border-color:#ff4466 !important;color:#ff4466 !important}
+
 /* Input */
 input[type=number]{background:var(--card2);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:13px;padding:7px 10px;border-radius:7px;outline:none;width:100%}
 input[type=number]:focus{border-color:#C9A84C55}
@@ -200,17 +206,25 @@ input[type=number]:focus{border-color:#C9A84C55}
 </div>
 
 <!-- ═══ OBV ═══ -->
-<div class="card" style="margin-bottom:1rem">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem;flex-wrap:wrap;gap:6px">
+<div class="card" style="margin-bottom:1rem" id="obv-card">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.625rem;flex-wrap:wrap;gap:8px">
     <div>
       <span class="lbl" style="margin-bottom:0;display:block">OBV · On Balance Volume · Acumulación institucional</span>
-      <span style="font-size:10px;color:var(--muted)">Precio y OBV alineados — busca divergencias entre ambas líneas</span>
+      <span style="font-size:10px;color:var(--muted)">Precio y OBV alineados — zona sombreada = divergencia activa</span>
     </div>
-    <span id="obv-tag" style="font-size:11px"></span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <!-- Pulsing divergence badge -->
+      <div id="obv-tag" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--b1);background:var(--card2);white-space:nowrap"></div>
+      <!-- Alert permission button -->
+      <button id="obv-alert-btn" onclick="enableAlerts()"
+        style="font-size:9px;padding:3px 9px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit">
+        🔔 Activar alertas
+      </button>
+    </div>
   </div>
 
-  <!-- Divergence alert -->
-  <div id="obv-div-banner" style="display:none;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5"></div>
+  <!-- Divergence alert banner — shown when divergence detected -->
+  <div id="obv-div-banner" style="display:none;border-radius:9px;padding:10px 14px;margin-bottom:.75rem;font-size:12px;line-height:1.6"></div>
 
   <!-- Price mini chart (top) -->
   <div style="margin-bottom:2px">
@@ -218,10 +232,10 @@ input[type=number]:focus{border-color:#C9A84C55}
       <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
       <span id="obv-price-range" style="font-size:9px;color:var(--muted2)"></span>
     </div>
-    <div style="position:relative;height:90px"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
+    <div style="position:relative;height:95px"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
   </div>
 
-  <!-- Divider with label -->
+  <!-- Divider -->
   <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
     <div style="flex:1;height:1px;background:var(--b1)"></div>
     <span style="font-size:9px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
@@ -229,26 +243,33 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
 
   <!-- OBV chart (bottom) -->
-  <div style="position:relative;height:90px;margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
+  <div style="position:relative;height:95px;margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
+
+  <!-- Legend for divergence colors -->
+  <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:.625rem">
+    <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2.5px;background:#2ec4b6;border-radius:1px;display:inline-block"></span>Divergencia alcista — COMPRAR</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2.5px;background:#ff4466;border-radius:1px;display:inline-block"></span>Divergencia bajista — CUIDADO</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2.5px;background:#3fd672;border-radius:1px;display:inline-block"></span>Acumulación normal</span>
+  </div>
 
   <!-- Reading guide -->
-  <div style="background:var(--card2);border-radius:8px;padding:.625rem .875rem;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+  <div style="background:var(--card2);border-radius:8px;padding:.625rem .875rem;display:grid;grid-template-columns:1fr 1fr;gap:8px">
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
-      <span style="color:var(--green)">Señal alcista:</span><br>
+      <span style="color:#2ec4b6;font-weight:bold">↑ Divergencia alcista:</span><br>
       Precio baja → OBV sube<br>
       <span style="font-size:9px;color:var(--muted2)">Instituciones comprando en silencio</span>
     </div>
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
-      <span style="color:var(--red)">Señal bajista:</span><br>
+      <span style="color:#ff4466;font-weight:bold">↓ Divergencia bajista:</span><br>
       Precio sube → OBV baja<br>
       <span style="font-size:9px;color:var(--muted2)">Distribución — venden mientras sube</span>
     </div>
   </div>
 
-  <!-- Stats row -->
+  <!-- Stats -->
   <div style="display:flex;justify-content:space-between;margin-top:.625rem;flex-wrap:wrap;gap:6px">
-    <span id="obv-daily-stat" style="font-size:10px;color:var(--muted)"></span>
-    <span id="obv-weekly-stat" style="font-size:10px;color:var(--muted)"></span>
+    <span id="obv-daily-stat" style="font-size:10px"></span>
+    <span id="obv-weekly-stat" style="font-size:10px"></span>
   </div>
 </div>
 
@@ -1055,60 +1076,201 @@ function renderMACD(s){
   }
 }
 
+/* ═══════════════════════════════════════════════
+   ALERT SYSTEM — Web Audio + Browser Notification
+═══════════════════════════════════════════════ */
+let _lastDivState=null; /* track state change to avoid repeat alerts */
+let _alertsEnabled=false;
+
+function enableAlerts(){
+  if(!('Notification' in window)){alert('Tu browser no soporta notificaciones.');return;}
+  Notification.requestPermission().then(p=>{
+    _alertsEnabled=p==='granted';
+    const btn=document.getElementById('obv-alert-btn');
+    if(_alertsEnabled){btn.textContent='🔔 Alertas activas';btn.style.color='#2ec4b6';btn.style.borderColor='#2ec4b644';}
+    else{btn.textContent='🔕 Sin permiso';}
+  });
+}
+
+function playDivSound(type){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const freqs=type==='bull'?[440,550,660]:[660,550,440]; /* ascending=bull, descending=bear */
+    freqs.forEach((f,i)=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ctx.currentTime+i*0.18);
+      g.gain.linearRampToValueAtTime(0.18,ctx.currentTime+i*0.18+0.04);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.18+0.16);
+      o.start(ctx.currentTime+i*0.18);
+      o.stop(ctx.currentTime+i*0.18+0.18);
+    });
+  }catch(e){/* audio not available — silent */}
+}
+
+function fireDivAlert(type){
+  if(!_alertsEnabled)return;
+  const title=type==='bull'?'ZEC · Divergencia alcista OBV':'ZEC · Divergencia bajista OBV';
+  const body=type==='bull'
+    ?'Precio cayendo pero OBV subiendo. Posible acumulación institucional.'
+    :'Precio subiendo pero OBV cayendo. Posible distribución.';
+  try{new Notification(title,{body,icon:'https://z.cash/favicon.ico'});}catch(e){}
+  playDivSound(type);
+}
+
+function checkDivAlert(divType){
+  /* Only fire on state change — not every refresh */
+  if(divType!==_lastDivState){
+    _lastDivState=divType;
+    if(divType)fireDivAlert(divType);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   OBV CHART — dual panel with divergence coloring
+═══════════════════════════════════════════════ */
 function renderOBV(s){
   if(cO)cO.destroy();
   if(cOP)cOP.destroy();
 
+  const n=s.closes.length;
   const PAD=8;
   const padL=[...s.labels,...Array(PAD).fill('')];
-  const obvM=pad(s.obvArr.map(v=>v/1e6),PAD);
-  const pricesPad=pad(s.closes,PAD);
+  const DIV_WINDOW=20; /* bars used for divergence detection */
 
-  /* Detect OBV divergence visually:
-     Compare last 20 candles — if price trend and OBV trend go opposite directions */
-  const priceLast=s.closes.slice(-20);
-  const obvLast=s.obvArr.slice(-20);
-  const priceSlope=linregSlope(priceLast,20);
-  const obvSlopeVal=linregSlope(obvLast,20);
-  const bullDiv=priceSlope<0&&obvSlopeVal>0;   /* price falling, OBV rising = bullish div */
-  const bearDiv=priceSlope>0&&obvSlopeVal<0;   /* price rising, OBV falling = bearish div */
-  const hasDivergence=bullDiv||bearDiv;
+  /* ── Divergence detection ── */
+  const priceLast=s.closes.slice(-DIV_WINDOW);
+  const obvLast=s.obvArr.slice(-DIV_WINDOW);
+  const priceSlope=linregSlope(priceLast,DIV_WINDOW);
+  const obvSlopeVal=linregSlope(obvLast,DIV_WINDOW);
+  const bullDiv=priceSlope<0&&obvSlopeVal>0;
+  const bearDiv=priceSlope>0&&obvSlopeVal<0;
+  const divType=bullDiv?'bull':bearDiv?'bear':null;
+  const DIV_COL_BULL='#2ec4b6'; /* teal — distinct from normal green */
+  const DIV_COL_BEAR='#ff4466'; /* bright red-pink — more alarming */
+  const divStart=n-DIV_WINDOW; /* index where divergence zone begins */
 
-  /* Divergence banner */
+  /* Fire alert if state changed */
+  checkDivAlert(divType);
+
+  /* ── Card border + badge ── */
+  const card=document.getElementById('obv-card');
+  const tag=document.getElementById('obv-tag');
+  tag.className=''; /* reset */
+  if(bullDiv){
+    card.style.borderColor='#2ec4b644';
+    tag.textContent='● Divergencia alcista — COMPRA';
+    tag.className='div-bull';
+    tag.style.cssText='font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid;background:#0a1612;white-space:nowrap';
+  }else if(bearDiv){
+    card.style.borderColor='#ff446644';
+    tag.textContent='● Divergencia bajista — CUIDADO';
+    tag.className='div-bear';
+    tag.style.cssText='font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid;background:#140810;white-space:nowrap';
+  }else if(s.obvRising){
+    card.style.borderColor='var(--b1)';
+    tag.textContent='Acumulación ↑';
+    tag.style.cssText='font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #3fd67233;background:#071109;color:#3fd672;white-space:nowrap';
+  }else{
+    card.style.borderColor='var(--b1)';
+    tag.textContent='Distribución ↓';
+    tag.style.cssText='font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #f0606033;background:#120707;color:#f06060;white-space:nowrap';
+  }
+
+  /* ── Banner ── */
   const divB=document.getElementById('obv-div-banner');
   if(bullDiv){
-    divB.style.cssText='display:block;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5;background:#091209;border:1px solid #3fd67233;color:#3fd672';
-    divB.textContent='Divergencia alcista detectada — precio cayendo pero OBV subiendo. Posible acumulación institucional silenciosa.';
+    divB.style.cssText='display:block;border-radius:9px;padding:10px 14px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#071410;border:1.5px solid #2ec4b655;color:#2ec4b6';
+    divB.innerHTML='<strong>▲ Divergencia alcista activa</strong> — El precio está cayendo pero el OBV sube. Señal de acumulación institucional silenciosa. Evaluar entrada con stop bajo el mínimo reciente.';
   }else if(bearDiv){
-    divB.style.cssText='display:block;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5;background:#120909;border:1px solid #f0606033;color:#f06060';
-    divB.textContent='Divergencia bajista detectada — precio subiendo pero OBV cayendo. Posible distribución institucional.';
+    divB.style.cssText='display:block;border-radius:9px;padding:10px 14px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#140810;border:1.5px solid #ff446655;color:#ff4466';
+    divB.innerHTML='<strong>▼ Divergencia bajista activa</strong> — El precio sube pero el OBV cae. Posible distribución institucional. Considerar reducir posición o mover stops.';
   }else{
     divB.style.display='none';
   }
 
-  /* ── PRICE mini chart (top) — same labels as OBV ── */
-  const priceMin=Math.min(...s.closes)*0.995;
-  const priceMax=Math.max(...s.closes)*1.005;
+  /* ── Custom plugin: shaded divergence zone + arrow annotation ── */
+  const DivZonePlugin={
+    id:'divzone',
+    afterDraw(chart){
+      if(!divType)return;
+      const{ctx,chartArea:{left,right,top,bottom},scales:{x,y}}=chart;
+      if(!x||!y)return;
+      const col=bullDiv?DIV_COL_BULL:DIV_COL_BEAR;
+
+      /* Zone start x pixel — clamp to chart area */
+      const zoneStartPx=Math.max(left,x.getPixelForValue(divStart));
+
+      ctx.save();
+
+      /* Shaded zone */
+      ctx.fillStyle=bullDiv?'rgba(46,196,182,0.07)':'rgba(255,68,102,0.07)';
+      ctx.fillRect(zoneStartPx,top,right-zoneStartPx,bottom-top);
+
+      /* Left border of zone */
+      ctx.strokeStyle=col+'66';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(zoneStartPx,top);ctx.lineTo(zoneStartPx,bottom);ctx.stroke();
+      ctx.setLineDash([]);
+
+      /* Label at top of zone */
+      ctx.font='bold 9px Courier New';ctx.fillStyle=col;ctx.textAlign='left';
+      const labelText=bullDiv?'DIV ALCISTA':'DIV BAJISTA';
+      ctx.fillText(labelText,zoneStartPx+4,top+11);
+
+      /* Arrow at the last bar pointing to divergence */
+      const lastBarPx=x.getPixelForValue(n-1);
+      const lastValY=y.getPixelForValue(chart.data.datasets[0].data[n-1]);
+      if(lastValY&&lastBarPx){
+        /* Arrow body */
+        const arrowDir=bullDiv?1:-1; /* +1 = pointing up (buy), -1 = pointing down (sell) */
+        const ay=lastValY+(arrowDir*-22);
+        ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.setLineDash([]);
+        ctx.beginPath();ctx.moveTo(lastBarPx,ay+(arrowDir*14));ctx.lineTo(lastBarPx,lastValY+(arrowDir*2));ctx.stroke();
+        /* Arrowhead */
+        ctx.fillStyle=col;ctx.beginPath();
+        ctx.moveTo(lastBarPx,lastValY+(arrowDir*2));
+        ctx.lineTo(lastBarPx-4,lastValY+(arrowDir*10));
+        ctx.lineTo(lastBarPx+4,lastValY+(arrowDir*10));
+        ctx.closePath();ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  };
+
+  /* ── Segment color callback — divergence zone gets special color ── */
+  function segmentColor(ctx,normalCol,divCol){
+    /* ctx.p0DataIndex = start of segment */
+    return ctx.p0DataIndex>=divStart&&divType?divCol:normalCol;
+  }
+
+  /* ── PRICE chart (top) ── */
+  const priceMin=Math.min(...s.closes)*0.994;
+  const priceMax=Math.max(...s.closes)*1.006;
+
   cOP=new Chart(document.getElementById('cOBVPrice'),{
     type:'line',
     data:{labels:padL,datasets:[{
-      data:pricesPad,
-      borderColor:G,borderWidth:2,
+      data:pad(s.closes,PAD),
+      borderColor:G,
+      borderWidth:2,
+      segment:{borderColor:ctx=>segmentColor(ctx,G,bullDiv?DIV_COL_BULL:DIV_COL_BEAR)},
       pointRadius:0,fill:true,
-      backgroundColor:'rgba(201,168,76,0.06)',
+      backgroundColor:'rgba(201,168,76,0.05)',
       tension:.3,spanGaps:false
     }]},
+    plugins:[DivZonePlugin],
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{
-        enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'44',borderWidth:1,
-        titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-        callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw?' $'+i.raw.toFixed(2):null}
-      }},
+      plugins:{legend:{display:false},divzone:{},
+        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'44',borderWidth:1,
+          titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+          callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' $'+i.raw.toFixed(2):null}}},
       scales:{
-        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},
-           grid:{color:GRID}},
+        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
         y:{min:priceMin,max:priceMax,
            ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>'$'+v.toFixed(0)},
            grid:{color:GRID}}
@@ -1118,36 +1280,38 @@ function renderOBV(s){
   document.getElementById('obv-price-range').textContent=
     'H $'+Math.max(...s.closes).toFixed(2)+' · L $'+Math.min(...s.closes).toFixed(2);
 
-  /* ── OBV chart (bottom) — exact same labels ── */
-  /* Color: segment by segment based on whether OBV is rising or falling */
-  const obvColor=hasDivergence
-    ?(bullDiv?GR:RD)                 /* divergence: highlight the signal */
-    :(s.obvRising?GR:RD);
-
-  const obvMin=Math.min(...s.obvArr.map(v=>v/1e6));
-  const obvMax=Math.max(...s.obvArr.map(v=>v/1e6));
-  const obvRange=obvMax-obvMin;
+  /* ── OBV chart (bottom) ── */
+  const obvVals=s.obvArr.map(v=>v/1e6);
+  const obvMin=Math.min(...obvVals);
+  const obvMax=Math.max(...obvVals);
+  const obvRange=Math.max(obvMax-obvMin,0.1);
+  const normalObvCol=s.obvRising?GR:RD;
+  const divObvCol=bullDiv?DIV_COL_BULL:DIV_COL_BEAR;
 
   cO=new Chart(document.getElementById('cOBV'),{
     type:'line',
     data:{labels:padL,datasets:[{
-      data:obvM,
-      borderColor:obvColor,borderWidth:2,
+      data:pad(obvVals,PAD),
+      borderColor:normalObvCol,
+      borderWidth:2.2,
+      segment:{
+        borderColor:ctx=>segmentColor(ctx,normalObvCol,divObvCol),
+        borderWidth:ctx=>ctx.p0DataIndex>=divStart&&divType?2.8:2
+      },
       pointRadius:0,fill:true,
-      backgroundColor:s.obvRising?'rgba(63,214,114,0.08)':'rgba(240,96,96,0.08)',
+      backgroundColor:s.obvRising?'rgba(63,214,114,0.07)':'rgba(240,96,96,0.07)',
       tension:.3,spanGaps:false
     }]},
+    plugins:[DivZonePlugin],
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{
-        enabled:true,backgroundColor:'#0c0c0f',borderColor:obvColor+'55',borderWidth:1,
-        titleColor:TICK,bodyColor:obvColor,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-        callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' OBV: '+i.raw.toFixed(1)+'M':null}
-      }},
+      plugins:{legend:{display:false},divzone:{},
+        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:(divType?divObvCol:normalObvCol)+'55',borderWidth:1,
+          titleColor:TICK,bodyColor:divType?divObvCol:normalObvCol,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+          callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' OBV: '+i.raw.toFixed(1)+'M':null}}},
       scales:{
-        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},
-           grid:{color:GRID}},
+        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
         y:{min:obvMin-obvRange*.05,max:obvMax+obvRange*.05,
            ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>v.toFixed(0)+'M'},
            grid:{color:GRID}}
@@ -1155,19 +1319,13 @@ function renderOBV(s){
     }
   });
 
-  /* Tag + stats */
-  const tag=document.getElementById('obv-tag');
-  if(bullDiv){tag.textContent='Divergencia alcista ↑';tag.style.color=GR;}
-  else if(bearDiv){tag.textContent='Divergencia bajista ↓';tag.style.color=RD;}
-  else if(s.obvRising){tag.textContent='Acumulación ↑';tag.style.color=GR;}
-  else{tag.textContent='Distribución ↓';tag.style.color=RD;}
-
-  document.getElementById('obv-daily-stat').textContent=
-    `Diario: ${s.obvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
-  document.getElementById('obv-daily-stat').style.color=s.obvRising?GR:RD;
-  document.getElementById('obv-weekly-stat').textContent=
-    `Semanal: ${s.wObvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
-  document.getElementById('obv-weekly-stat').style.color=s.wObvRising?GR:RD;
+  /* Stats */
+  const ds=document.getElementById('obv-daily-stat');
+  const ws=document.getElementById('obv-weekly-stat');
+  ds.textContent=`Diario: ${s.obvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
+  ds.style.color=s.obvRising?GR:RD;
+  ws.textContent=`Semanal: ${s.wObvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
+  ws.style.color=s.wObvRising?GR:RD;
 }
 
 /* ═══════════════════════════════════════════════
