@@ -201,11 +201,55 @@ input[type=number]:focus{border-color:#C9A84C55}
 
 <!-- ═══ OBV ═══ -->
 <div class="card" style="margin-bottom:1rem">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-    <span class="lbl" style="margin-bottom:0">OBV · Acumulación institucional</span>
-    <span id="obv-tag" style="font-size:11px;color:var(--muted)"></span>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem;flex-wrap:wrap;gap:6px">
+    <div>
+      <span class="lbl" style="margin-bottom:0;display:block">OBV · On Balance Volume · Acumulación institucional</span>
+      <span style="font-size:10px;color:var(--muted)">Precio y OBV alineados — busca divergencias entre ambas líneas</span>
+    </div>
+    <span id="obv-tag" style="font-size:11px"></span>
   </div>
-  <div class="mh"><canvas id="cOBV" role="img" aria-label="OBV"></canvas></div>
+
+  <!-- Divergence alert -->
+  <div id="obv-div-banner" style="display:none;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5"></div>
+
+  <!-- Price mini chart (top) -->
+  <div style="margin-bottom:2px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
+      <span id="obv-price-range" style="font-size:9px;color:var(--muted2)"></span>
+    </div>
+    <div style="position:relative;height:90px"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
+  </div>
+
+  <!-- Divider with label -->
+  <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+    <div style="flex:1;height:1px;background:var(--b1)"></div>
+    <span style="font-size:9px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
+    <div style="flex:1;height:1px;background:var(--b1)"></div>
+  </div>
+
+  <!-- OBV chart (bottom) -->
+  <div style="position:relative;height:90px;margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
+
+  <!-- Reading guide -->
+  <div style="background:var(--card2);border-radius:8px;padding:.625rem .875rem;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+    <div style="font-size:10px;color:var(--muted);line-height:1.6">
+      <span style="color:var(--green)">Señal alcista:</span><br>
+      Precio baja → OBV sube<br>
+      <span style="font-size:9px;color:var(--muted2)">Instituciones comprando en silencio</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);line-height:1.6">
+      <span style="color:var(--red)">Señal bajista:</span><br>
+      Precio sube → OBV baja<br>
+      <span style="font-size:9px;color:var(--muted2)">Distribución — venden mientras sube</span>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:flex;justify-content:space-between;margin-top:.625rem;flex-wrap:wrap;gap:6px">
+    <span id="obv-daily-stat" style="font-size:10px;color:var(--muted)"></span>
+    <span id="obv-weekly-stat" style="font-size:10px;color:var(--muted)"></span>
+  </div>
 </div>
 
 <!-- ═══ HALVING CYCLE ═══ -->
@@ -398,7 +442,7 @@ const ZEC_SUPPLY=16_800_000; // approx circulating supply
 const ZEC_HALVING2=new Date('2024-11-18'); // 2nd halving
 const ZEC_HALVING3=new Date('2028-11-01'); // estimated 3rd
 
-let cP=null,cR=null,cM=null,cO=null;
+let cP=null,cR=null,cM=null,cO=null,cOP=null;
 let raw=null,stats=null,tf='daily',fibWindow=60,livePrice=null,liveMcap=null;
 
 /* ═══════════════════════════════════════════════
@@ -1013,20 +1057,117 @@ function renderMACD(s){
 
 function renderOBV(s){
   if(cO)cO.destroy();
-  const PAD=8,padL=[...s.labels,...Array(PAD).fill('')];
-  cO=new Chart(document.getElementById('cOBV'),{type:'line',
-    data:{labels:padL,datasets:[{data:pad(s.obvArr.map(v=>v/1e6),PAD),borderColor:s.obvRising?GR:RD,borderWidth:1.8,pointRadius:0,fill:true,backgroundColor:s.obvRising?'rgba(63,214,114,0.06)':'rgba(240,96,96,0.06)',tension:.3,spanGaps:false}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
+  if(cOP)cOP.destroy();
+
+  const PAD=8;
+  const padL=[...s.labels,...Array(PAD).fill('')];
+  const obvM=pad(s.obvArr.map(v=>v/1e6),PAD);
+  const pricesPad=pad(s.closes,PAD);
+
+  /* Detect OBV divergence visually:
+     Compare last 20 candles — if price trend and OBV trend go opposite directions */
+  const priceLast=s.closes.slice(-20);
+  const obvLast=s.obvArr.slice(-20);
+  const priceSlope=linregSlope(priceLast,20);
+  const obvSlopeVal=linregSlope(obvLast,20);
+  const bullDiv=priceSlope<0&&obvSlopeVal>0;   /* price falling, OBV rising = bullish div */
+  const bearDiv=priceSlope>0&&obvSlopeVal<0;   /* price rising, OBV falling = bearish div */
+  const hasDivergence=bullDiv||bearDiv;
+
+  /* Divergence banner */
+  const divB=document.getElementById('obv-div-banner');
+  if(bullDiv){
+    divB.style.cssText='display:block;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5;background:#091209;border:1px solid #3fd67233;color:#3fd672';
+    divB.textContent='Divergencia alcista detectada — precio cayendo pero OBV subiendo. Posible acumulación institucional silenciosa.';
+  }else if(bearDiv){
+    divB.style.cssText='display:block;border-radius:8px;padding:7px 10px;margin-bottom:.625rem;font-size:12px;line-height:1.5;background:#120909;border:1px solid #f0606033;color:#f06060';
+    divB.textContent='Divergencia bajista detectada — precio subiendo pero OBV cayendo. Posible distribución institucional.';
+  }else{
+    divB.style.display='none';
+  }
+
+  /* ── PRICE mini chart (top) — same labels as OBV ── */
+  const priceMin=Math.min(...s.closes)*0.995;
+  const priceMax=Math.max(...s.closes)*1.005;
+  cOP=new Chart(document.getElementById('cOBVPrice'),{
+    type:'line',
+    data:{labels:padL,datasets:[{
+      data:pricesPad,
+      borderColor:G,borderWidth:2,
+      pointRadius:0,fill:true,
+      backgroundColor:'rgba(201,168,76,0.06)',
+      tension:.3,spanGaps:false
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},
-        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:GR+'44',borderWidth:1,titleColor:TICK,bodyColor:s.obvRising?GR:RD,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-          callbacks:{title:i=>i[0]?.label||'',label:i=>' OBV: '+i.parsed.y?.toFixed(2)+'M'}}},
-      scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-              y:{ticks:{color:TICK,font:{size:10},callback:v=>v.toFixed(0)+'M'},grid:{color:GRID}}}
+      plugins:{legend:{display:false},tooltip:{
+        enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'44',borderWidth:1,
+        titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+        callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw?' $'+i.raw.toFixed(2):null}
+      }},
+      scales:{
+        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},
+           grid:{color:GRID}},
+        y:{min:priceMin,max:priceMax,
+           ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>'$'+v.toFixed(0)},
+           grid:{color:GRID}}
+      }
     }
   });
-  document.getElementById('obv-tag').textContent=s.obvRising?`Acumulación activa ↑ · Semanal: ${s.wObvRising?'↑':'↓'}`:`Distribución ↓ · Semanal: ${s.wObvRising?'↑':'↓'}`;
-  document.getElementById('obv-tag').style.color=s.obvRising?GR:RD;
+  document.getElementById('obv-price-range').textContent=
+    'H $'+Math.max(...s.closes).toFixed(2)+' · L $'+Math.min(...s.closes).toFixed(2);
+
+  /* ── OBV chart (bottom) — exact same labels ── */
+  /* Color: segment by segment based on whether OBV is rising or falling */
+  const obvColor=hasDivergence
+    ?(bullDiv?GR:RD)                 /* divergence: highlight the signal */
+    :(s.obvRising?GR:RD);
+
+  const obvMin=Math.min(...s.obvArr.map(v=>v/1e6));
+  const obvMax=Math.max(...s.obvArr.map(v=>v/1e6));
+  const obvRange=obvMax-obvMin;
+
+  cO=new Chart(document.getElementById('cOBV'),{
+    type:'line',
+    data:{labels:padL,datasets:[{
+      data:obvM,
+      borderColor:obvColor,borderWidth:2,
+      pointRadius:0,fill:true,
+      backgroundColor:s.obvRising?'rgba(63,214,114,0.08)':'rgba(240,96,96,0.08)',
+      tension:.3,spanGaps:false
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{
+        enabled:true,backgroundColor:'#0c0c0f',borderColor:obvColor+'55',borderWidth:1,
+        titleColor:TICK,bodyColor:obvColor,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
+        callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' OBV: '+i.raw.toFixed(1)+'M':null}
+      }},
+      scales:{
+        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},
+           grid:{color:GRID}},
+        y:{min:obvMin-obvRange*.05,max:obvMax+obvRange*.05,
+           ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>v.toFixed(0)+'M'},
+           grid:{color:GRID}}
+      }
+    }
+  });
+
+  /* Tag + stats */
+  const tag=document.getElementById('obv-tag');
+  if(bullDiv){tag.textContent='Divergencia alcista ↑';tag.style.color=GR;}
+  else if(bearDiv){tag.textContent='Divergencia bajista ↓';tag.style.color=RD;}
+  else if(s.obvRising){tag.textContent='Acumulación ↑';tag.style.color=GR;}
+  else{tag.textContent='Distribución ↓';tag.style.color=RD;}
+
+  document.getElementById('obv-daily-stat').textContent=
+    `Diario: ${s.obvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
+  document.getElementById('obv-daily-stat').style.color=s.obvRising?GR:RD;
+  document.getElementById('obv-weekly-stat').textContent=
+    `Semanal: ${s.wObvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
+  document.getElementById('obv-weekly-stat').style.color=s.wObvRising?GR:RD;
 }
 
 /* ═══════════════════════════════════════════════
