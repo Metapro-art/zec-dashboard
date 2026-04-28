@@ -86,49 +86,64 @@ function getHalvingPhase() {
   return { phase: 'Bear market', key: 'bear', days };
 }
 
-/* ── Weighted scoring with extension cap ── */
+/* ── Weighted scoring v2 — 8 independent dimensions, 16pt max ── */
 function buildScore(params) {
-  const { rsi, cur, e50c, wE200c, volR, macdAbove, macdBullish, obvRising,
-          div, fibZone, belowHi, peakFib618, peakFib786, halvPhase,
-          wRsi, wMacdAbove, wObvRising, e500d } = params;
+  const { rsiD, rsiW, cur, e200c, volR, macdAbove, macdBullish, obvRising,
+          div, fibZone, peakFib618, peakFib786, halvPhase,
+          wObvRising, e500d } = params;
+
+  /* TIMING — best of 3 momentum signals */
+  const macdBullSignal = macdBullish === true;
+  const rsiOversoldDiv = div === 'bullish';
+  const rsiBoth        = rsiD!==null&&rsiD<45 && rsiW!==null&&rsiW<45;
+  const timingActive   = macdBullSignal || rsiOversoldDiv || rsiBoth;
+  const timingDetail   = macdBullSignal ? 'MACD cruce alcista bajo cero ★'
+                       : rsiOversoldDiv ? 'Divergencia alcista RSI'
+                       : rsiBoth        ? 'RSI diario y semanal ambos < 45'
+                       : 'Ninguna';
+
+  /* CICLO — price not extended */
+  const notExtended = (rsiD===null||rsiD<70) && ((e500d||0)<60);
+
   const conds = [
-    { cat:'Macro',    l:'Precio en zona Last Peak Fib 0.618–0.786', w:3, ok: peakFib618||peakFib786 },
-    { cat:'Macro',    l:'Fase de acumulación post-halving',          w:2, ok: halvPhase==='accumulation' },
-    { cat:'Macro',    l:'Precio sobre EMA 200 semanal',              w:2, ok: wE200c ? cur>wE200c : false },
-    { cat:'Momentum', l:'MACD cruce alcista bajo cero',              w:2, ok: macdBullish===true },
-    { cat:'Momentum', l:'RSI semanal < 45',                         w:2, ok: wRsi!==null&&wRsi<45 },
-    { cat:'Momentum', l:'OBV en alza (D+S)',                        w:2, ok: obvRising&&wObvRising },
-    { cat:'Confirma', l:'RSI diario < 45',                          w:1, ok: rsi!==null&&rsi<45 },
-    { cat:'Confirma', l:'Fib 0.382–0.618 (60d)',                    w:1, ok: fibZone },
-    { cat:'Confirma', l:'Volumen creciente ≥ 1.1x',                 w:1, ok: volR>=1.1 },
-    { cat:'Confirma', l:'Bajo 95% del máx 30d',                    w:1, ok: belowHi },
-    { cat:'Confirma', l:'Divergencia alcista RSI',                  w:1, ok: div==='bullish' },
-    { cat:'Confirma', l:'MACD sobre línea señal',                   w:1, ok: macdAbove },
+    /* MACRO (7pt max) */
+    { cat:'Macro',  l:'Fase de acumulación post-halving',          w:3, ok: halvPhase==='accumulation' },
+    { cat:'Macro',  l:'Precio sobre EMA 200 semanal',              w:2, ok: e200c ? cur>e200c : false },
+    { cat:'Macro',  l:'Zona Last Peak Fib (0.618–0.786)',          w:2, ok: peakFib618||peakFib786 },
+    /* CICLO (4pt max) */
+    { cat:'Ciclo',  l:'Precio NO extendido (RSI<70, EMA500<60%)',  w:2, ok: notExtended },
+    { cat:'Ciclo',  l:'Soporte Fib 60d (0.382–0.618)',             w:2, ok: fibZone },
+    /* FLUJO (4pt max) */
+    { cat:'Flujo',  l:'OBV alcista en diario Y semanal',           w:2, ok: obvRising && wObvRising },
+    { cat:'Flujo',  l:'Volumen creciente (ratio ≥ 1.2)',           w:2, ok: volR>=1.2 },
+    /* TIMING (1pt max) */
+    { cat:'Timing', l:`Señal de momentum: ${timingDetail}`,        w:1, ok: timingActive },
   ];
+
   const earned = conds.reduce((a,c)=>a+(c.ok?c.w:0), 0);
   const max    = conds.reduce((a,c)=>a+c.w, 0);
   const pct    = max>0 ? earned/max : 0;
 
   /* Extension cap — same logic as dashboard */
-  const veryExtended = rsi>70 && (e500d||0)>60;
-  const extended     = rsi>65 || (e500d||0)>60;
+  const veryExtended = rsiD>70 && (e500d||0)>60;
+  const extended     = rsiD>65 || (e500d||0)>60;
 
   let signal, extNote='';
   if (veryExtended) {
     signal='Cautela (precio extendido)';
-    extNote=`⚠ RSI ${rsi?.toFixed(1)} en sobrecompra + ${(e500d||0).toFixed(0)}% sobre EMA 500. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
+    extNote=`⚠ RSI ${rsiD?.toFixed(1)} en sobrecompra + ${(e500d||0).toFixed(0)}% sobre EMA 500. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
   } else if (extended) {
-    const rawSig=pct>=.80?'Compra fuerte':pct>=.58?'Señal de compra':pct>=.40?'Observar':pct>=.24?'Cautela':'Esperar';
-    signal=(rawSig==='Compra fuerte'||rawSig==='Señal de compra')?'Observar (precio extendido)':rawSig;
-    extNote=`${rsi>65?`RSI ${rsi?.toFixed(1)} zona alta. `:''}${(e500d||0)>60?`Precio ${(e500d||0).toFixed(0)}% sobre EMA 500. `:''}Señal rebajada — mejor entrada en pullback.`;
+    const rawSig = pct>=.68?'Compra fuerte':pct>=.56?'Señal de compra':pct>=.38?'Observar':pct>=.22?'Cautela':'Esperar';
+    signal=(rawSig==='Compra fuerte'||rawSig==='Señal de compra') ? 'Observar (precio extendido)' : rawSig;
+    extNote=`${rsiD>65?`RSI ${rsiD?.toFixed(1)} zona alta. `:''}${(e500d||0)>60?`Precio ${(e500d||0).toFixed(0)}% sobre EMA 500. `:''}Señal rebajada — mejor entrada en pullback.`;
   } else {
-    if      (pct>=.80) signal='COMPRA FUERTE';
-    else if (pct>=.58) signal='Señal de compra';
-    else if (pct>=.40) signal='Observar';
-    else if (pct>=.24) signal='Cautela';
+    if      (pct>=.68) signal='COMPRA FUERTE';
+    else if (pct>=.56) signal='Señal de compra';
+    else if (pct>=.38) signal='Observar';
+    else if (pct>=.22) signal='Cautela';
     else               signal='Esperar';
   }
-  return { earned, max, pct, signal, conds, extNote };
+  return { earned, max, pct, signal, conds, extNote, timingDetail };
 }
 
 /* ── Main ── */
@@ -216,22 +231,47 @@ async function main() {
   // Score
   const e500dVal = e500c ? ((curPrice-e500c)/e500c*100) : 0;
 
+  // ═══ DCA MODE & DIP DETECTION ═══
+  const dcaModeActive = halv.key==='accumulation' && wE200c && curPrice>wE200c && halv.days>90;
+  const hi14 = Math.max(...dc.slice(-14));
+  const dropFromHi14 = ((curPrice-hi14)/hi14)*100;
+  const rsi14ago = dRsiArr[dRsiArr.length-15];
+  const dipDrop8 = dropFromHi14 <= -8;
+  const dipRsiSwing = rsi14ago>55 && dRsiC<45;
+  const dipRsiOversold = dRsiC!==null && dRsiC<35;
+  const dipFibSupport = fibZone || peakFib618 || peakFib786;
+
+  const dipSignals = [];
+  if (dipDrop8)        dipSignals.push({l:`Caída del ${dropFromHi14.toFixed(1)}% desde máx 14d`, w:2});
+  if (dipRsiSwing)     dipSignals.push({l:`RSI bajó de ${rsi14ago?.toFixed(0)} a ${dRsiC?.toFixed(0)} en 14d`, w:2});
+  if (dipRsiOversold)  dipSignals.push({l:`RSI sobreventa profunda (${dRsiC?.toFixed(0)})`, w:3});
+  if (dipFibSupport)   dipSignals.push({l: peakFib618?'Fib 0.618 macro ★★':peakFib786?'Fib 0.786 macro ★':'Fib 0.382–0.618 corto plazo', w: peakFib618||peakFib786?3:2});
+
+  const dipScore = dipSignals.reduce((a,s)=>a+s.w, 0);
+  const dipActive = dcaModeActive && dipScore>=2;
+  let dcaTier = null;
+  if (dipActive) {
+    if (dipScore>=5) dcaTier = {l:'CAÍDA FUERTE', pct:'25–35%', note:'Múltiples señales — comprar tramo grande'};
+    else if (dipScore>=3) dcaTier = {l:'CAÍDA BUENA', pct:'15–20%', note:'Buena oportunidad — tramo medio'};
+    else dcaTier = {l:'CAÍDA LEVE', pct:'8–12%', note:'Caída pequeña — tramo pequeño'};
+  }
+
   const score = buildScore({
-    rsi:dRsiC, cur:curPrice, e50c:dE50c, wE200c,
+    rsiD:dRsiC, rsiW:wRsiC, cur:curPrice, e200c:wE200c,
     volR:dVr, macdAbove:dMacdAbove, macdBullish:dMacdBull,
-    obvRising:dObvRising, div:dDiv, fibZone, belowHi,
+    obvRising:dObvRising, wObvRising,
+    div:dDiv, fibZone,
     peakFib618, peakFib786, halvPhase:halv.key,
-    wRsi:wRsiC, wMacdAbove, wObvRising,
     e500d:e500dVal
   });
 
-  // Weekly score for confluence
+  // Weekly score (using weekly-derived data) for confluence display
   const wScore = buildScore({
-    rsi:wRsiC, cur:curPrice, e50c:wE20c, wE200c,
+    rsiD:wRsiC, rsiW:wRsiC, cur:curPrice, e200c:wE200c,
     volR:wVr, macdAbove:wMacdAbove, macdBullish:wMacdBull,
-    obvRising:wObvRising, div:wDiv, fibZone, belowHi:curPrice<Math.max(...wData.highs.slice(-12))*.95,
+    obvRising:wObvRising, wObvRising,
+    div:wDiv, fibZone,
     peakFib618, peakFib786, halvPhase:halv.key,
-    wRsi:wRsiC, wMacdAbove, wObvRising,
     e500d:e500dVal
   });
 
@@ -260,17 +300,55 @@ async function main() {
   console.log(`  Div RSI: ${dDiv||'Ninguna'}`);
   console.log(`  Fib (60d): cercano a ${nFib} | En zona: ${fibZone?'Sí':'No'}`);
 
-  // Send if score threshold met
+  // Send if score threshold met OR DCA dip is active
   const trigger = score.pct * 100;
-  if (trigger >= MIN_PCT) {
-    console.log(`\n→ Score ${trigger.toFixed(0)}% >= mínimo ${MIN_PCT}% — enviando email...`);
+  const shouldSendNormal = trigger >= MIN_PCT;
+  const shouldSendDip = dipActive;
+  const shouldSend = shouldSendNormal || shouldSendDip;
+
+  if (shouldSend) {
+    const triggerReason = shouldSendNormal && shouldSendDip
+      ? `Score ${trigger.toFixed(0)}% + DIP ${dcaTier.l}`
+      : shouldSendNormal
+      ? `Score ${trigger.toFixed(0)}% >= ${MIN_PCT}%`
+      : `DIP ${dcaTier.l} en modo DCA`;
+    console.log(`\n→ Trigger: ${triggerReason} — enviando email...`);
 
     const condText = score.conds.map(c=>`${c.ok?'✓':'✗'} [${c.w}pt] ${c.l}`).join('\n');
     const targetsText = Object.entries(exts).map(([r,p])=>`  Fib ${r}: $${p.toFixed(2)} (+${((p-curPrice)/curPrice*100).toFixed(0)}%)`).join('\n');
 
+    /* DCA section */
+    let dcaSection = '';
+    if (dcaModeActive) {
+      dcaSection = `\n━━━ MODO ACUMULACIÓN DCA ━━━━━\n`;
+      dcaSection += `Estamos en fase de acumulación post-halving (día ${halv.days}).\n`;
+      dcaSection += `Estrategia: comprar caídas en tramos, no esperar bottom único.\n`;
+      if (dipActive) {
+        dcaSection += `\n⬇ DIP DETECTADO: ${dcaTier.l}\n`;
+        dcaSection += `${dcaTier.note} (sugerencia: ${dcaTier.pct} del capital DCA)\n`;
+        dcaSection += `\nSeñales detectadas:\n`;
+        dipSignals.forEach(s => dcaSection += `  • ${s.l}\n`);
+      } else {
+        dcaSection += `Sin dip activo en este momento.\n`;
+      }
+      const fibHalf = (PEAK_LO+PEAK_HI)/2;
+      const lvls = [
+        {l:'Nivel 1 — Precio actual', p:curPrice, pct:25},
+        {l:'Nivel 2 — Fib 0.382 macro', p:pkFibs[.382], pct:25},
+        {l:'Nivel 3 — Fib 0.5 macro', p:fibHalf, pct:25},
+        {l:'Nivel 4 — Fib 0.618 macro ★★', p:pkFibs[.618], pct:25},
+      ];
+      dcaSection += `\nNiveles DCA recomendados (% del capital total):\n`;
+      lvls.forEach(lv => {
+        const dist = ((curPrice-lv.p)/lv.p*100);
+        const reached = curPrice <= lv.p*1.03;
+        dcaSection += `  ${reached?'✓':' '} ${lv.l}: $${lv.p.toFixed(2)} (${dist>=0?'+':''}${dist.toFixed(1)}%) — ${lv.pct}%\n`;
+      });
+    }
+
     const body = `
 ZEC ALERT — ${new Date().toLocaleString('es-CO')}
-
+${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}
 ━━━ SEÑAL PONDERADA ━━━━━━━━━━━
 ${score.signal}
 ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posible)
@@ -289,7 +367,7 @@ ZEC Market Cap:  $${(zecMcap/1e6).toFixed(0)}M
 ━━━ CICLO HALVING ━━━━━━━━━━━━━
 ${halv.phase}
 ${halv.days} días desde halving Nov 2024
-
+${dcaSection}
 ━━━ MACRO — LAST PEAK ━━━━━━━━
 Ciclo: $${PEAK_LO} (sep 2025) → $${PEAK_HI} (nov 2025)
 Fib 0.382: $${pkFibs[.382].toFixed(2)}
