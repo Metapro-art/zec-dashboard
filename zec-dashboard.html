@@ -33,7 +33,7 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 /* Buttons */
 .tf-btn{font-size:10px;padding:6px 14px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
 .tf-btn.on{background:var(--gold);color:#080809;border-color:var(--gold)}
-.zbtn{font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:var(--muted);font-family:inherit;transition:all .15s}
+.zbtn{font-size:11px;padding:7px 12px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:var(--muted);font-family:inherit;transition:all .15s;min-height:32px}
 .zbtn:hover{border-color:var(--gold);color:var(--gold)}
 .zbtn.on{border-color:var(--gold);color:var(--gold)}
 
@@ -108,12 +108,18 @@ input[type=number]:focus{border-color:#C9A84C55}
   /* DCA rows - tighter padding on small screens */
   .dca-row{padding:8px 10px !important}
   .dca-row-bot{padding-left:14px !important}
+  /* Sell rows - same treatment */
+  .sell-row{padding:8px 10px !important}
+  .sell-row-bot{padding-left:14px !important}
 }
 @media(max-width:380px){
   .g7{grid-template-columns:repeat(3,minmax(0,1fr))}
   /* On very narrow screens, stack DCA bottom row */
   .dca-row-bot{flex-wrap:wrap !important;gap:4px !important}
   .dca-row-bot > div:first-child{width:100% !important}
+  /* Same for sell rows */
+  .sell-row-bot{flex-wrap:wrap !important;gap:4px !important}
+  .sell-row-bot > div:first-child{width:100% !important}
 }
 </style>
 </head>
@@ -221,7 +227,7 @@ input[type=number]:focus{border-color:#C9A84C55}
 <!-- ═══ OBV ═══ -->
 <div class="card" style="margin-bottom:1rem" id="obv-card">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.625rem;flex-wrap:wrap;gap:8px">
-    <div>
+    <div style="flex:1;min-width:0">
       <span class="lbl" style="margin-bottom:0;display:block">OBV · On Balance Volume · Acumulación institucional</span>
       <span style="font-size:10px;color:var(--muted)">Precio y OBV alineados — zona sombreada = divergencia activa</span>
     </div>
@@ -230,7 +236,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <div id="obv-tag" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--b1);background:var(--card2);white-space:nowrap"></div>
       <!-- Alert permission button -->
       <button id="obv-alert-btn" onclick="enableAlerts()"
-        style="font-size:9px;padding:3px 9px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit">
+        style="font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;min-height:30px">
         🔔 Activar alertas
       </button>
     </div>
@@ -400,10 +406,10 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div><span class="lbl" style="display:block;margin-bottom:2px">Retrocesos Fibonacci</span>
     <span id="fib-hl" style="font-size:10px;color:var(--muted)"></span></div>
     <div class="zbtn-group" style="display:flex;gap:4px">
-      <button class="zbtn" id="fw-30" onclick="setFibWindow(30)" style="font-size:9px;padding:3px 8px">30d</button>
-      <button class="zbtn on" id="fw-60" onclick="setFibWindow(60)" style="font-size:9px;padding:3px 8px">60d</button>
-      <button class="zbtn" id="fw-90" onclick="setFibWindow(90)" style="font-size:9px;padding:3px 8px">90d</button>
-      <button class="zbtn" id="fw-peak" onclick="setFibWindow('peak')" style="font-size:9px;padding:3px 8px">Last Peak</button>
+      <button class="zbtn" id="fw-30" onclick="setFibWindow(30)" style="font-size:10px">30d</button>
+      <button class="zbtn on" id="fw-60" onclick="setFibWindow(60)" style="font-size:10px">60d</button>
+      <button class="zbtn" id="fw-90" onclick="setFibWindow(90)" style="font-size:10px">90d</button>
+      <button class="zbtn" id="fw-peak" onclick="setFibWindow('peak')" style="font-size:10px">Last Peak</button>
     </div>
   </div>
   <div id="peak-banner" style="display:none;background:#1a1208;border:1px solid #C9A84C33;border-radius:8px;padding:7px 10px;margin-bottom:.75rem;font-size:11px;color:#C9A84C;line-height:1.6">
@@ -451,11 +457,22 @@ input[type=number]:focus{border-color:#C9A84C55}
 <!-- ═══ DCA CALCULATOR ═══ -->
 <div class="card" style="margin-bottom:1rem" id="dca-card">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:8px">
-    <div>
+    <div style="flex:1;min-width:0">
       <span class="lbl" style="margin-bottom:2px;display:block">Estrategia DCA · Acumulación por niveles</span>
       <span style="font-size:10px;color:var(--muted)">Distribuye tu capital total en 4 compras escalonadas</span>
     </div>
-    <span id="dca-mode-tag" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);color:var(--muted);white-space:nowrap"></span>
+    <span id="dca-mode-tag" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);color:var(--muted);white-space:nowrap;flex-shrink:0"></span>
+  </div>
+
+  <!-- Anchor price input -->
+  <div style="background:var(--card2);border-radius:9px;padding:.75rem;margin-bottom:.625rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px">
+      <span class="lbl" style="margin-bottom:0">Precio ancla DCA ($)</span>
+      <button onclick="setAnchorToCurrent()" style="font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap;min-height:30px">↻ Usar precio actual</button>
+    </div>
+    <input id="dca-anchor" type="number" step="0.01" oninput="setAnchor()"
+      style="width:100%;background:var(--card);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:14px;padding:8px 10px;border-radius:7px;outline:none">
+    <div style="font-size:9px;color:var(--muted);margin-top:5px">El precio desde el cual se calculan las caídas. Si compraste a $336, ese es tu ancla — los niveles se quedan fijos.</div>
   </div>
 
   <!-- Capital input -->
@@ -463,7 +480,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div class="lbl" style="margin-bottom:6px">Capital total a destinar a DCA ($)</div>
     <input id="dca-capital" type="number" step="100" placeholder="ej: 1000" oninput="calcDCA()"
       style="width:100%;background:var(--card);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:14px;padding:8px 10px;border-radius:7px;outline:none">
-    <div style="font-size:9px;color:var(--muted);margin-top:5px">Mete cuánto en total quieres acumular. Cada nivel toma un % de ese total.</div>
+    <div style="font-size:9px;color:var(--muted);margin-top:5px">Cuánto en total quieres acumular. Cada nivel toma un % distinto (15% / 20% / 30% / 35%).</div>
   </div>
 
   <!-- 4 levels grid -->
@@ -473,16 +490,76 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div id="dca-summary" style="background:var(--card2);border-radius:9px;padding:.75rem;margin-top:.875rem;display:none">
     <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:11px">
       <div><span class="lbl" style="display:block;margin-bottom:2px">Capital total</span><span id="dca-total" class="mono" style="font-size:14px;color:var(--text)">$0</span></div>
-      <div><span class="lbl" style="display:block;margin-bottom:2px">Precio promedio si llega a Fib 0.618</span><span id="dca-avg" class="mono" style="font-size:14px;color:var(--gold)">—</span></div>
+      <div><span class="lbl" style="display:block;margin-bottom:2px">Precio promedio si baja a -30%</span><span id="dca-avg" class="mono" style="font-size:14px;color:var(--gold)">—</span></div>
       <div><span class="lbl" style="display:block;margin-bottom:2px">ZEC total estimado</span><span id="dca-zec" class="mono" style="font-size:14px;color:var(--green)">—</span></div>
     </div>
   </div>
 
   <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.6">
-    <strong style="color:var(--text)">Cómo funciona:</strong> compras 25% del capital ahora al precio actual.
-    Si baja al primer soporte Fib (0.382), compras otro 25%. Si sigue cayendo a 0.5, compras otro 25%.
-    Si llega al 0.618 macro (zona áurea), compras el último 25%. Tu precio promedio queda mucho más bajo
-    que comprar todo de una vez.
+    <strong style="color:var(--text)">Cómo funciona:</strong> compras 15% del capital al precio ancla.
+    Si cae 10%, compras 20% más. Si sigue cayendo a -20%, compras 30%.
+    Si llega a -30%, compras el 35% restante. La distribución es <strong>asimétrica</strong> —
+    compras más cantidad de capital cuando el precio está más barato, así acumulas más ZEC.
+    Tu precio promedio queda mucho más bajo que comprar todo de una vez.
+  </div>
+</div>
+
+<!-- ═══ SELL STRATEGY · CICLO HALVING ═══ -->
+<div class="card" style="margin-bottom:1rem" id="sell-card">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:8px">
+    <div style="flex:1;min-width:0">
+      <span class="lbl" style="margin-bottom:2px;display:block">Estrategia de salida · ciclo de halving</span>
+      <span style="font-size:10px;color:var(--muted)">Ventas asimétricas en techo de ciclo · disciplina de holder</span>
+    </div>
+    <span id="sell-mode-tag" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);color:var(--muted);white-space:nowrap;flex-shrink:0"></span>
+  </div>
+
+  <!-- Cycle progress bar -->
+  <div style="margin-bottom:.875rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:6px">
+      <span style="font-size:10px;color:var(--muted2);letter-spacing:.05em;text-transform:uppercase">Posición en ciclo de 4 años</span>
+      <span id="cycle-pos" style="font-size:10px;font-family:'Courier New',monospace;color:var(--muted)"></span>
+    </div>
+    <div style="position:relative;height:18px;background:var(--card2);border-radius:9px;overflow:hidden;border:1px solid var(--b1)">
+      <!-- Phase bands -->
+      <div style="position:absolute;top:0;left:0;width:12.3%;height:100%;background:#3a1010;opacity:.4" title="Corrección"></div>
+      <div style="position:absolute;top:0;left:12.3%;width:24.7%;height:100%;background:#0f2620;opacity:.5" title="Acumulación"></div>
+      <div style="position:absolute;top:0;left:37%;width:24.7%;height:100%;background:#0f2018;opacity:.4" title="Bull run"></div>
+      <div style="position:absolute;top:0;left:61.7%;width:24.7%;height:100%;background:#2a1f08;opacity:.6" title="Techo · zona venta"></div>
+      <div style="position:absolute;top:0;left:86.4%;width:13.6%;height:100%;background:#3a1010;opacity:.4" title="Bear"></div>
+      <!-- Position marker -->
+      <div id="cycle-marker" style="position:absolute;top:-3px;width:3px;height:24px;background:var(--gold);box-shadow:0 0 6px var(--gold);transition:left .8s;left:0"></div>
+    </div>
+    <div class="cycle-labels" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:9px;color:var(--muted2);margin-top:5px;letter-spacing:.04em">
+      <span>Halving 2024</span>
+      <span style="color:#f0834f">Acum.</span>
+      <span style="color:#5ecc7b">Bull</span>
+      <span style="color:var(--gold)">★ Techo</span>
+      <span>Halving 2028</span>
+    </div>
+  </div>
+
+  <!-- Mode banner -->
+  <div id="sell-banner" style="border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6"></div>
+
+  <!-- Activation conditions checklist -->
+  <div id="sell-conditions" style="background:var(--card2);border-radius:9px;padding:.75rem;margin-bottom:.875rem">
+    <div class="lbl" style="margin-bottom:6px;font-size:9px">Condiciones requeridas (TODAS deben cumplirse)</div>
+    <div id="sell-conds-list" style="display:flex;flex-direction:column;gap:5px"></div>
+  </div>
+
+  <!-- Sell levels (always visible but greyed when inactive) -->
+  <div id="sell-levels" style="display:grid;gap:8px"></div>
+
+  <!-- Core holding -->
+  <div style="background:var(--card2);border:1px dashed #C9A84C44;border-radius:9px;padding:10px 12px;margin-top:8px;text-align:center">
+    <span style="font-size:10px;color:var(--gold);letter-spacing:.05em;text-transform:uppercase">Core holding permanente</span>
+    <div class="mono" style="font-size:14px;color:var(--gold);margin-top:2px">15% — para el siguiente ciclo de halving</div>
+    <div style="font-size:9px;color:var(--muted);margin-top:3px">Nunca vender · cobertura para el ciclo 2028–2032</div>
+  </div>
+
+  <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.6">
+    <strong style="color:var(--text)">Lógica estricta:</strong> el módulo solo se activa en techo de ciclo (mes 30–42 post-halving = mayo 2027–mayo 2028 aprox) <strong>y</strong> con extensión Fibonacci alta <strong>y</strong> RSI semanal sobrecompra. Si alguna falta, dice "no vender". Esto te protege del FOMO de salida durante el bull run.
   </div>
 </div>
 
@@ -910,6 +987,7 @@ function analyze(data,curPrice,tf){
 
   /* Last Peak Fibonacci zones */
   const pkFibs=fibL(PEAK_HI,PEAK_LO);
+  const pkExts=fibE(PEAK_HI,PEAK_LO);
   const peakFibZone618=cur>=pkFibs[.618]*0.97&&cur<=pkFibs[.618]*1.03;
   const peakFibZone786=cur>=pkFibs[.786]*0.97&&cur<=pkFibs[.786]*1.03;
 
@@ -1005,13 +1083,18 @@ function analyze(data,curPrice,tf){
     else                 dcaTier={l:'CAÍDA LEVE',pct:'8–12%',col:AM,note:'Caída pequeña — comprar tramo pequeño del DCA'};
   }
 
-  /* ═══ DCA Levels — based on Last Peak Fibonacci ═══ */
-  /* Distribute capital across 4 levels: current, Fib 0.382, Fib 0.5, Fib 0.618 macro */
+  /* ═══ DCA Levels — caídas progresivas con anclaje y pesos asimétricos ═══ */
+  /* El precio ancla viene de localStorage si el usuario lo definió, si no usa precio actual */
+  let dcaAnchor=cur;
+  try{
+    const stored=parseFloat(localStorage.getItem('zec_dca_anchor'));
+    if(stored&&stored>0)dcaAnchor=stored;
+  }catch(e){/* private mode — fallback to cur */}
   const dcaLevels=[
-    {label:'Nivel 1 · Precio actual',   price:cur,                pctOfCapital:25, note:'Primera compra inmediata'},
-    {label:'Nivel 2 · Fib 0.382 macro', price:pkFibs[.382],       pctOfCapital:25, note:'Si cae al primer soporte'},
-    {label:'Nivel 3 · Fib 0.5 macro',   price:pkFibs[.5],         pctOfCapital:25, note:'Si profundiza la corrección'},
-    {label:'Nivel 4 · Fib 0.618 macro', price:pkFibs[.618],       pctOfCapital:25, note:'Zona óptima áurea — compra grande si llega'},
+    {label:'Nivel 1 · Precio ancla',   price:dcaAnchor,        drop:0,   pctOfCapital:15, note:'Entrada inicial — pie en el agua'},
+    {label:'Nivel 2 · Caída del 10%',  price:dcaAnchor*0.90,   drop:-10, pctOfCapital:20, note:'Corrección técnica normal'},
+    {label:'Nivel 3 · Caída del 20%',  price:dcaAnchor*0.80,   drop:-20, pctOfCapital:30, note:'Corrección significativa — oportunidad clara'},
+    {label:'Nivel 4 · Caída del 30%',  price:dcaAnchor*0.70,   drop:-30, pctOfCapital:35, note:'Corrección profunda — mejor entrada del ciclo'},
   ];
 
   return{
@@ -1022,7 +1105,7 @@ function analyze(data,curPrice,tf){
     wMacdAbove,wMacdBullish,
     obvArr,obvRising,wObvRising,
     fibs,exts,fibZone,nFib,fibHi,fibLo,
-    pkFibs,peakFibZone618,peakFibZone786,
+    pkFibs,pkExts,peakFibZone618,peakFibZone786,
     volR,belowHi30,swingStop,
     halvInfo,
     conds,sc,confD,confW,
@@ -1571,7 +1654,41 @@ function renderConds(s){
   document.getElementById('w-score-detail').textContent='Macro 7pt · Ciclo 4pt · Flujo 4pt · Timing 1pt = 16 max';
 }
 
+function setAnchor(){
+  const v=parseFloat(document.getElementById('dca-anchor').value);
+  try{
+    if(v&&v>0){
+      localStorage.setItem('zec_dca_anchor',v);
+    }else{
+      localStorage.removeItem('zec_dca_anchor');
+    }
+  }catch(e){/* private mode — silent */}
+  if(stats){
+    /* Recompute levels with new anchor without full reload */
+    const a=v||stats.cur;
+    stats.dcaLevels[0].price=a;
+    stats.dcaLevels[1].price=a*0.90;
+    stats.dcaLevels[2].price=a*0.80;
+    stats.dcaLevels[3].price=a*0.70;
+    renderDCA(stats);
+  }
+}
+
+function setAnchorToCurrent(){
+  if(!stats)return;
+  document.getElementById('dca-anchor').value=stats.cur.toFixed(2);
+  setAnchor();
+}
+
 function renderDCA(s){
+  /* ── Initialize anchor input (only once, if empty) ── */
+  const anchorInput=document.getElementById('dca-anchor');
+  if(!anchorInput.value){
+    let stored=null;
+    try{stored=parseFloat(localStorage.getItem('zec_dca_anchor'));}catch(e){}
+    anchorInput.value=(stored&&stored>0?stored:s.cur).toFixed(2);
+  }
+
   /* ── Mode banner ── */
   const banner=document.getElementById('dca-mode-banner');
   const detail=document.getElementById('dca-mode-detail');
@@ -1664,6 +1781,117 @@ function calcDCA(){
   document.getElementById('dca-avg').textContent='$'+avgPrice.toFixed(2);
   document.getElementById('dca-zec').textContent=totalZec.toFixed(3)+' ZEC';
   summary.style.display='block';
+}
+
+function renderSell(s){
+  /* ═══════════════════════════════════════════════
+     STRICT SELL STRATEGY — only activates in cycle top phase
+     Required (ALL):
+       1. Halving phase = 'top' (mes 30-42 post-halving)
+       2. Price in high Fib extension zone (>= 1.618 from Last Peak)
+       3. RSI semanal > 70 (macro overbought)
+  ═══════════════════════════════════════════════ */
+
+  /* ── Cycle position (% from halving 2 to halving 3) ── */
+  const TOTAL_CYCLE_DAYS=1460; /* ~4 años */
+  const cyclePct=Math.max(0,Math.min(100,(s.halvInfo.daysSince/TOTAL_CYCLE_DAYS)*100));
+  document.getElementById('cycle-marker').style.left=cyclePct.toFixed(1)+'%';
+  document.getElementById('cycle-pos').textContent=
+    `Día ${s.halvInfo.daysSince} de ${TOTAL_CYCLE_DAYS} · ${cyclePct.toFixed(0)}% del ciclo`;
+
+  /* ── Conditions ── */
+  const inTopPhase=s.halvInfo.halvingPhaseKey==='top';
+  /* High Fib extension: precio cerca o sobre Fib 1.618 desde Last Peak macro */
+  const fib1618=s.pkExts?.['1.618']||null;
+  const inHighExt=fib1618!==null && s.cur>=fib1618*0.97;
+  /* RSI semanal sobre 70 */
+  const wRsiHot=s.wRsiC!==null && s.wRsiC>70;
+
+  const conds=[
+    {ok:inTopPhase, l:'Fase de techo de ciclo (mes 30–42 post-halving)',
+     detail:`Actual: ${s.halvInfo.phase} · día ${s.halvInfo.daysSince}`},
+    {ok:inHighExt, l:'Precio en extensión Fibonacci alta (≥ 1.618)',
+     detail:fib1618?`Fib 1.618 = $${fib1618.toFixed(2)} · actual $${s.cur.toFixed(2)}`:'Sin datos de extensión'},
+    {ok:wRsiHot, l:'RSI semanal en sobrecompra (> 70)',
+     detail:s.wRsiC!==null?`RSI semanal: ${s.wRsiC.toFixed(1)}`:'RSI semanal: —'},
+  ];
+  const allMet=conds.every(c=>c.ok);
+
+  /* ── Render conditions checklist ── */
+  document.getElementById('sell-conds-list').innerHTML=conds.map(c=>
+    `<div style="display:flex;align-items:flex-start;gap:8px;font-size:11px">
+       <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
+       <div style="flex:1;min-width:0">
+         <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
+         <div style="font-size:9px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+       </div>
+     </div>`
+  ).join('');
+
+  /* ── Mode tag ── */
+  const tag=document.getElementById('sell-mode-tag');
+  if(allMet){
+    tag.textContent='● ZONA DE VENTA';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #f0b42977;background:#1f1608;color:#f0b429;white-space:nowrap;flex-shrink:0;animation:pulse-bull 2s ease-in-out infinite';
+  }else if(inTopPhase){
+    tag.textContent='○ Techo · esperando confluencia';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #f0834f44;background:#1a0e08;color:#f0834f;white-space:nowrap;flex-shrink:0';
+  }else{
+    tag.textContent='○ Inactivo · holdear';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--card2);color:var(--muted);white-space:nowrap;flex-shrink:0';
+  }
+
+  /* ── Banner ── */
+  const banner=document.getElementById('sell-banner');
+  if(allMet){
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#1a1208;border:1.5px solid #f0b42977;color:#f0b429';
+    banner.innerHTML='<strong>★ ACTIVADO · Ejecutar plan de salida</strong><br><span style="font-size:11px;color:#d4a040">Las 3 condiciones se cumplen. Techo de ciclo confirmado. Empezar distribución asimétrica abajo.</span>';
+  }else if(inTopPhase){
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#180e08;border:1.5px solid #f0834f44;color:#f0834f';
+    banner.innerHTML='<strong>Estás en zona temporal de techo</strong><br><span style="font-size:11px;color:#c0a080">Esperando que el precio y el RSI confirmen. Sin esa confluencia, no vender.</span>';
+  }else{
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#0d1612;border:1.5px solid #2ec4b644;color:#2ec4b6';
+    banner.innerHTML=`<strong>NO VENDER · seguir holdeando</strong><br><span style="font-size:11px;color:#80b8a8">Estamos en fase: <strong>${s.halvInfo.phase}</strong>. La venta solo se justifica en techo de ciclo. Subidas en bull run no son señal de salida.</span>`;
+  }
+
+  /* ── Sell levels — based on DCA anchor × multipliers ── */
+  let dcaAnchor=s.cur;
+  try{
+    const stored=parseFloat(localStorage.getItem('zec_dca_anchor'));
+    if(stored&&stored>0)dcaAnchor=stored;
+  }catch(e){}
+
+  const sellLevels=[
+    {label:'Nivel 1 · +50% del ancla',  price:dcaAnchor*1.50, mult:'+50%',  pct:10, note:'Toma de ganancias inicial'},
+    {label:'Nivel 2 · +100% del ancla', price:dcaAnchor*2.00, mult:'+100%', pct:20, note:'Doble del ancla — confirmación'},
+    {label:'Nivel 3 · +200% del ancla', price:dcaAnchor*3.00, mult:'+200%', pct:30, note:'Bull run consolidado'},
+    {label:'Nivel 4 · +400% del ancla', price:dcaAnchor*5.00, mult:'+400%', pct:25, note:'Euforia · zona de salida grande'},
+  ];
+
+  /* Render levels — greyed when sell mode not active */
+  const lvlEl=document.getElementById('sell-levels');
+  lvlEl.innerHTML=sellLevels.map((lv,i)=>{
+    const distance=((s.cur-lv.price)/lv.price*100);
+    const reached=allMet && s.cur>=lv.price;
+    const col=allMet?(i===0?'#5ecc7b':i===1?'#3fd672':i===2?'#f0b429':'#f0834f'):'#444';
+    const opacity=allMet?'1':'0.5';
+    return`<div class="sell-row" style="background:var(--card2);border:1px solid ${reached?col+'88':col+'33'};border-radius:9px;padding:10px 12px;opacity:${opacity}">
+      <div class="sell-row-top" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${reached?col:'var(--b1)'};${reached?'box-shadow:0 0 6px '+col+'88':''};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:${col};letter-spacing:.05em;line-height:1.3">${lv.label}</div>
+        </div>
+        <div class="mono" style="font-size:14px;color:${allMet?'var(--text)':'var(--muted)'};white-space:nowrap">$${lv.price.toFixed(2)}</div>
+      </div>
+      <div class="sell-row-bot" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-left:18px">
+        <div style="font-size:10px;color:var(--muted);flex:1;min-width:0">${lv.note}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="font-size:10px;font-family:'Courier New',monospace;color:${distance<=0?'#5ecc7b':RD};white-space:nowrap">${distance>=0?'+':''}${distance.toFixed(1)}%</span>
+          <span class="mono" style="font-size:13px;color:${col};white-space:nowrap;text-align:right;min-width:50px">vender ${lv.pct}%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderRR(s){
@@ -1760,7 +1988,7 @@ function renderAll(s){
 
   renderPriceChart(s);renderRSI(s);renderMACD(s);renderOBV(s);
   renderHalving(s);renderMcap(s);renderConfluence(s);
-  renderFibRet(s);renderExtensions(s);renderConds(s);renderDCA(s);renderRR(s);
+  renderFibRet(s);renderExtensions(s);renderConds(s);renderDCA(s);renderSell(s);renderRR(s);
 }
 
 /* ═══════════════════════════════════════════════

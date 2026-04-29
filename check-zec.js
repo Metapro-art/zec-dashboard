@@ -210,6 +210,7 @@ async function main() {
   // Last Peak macro fibs
   const PEAK_LO=55.78, PEAK_HI=698.33;
   const pkFibs = fibL(PEAK_HI,PEAK_LO);
+  const pkExts = fibE(PEAK_HI,PEAK_LO);
   const peakFib618 = curPrice>=pkFibs[.618]*.97 && curPrice<=pkFibs[.618]*1.03;
   const peakFib786 = curPrice>=pkFibs[.786]*.97 && curPrice<=pkFibs[.786]*1.03;
 
@@ -300,22 +301,64 @@ async function main() {
   console.log(`  Div RSI: ${dDiv||'Ninguna'}`);
   console.log(`  Fib (60d): cercano a ${nFib} | En zona: ${fibZone?'Sí':'No'}`);
 
-  // Send if score threshold met OR DCA dip is active
+  // ═══ SELL STRATEGY · STRICT CYCLE TOP MODE ═══
+  // All 3 conditions must be met simultaneously
+  const inTopPhase = halv.key === 'top';
+  const fib1618 = pkExts['1.618'] || null;
+  const inHighExt = fib1618 !== null && curPrice >= fib1618 * 0.97;
+  const wRsiHot = wRsiC !== null && wRsiC > 70;
+  const sellModeActive = inTopPhase && inHighExt && wRsiHot;
+  const sellInTopButWaiting = inTopPhase && !sellModeActive;
+
+  // Send if score threshold met OR DCA dip is active OR sell mode activates
   const trigger = score.pct * 100;
   const shouldSendNormal = trigger >= MIN_PCT;
   const shouldSendDip = dipActive;
-  const shouldSend = shouldSendNormal || shouldSendDip;
+  const shouldSendSell = sellModeActive;
+  const shouldSend = shouldSendNormal || shouldSendDip || shouldSendSell;
 
   if (shouldSend) {
-    const triggerReason = shouldSendNormal && shouldSendDip
-      ? `Score ${trigger.toFixed(0)}% + DIP ${dcaTier.l}`
-      : shouldSendNormal
-      ? `Score ${trigger.toFixed(0)}% >= ${MIN_PCT}%`
-      : `DIP ${dcaTier.l} en modo DCA`;
+    const reasons = [];
+    if (shouldSendNormal) reasons.push(`Score ${trigger.toFixed(0)}% >= ${MIN_PCT}%`);
+    if (shouldSendDip)    reasons.push(`DIP ${dcaTier.l}`);
+    if (shouldSendSell)   reasons.push(`★ ZONA DE VENTA · techo de ciclo`);
+    const triggerReason = reasons.join(' + ');
     console.log(`\n→ Trigger: ${triggerReason} — enviando email...`);
 
     const condText = score.conds.map(c=>`${c.ok?'✓':'✗'} [${c.w}pt] ${c.l}`).join('\n');
     const targetsText = Object.entries(exts).map(([r,p])=>`  Fib ${r}: $${p.toFixed(2)} (+${((p-curPrice)/curPrice*100).toFixed(0)}%)`).join('\n');
+
+    /* SELL section */
+    let sellSection = '';
+    if (sellModeActive) {
+      // Use anchor from env if set, else current price (GitHub Actions can't read browser localStorage)
+      const sellAnchor = parseFloat(process.env.DCA_ANCHOR) || curPrice;
+      sellSection = `\n━━━ ★ ESTRATEGIA DE SALIDA ACTIVA ━━\n`;
+      sellSection += `TECHO DE CICLO CONFIRMADO — ejecutar plan asimétrico\n`;
+      sellSection += `\n3 condiciones cumplidas:\n`;
+      sellSection += `  ✓ Fase: ${halv.phase} (día ${halv.days} post-halving)\n`;
+      sellSection += `  ✓ Precio en Fib 1.618+ ($${fib1618.toFixed(2)})\n`;
+      sellSection += `  ✓ RSI semanal sobrecompra (${wRsiC.toFixed(1)})\n`;
+      sellSection += `\nNiveles de venta (% de tu posición):\n`;
+      const sellLvls = [
+        {l:'Nivel 1 — +50% del ancla',  p:sellAnchor*1.50, pct:10},
+        {l:'Nivel 2 — +100% del ancla', p:sellAnchor*2.00, pct:20},
+        {l:'Nivel 3 — +200% del ancla', p:sellAnchor*3.00, pct:30},
+        {l:'Nivel 4 — +400% del ancla', p:sellAnchor*5.00, pct:25},
+      ];
+      sellLvls.forEach(lv => {
+        const dist = ((curPrice-lv.p)/lv.p*100);
+        const reached = curPrice >= lv.p;
+        sellSection += `  ${reached?'✓':' '} ${lv.l}: $${lv.p.toFixed(2)} (${dist>=0?'+':''}${dist.toFixed(1)}%) — vender ${lv.pct}%\n`;
+      });
+      sellSection += `\n  ★ CORE: 15% holding permanente (siguiente ciclo halving 2028)\n`;
+    } else if (sellInTopButWaiting) {
+      sellSection = `\n━━━ ZONA DE TECHO · ESPERANDO CONFLUENCIA ━━\n`;
+      sellSection += `Estás en fase de techo (día ${halv.days}) pero faltan condiciones:\n`;
+      sellSection += `  ${inHighExt?'✓':'✗'} Fib 1.618 alcanzado${fib1618?` (= $${fib1618.toFixed(2)})`:''}\n`;
+      sellSection += `  ${wRsiHot?'✓':'✗'} RSI semanal > 70 (actual: ${wRsiC?.toFixed(1)||'—'})\n`;
+      sellSection += `Sin las 3, NO vender.\n`;
+    }
 
     /* DCA section */
     let dcaSection = '';
@@ -331,12 +374,11 @@ async function main() {
       } else {
         dcaSection += `Sin dip activo en este momento.\n`;
       }
-      const fibHalf = (PEAK_LO+PEAK_HI)/2;
       const lvls = [
-        {l:'Nivel 1 — Precio actual', p:curPrice, pct:25},
-        {l:'Nivel 2 — Fib 0.382 macro', p:pkFibs[.382], pct:25},
-        {l:'Nivel 3 — Fib 0.5 macro', p:fibHalf, pct:25},
-        {l:'Nivel 4 — Fib 0.618 macro ★★', p:pkFibs[.618], pct:25},
+        {l:'Nivel 1 — Precio actual',  p:curPrice,        pct:15},
+        {l:'Nivel 2 — Caída del 10%',  p:curPrice*0.90,   pct:20},
+        {l:'Nivel 3 — Caída del 20%',  p:curPrice*0.80,   pct:30},
+        {l:'Nivel 4 — Caída del 30%',  p:curPrice*0.70,   pct:35},
       ];
       dcaSection += `\nNiveles DCA recomendados (% del capital total):\n`;
       lvls.forEach(lv => {
@@ -348,7 +390,7 @@ async function main() {
 
     const body = `
 ZEC ALERT — ${new Date().toLocaleString('es-CO')}
-${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}
+${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}${shouldSendSell?'\n★ ZONA DE VENTA · TECHO DE CICLO ACTIVO — ejecutar plan de salida asimétrico\n':''}
 ━━━ SEÑAL PONDERADA ━━━━━━━━━━━
 ${score.signal}
 ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posible)
@@ -367,7 +409,7 @@ ZEC Market Cap:  $${(zecMcap/1e6).toFixed(0)}M
 ━━━ CICLO HALVING ━━━━━━━━━━━━━
 ${halv.phase}
 ${halv.days} días desde halving Nov 2024
-${dcaSection}
+${dcaSection}${sellSection}
 ━━━ MACRO — LAST PEAK ━━━━━━━━
 Ciclo: $${PEAK_LO} (sep 2025) → $${PEAK_HI} (nov 2025)
 Fib 0.382: $${pkFibs[.382].toFixed(2)}
@@ -406,7 +448,7 @@ Señal al ${MIN_PCT}% del score máximo
     await transporter.sendMail({
       from: `"ZEC Alert" <${EMAIL_USER}>`,
       to: EMAIL_TO,
-      subject: `ZEC: ${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
+      subject: `ZEC: ${sellModeActive?'★ ZONA VENTA · ':''}${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
       text: body
     });
     console.log('✓ Email enviado.');
