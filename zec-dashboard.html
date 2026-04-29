@@ -331,12 +331,12 @@ input[type=number]:focus{border-color:#C9A84C55}
       <div style="position:absolute;top:0;left:62.5%;width:1px;height:100%;background:var(--muted2)"></div>
       <div style="position:absolute;top:0;left:87.5%;width:1px;height:100%;background:var(--muted2)"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:3px;padding:0 0">
-      <span style="font-size:8px;color:var(--muted2)">Corrección</span>
-      <span style="font-size:8px;color:var(--muted2)">Acumulación</span>
-      <span style="font-size:8px;color:var(--muted2)">Bull run</span>
-      <span style="font-size:8px;color:var(--muted2)">Techo</span>
-      <span style="font-size:8px;color:var(--muted2)">Bear</span>
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:5px;padding:0">
+      <span style="font-size:9px;color:var(--muted2)">Corrección</span>
+      <span style="font-size:9px;color:var(--muted2)">Acumulación</span>
+      <span style="font-size:9px;color:var(--muted2)">Bull run</span>
+      <span style="font-size:9px;color:var(--muted2)">Techo</span>
+      <span style="font-size:9px;color:var(--muted2)">Bear</span>
     </div>
   </div>
   <div id="hv-note" style="font-size:11px;color:var(--muted);line-height:1.6;padding:.625rem .875rem;background:var(--card2);border-radius:8px;border:1px solid var(--b1)"></div>
@@ -441,7 +441,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
     <span id="score-lbl" style="font-size:11px;color:var(--muted)"></span>
-    <button onclick="refresh()" style="font-size:11px;padding:5px 14px;border-radius:7px;cursor:pointer;font-family:inherit;background:var(--b2);color:var(--muted);border:1px solid var(--b1)">Actualizar</button>
+    <button onclick="refresh()" style="font-size:11px;padding:8px 16px;border-radius:7px;cursor:pointer;font-family:inherit;background:var(--b2);color:var(--muted);border:1px solid var(--b1);min-height:34px">Actualizar</button>
   </div>
 </div>
 
@@ -814,23 +814,37 @@ function scoreFromConds(conds, extCtx){
 }
 
 /* Lightweight score for confluence panels (no halving/peak/weekly) */
-function quickScore({rsi,cur,e50c,volR,macdAbove,macdBullish,obvRising,div,fibZone,belowHi}){
+/* ═══════════════════════════════════════════════
+   CONFLUENCE SCORE — usa el mismo sistema de 8 dimensiones
+   pero recalculado para D y S separados, sin extension cap.
+   Esto asegura que confluencia y señal principal sean comparables.
+═══════════════════════════════════════════════ */
+function quickScore({rsiD,rsiW,cur,e200c,volR,macdAbove,macdBullish,obvRising,wObvRising,div,fibZone,
+                     peakFibZone618,peakFibZone786,halvingPhase,e500d}){
+  /* TIMING — mejor de las 3 señales */
+  const macdBullSignal=macdBullish===true;
+  const rsiOversoldDiv=div?.t==='bull';
+  const rsiBoth=rsiD!==null&&rsiD<45 && rsiW!==null&&rsiW<45;
+  const timingActive=macdBullSignal||rsiOversoldDiv||rsiBoth;
+
+  /* CICLO — precio NO extendido */
+  const notExtended=(rsiD===null||rsiD<70) && (e500d===null||e500d<60);
+
   const conds=[
-    {w:2,ok:rsi!==null&&rsi<45},
-    {w:2,ok:macdBullish},
-    {w:2,ok:obvRising},
-    {w:1,ok:fibZone},
-    {w:1,ok:volR>=1.1},
-    {w:1,ok:e50c?cur>e50c:false},
-    {w:1,ok:belowHi},
-    {w:1,ok:div?.t==='bull'},
-    {w:1,ok:macdAbove},
+    {w:3,ok:halvingPhase==='accumulation'},
+    {w:2,ok:e200c?cur>e200c:false},
+    {w:2,ok:peakFibZone618||peakFibZone786},
+    {w:2,ok:notExtended},
+    {w:2,ok:fibZone},
+    {w:2,ok:obvRising&&wObvRising},
+    {w:2,ok:volR>=1.2},
+    {w:1,ok:timingActive},
   ];
   const earned=conds.reduce((a,c)=>a+(c.ok?c.w:0),0);
   const max=conds.reduce((a,c)=>a+c.w,0);
   const pct=max>0?earned/max:0;
   let sig,col;
-  if(pct>=.78){sig='Compra fuerte';col=GR;}
+  if(pct>=.68){sig='Compra fuerte';col=GR;}
   else if(pct>=.56){sig='Señal de compra';col='#5ecc7b';}
   else if(pct>=.38){sig='Observar';col=AM;}
   else if(pct>=.22){sig='Cautela';col='#f0834f';}
@@ -1041,14 +1055,33 @@ function analyze(data,curPrice,tf){
   const dMacdBullish=dMacdAbove&&dMacd.macd[dMacd.macd.length-1]<0;
   const dObv=calcOBV(dc,dv);const dObvRising=linregSlope(dObv,14)>0;
   const dDiv=detectDiv(dc,dRsi);
-  const confD=quickScore({rsi:dRsiC,cur,e50c:dE50c,volR:dVr,macdAbove:dMacdAbove,macdBullish:dMacdBullish,obvRising:dObvRising,div:dDiv,fibZone,belowHi:belowHi30});
+  /* Confluencia DIARIA — usa indicadores diarios para D/S/macd/OBV */
+  const confD=quickScore({
+    rsiD:dRsiC,rsiW:wRsiC,cur,e200c:wE200c,volR:dVr,
+    macdAbove:dMacdAbove,macdBullish:dMacdBullish,
+    obvRising:dObvRising,wObvRising,
+    div:dDiv,fibZone,
+    peakFibZone618,peakFibZone786,
+    halvingPhase:halvInfo.halvingPhaseKey,
+    e500d
+  });
 
   const wE20arr=calcEMA(wData.closes,Math.min(20,wData.closes.length-2));
   const wE20c=wE20arr[wE20arr.length-1];
   const wVr=(wData.vols.slice(-4).reduce((a,b)=>a+b,0)/4)/((wData.vols.slice(-8,-4).reduce((a,b)=>a+b,0)/4)||1);
   const wDiv=detectDiv(wData.closes,wRsiArr);
   const wHi12=Math.max(...wData.highs.slice(-12));
-  const confW=quickScore({rsi:wRsiC,cur,e50c:wE20c,volR:wVr,macdAbove:wMacdAbove,macdBullish:wMacdBullish,obvRising:wObvRising,div:wDiv,fibZone,belowHi:cur<wHi12*.95});
+
+  /* Confluencia SEMANAL — mismos params pero con indicadores semanales para timing/momentum */
+  const confW=quickScore({
+    rsiD:wRsiC,rsiW:wRsiC,cur,e200c:wE200c,volR:wVr,
+    macdAbove:wMacdAbove,macdBullish:wMacdBullish,
+    obvRising:wObvRising,wObvRising,
+    div:wDiv,fibZone,
+    peakFibZone618,peakFibZone786,
+    halvingPhase:halvInfo.halvingPhaseKey,
+    e500d
+  });
 
   /* ═══ DCA MODE — accumulation phase strategy ═══ */
   /* Active when: post-halving accumulation phase + macro context bullish */
