@@ -257,7 +257,7 @@ async function main() {
   const dcaModeActive = halv.key==='accumulation' && wE200c && curPrice>wE200c && halv.days>90;
   const hi14 = Math.max(...dc.slice(-14));
   const dropFromHi14 = ((curPrice-hi14)/hi14)*100;
-  const rsi14ago = dRsiArr[dRsiArr.length-15];
+  const rsi14ago = dRsi[dRsi.length-15];
   const dipDrop8 = dropFromHi14 <= -8;
   const dipRsiSwing = rsi14ago>55 && dRsiC<45;
   const dipRsiOversold = dRsiC!==null && dRsiC<35;
