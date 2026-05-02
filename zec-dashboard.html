@@ -31,7 +31,7 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 .card-sm{background:var(--card2);border:1px solid var(--b1);border-radius:10px;padding:.75rem}
 
 /* Buttons */
-.tf-btn{font-size:10px;padding:6px 14px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)}
+.tf-btn{font-size:10px;padding:8px 16px;border-radius:6px;cursor:pointer;letter-spacing:.07em;border:1px solid var(--b1);font-family:inherit;transition:all .2s;background:transparent;color:var(--muted);min-height:32px}
 .tf-btn.on{background:var(--gold);color:#080809;border-color:var(--gold)}
 .zbtn{font-size:11px;padding:7px 12px;border-radius:5px;cursor:pointer;border:1px solid var(--b1);background:transparent;color:var(--muted);font-family:inherit;transition:all .15s;min-height:32px}
 .zbtn:hover{border-color:var(--gold);color:var(--gold)}
@@ -291,6 +291,19 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div style="display:flex;justify-content:space-between;margin-top:.625rem;flex-wrap:wrap;gap:6px">
     <span id="obv-daily-stat" style="font-size:10px"></span>
     <span id="obv-weekly-stat" style="font-size:10px"></span>
+  </div>
+
+  <!-- Divergence history log -->
+  <div style="margin-top:.875rem;border-top:1px solid var(--b1);padding-top:.75rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;flex-wrap:wrap;gap:6px">
+      <span class="lbl" style="margin-bottom:0">Historial de divergencias detectadas</span>
+      <span id="div-stats" style="font-size:10px;color:var(--muted);font-family:'Courier New',monospace"></span>
+    </div>
+    <div id="div-history-list" style="display:flex;flex-direction:column;gap:4px;font-size:11px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;gap:8px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--muted2)">Resolución a +7 días · pending = aún no han pasado 7 días</span>
+      <button onclick="clearDivHistory()" style="font-size:9px;padding:4px 9px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;min-height:26px">↺ Limpiar log</button>
+    </div>
   </div>
 </div>
 
@@ -1376,11 +1389,125 @@ function fireDivAlert(type){
   playDivSound(type);
 }
 
-function checkDivAlert(divType){
+function loadDivHistory(){
+  try{
+    const raw=localStorage.getItem('zec_div_history');
+    return raw?JSON.parse(raw):[];
+  }catch(e){return [];}
+}
+
+function saveDivHistory(arr){
+  try{
+    /* Keep last 30 entries max */
+    const trimmed=arr.slice(-30);
+    localStorage.setItem('zec_div_history',JSON.stringify(trimmed));
+  }catch(e){}
+}
+
+function resolveOldDivergences(history,currentPrice){
+  /* Mark entries as ✓/✗ when 7 days have passed */
+  const now=Date.now();
+  const SEVEN_DAYS=7*24*60*60*1000;
+  let changed=false;
+  history.forEach(entry=>{
+    if(entry.result==='pending'&&(now-entry.timestamp)>=SEVEN_DAYS){
+      const pct=((currentPrice-entry.price)/entry.price)*100;
+      entry.priceAfter=currentPrice;
+      entry.pctChange=pct;
+      /* Bullish divergence = expected price up. Bearish = expected price down */
+      if(entry.type==='bull'){
+        entry.result=pct>0?'win':'loss';
+      }else{
+        entry.result=pct<0?'win':'loss';
+      }
+      changed=true;
+    }
+  });
+  if(changed)saveDivHistory(history);
+  return history;
+}
+
+function clearDivHistory(){
+  if(!confirm('¿Borrar todo el historial de divergencias?'))return;
+  try{localStorage.removeItem('zec_div_history');}catch(e){}
+  if(stats)renderDivHistory(stats.cur);
+}
+
+function renderDivHistory(currentPrice){
+  const list=document.getElementById('div-history-list');
+  const statsEl=document.getElementById('div-stats');
+  if(!list)return;
+  let history=loadDivHistory();
+  history=resolveOldDivergences(history,currentPrice);
+
+  if(history.length===0){
+    list.innerHTML='<div style="font-size:10px;color:var(--muted2);padding:8px;text-align:center;background:var(--card2);border-radius:6px">Sin divergencias detectadas todavía. Aparecerán aquí cuando el sistema las identifique.</div>';
+    statsEl.textContent='';
+    return;
+  }
+
+  /* Sort newest first */
+  const sorted=[...history].reverse();
+  list.innerHTML=sorted.map(e=>{
+    const isBull=e.type==='bull';
+    const typeColor=isBull?'#2ec4b6':'#ff4466';
+    const typeLabel=isBull?'Alcista':'Bajista';
+    const arrow=isBull?'↑':'↓';
+
+    let resultBadge='';
+    let resultColor='var(--muted)';
+    if(e.result==='pending'){
+      const daysLeft=Math.max(0,7-Math.floor((Date.now()-e.timestamp)/(24*60*60*1000)));
+      resultBadge=`pending · ${daysLeft}d`;
+      resultColor='var(--muted)';
+    }else if(e.result==='win'){
+      resultBadge=`✓ acertó (${e.pctChange>=0?'+':''}${e.pctChange.toFixed(1)}%)`;
+      resultColor=GR;
+    }else{
+      resultBadge=`✗ falló (${e.pctChange>=0?'+':''}${e.pctChange.toFixed(1)}%)`;
+      resultColor=RD;
+    }
+
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--card2);border-radius:6px;border-left:2px solid ${typeColor}">
+      <span style="color:var(--muted);font-family:'Courier New',monospace;font-size:10px;flex-shrink:0">${e.date}</span>
+      <span style="color:${typeColor};flex-shrink:0">${arrow} ${typeLabel}</span>
+      <span style="color:var(--text);font-family:'Courier New',monospace;font-size:10px">$${e.price.toFixed(2)}</span>
+      <span style="margin-left:auto;color:${resultColor};font-size:10px;font-family:'Courier New',monospace;text-align:right">${resultBadge}</span>
+    </div>`;
+  }).join('');
+
+  /* Aggregate stats */
+  const resolved=history.filter(e=>e.result==='win'||e.result==='loss');
+  const wins=resolved.filter(e=>e.result==='win').length;
+  if(resolved.length>0){
+    const winRate=(wins/resolved.length*100).toFixed(0);
+    statsEl.textContent=`${wins}/${resolved.length} acertadas · ${winRate}% win rate · ${history.length} total`;
+  }else{
+    statsEl.textContent=`${history.length} detectadas · sin resolver aún`;
+  }
+}
+
+function checkDivAlert(divType,currentPrice){
   /* Only fire on state change — not every refresh */
   if(divType!==_lastDivState){
+    const previousState=_lastDivState;
     _lastDivState=divType;
-    if(divType)fireDivAlert(divType);
+
+    /* Log new divergence appearance to history */
+    if(divType&&previousState!==divType){
+      const history=loadDivHistory();
+      history.push({
+        timestamp:Date.now(),
+        date:new Date().toISOString().slice(0,10),
+        type:divType,                /* 'bull' or 'bear' */
+        price:currentPrice,
+        priceAfter:null,
+        pctChange:null,
+        result:'pending'
+      });
+      saveDivHistory(history);
+      fireDivAlert(divType);
+    }
   }
 }
 
@@ -1409,7 +1536,9 @@ function renderOBV(s){
   const divStart=n-DIV_WINDOW; /* index where divergence zone begins */
 
   /* Fire alert if state changed */
-  checkDivAlert(divType);
+  checkDivAlert(divType,s.cur);
+  /* Resolve past pending entries with current price */
+  resolveOldDivergences(loadDivHistory(),s.cur);
 
   /* ── Card border + badge ── */
   const card=document.getElementById('obv-card');
@@ -1582,6 +1711,9 @@ function renderOBV(s){
   ds.style.color=s.obvRising?GR:RD;
   ws.textContent=`Semanal: ${s.wObvRising?'Acumulando ↑':'Distribuyendo ↓'}`;
   ws.style.color=s.wObvRising?GR:RD;
+
+  /* Render divergence history log */
+  renderDivHistory(s.cur);
 }
 
 /* ═══════════════════════════════════════════════

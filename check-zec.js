@@ -3,6 +3,8 @@
 // Matches dashboard v8 indicator logic exactly
 
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
 const EMAIL_USER     = process.env.EMAIL_USER;
@@ -10,6 +12,25 @@ const EMAIL_PASS     = process.env.EMAIL_PASS;   // Google App Password
 const EMAIL_TO       = process.env.EMAIL_TO;
 // Minimum score PERCENTAGE to trigger email (e.g. 40 = 40% of max weighted score)
 const MIN_PCT = parseFloat(process.env.MIN_PCT || process.env.MIN_CONDITIONS || '58');
+
+// State file path — gets committed back to repo by workflow
+const STATE_FILE = path.join(__dirname, 'last-state.json');
+
+function loadState() {
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    }
+  } catch(e) { console.log('No state file or invalid:', e.message); }
+  return { lastDivState: null, lastSellMode: false, lastCapMode: false };
+}
+
+function saveState(state) {
+  try {
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+    console.log('State saved:', state);
+  } catch(e) { console.log('Save state error:', e.message); }
+}
 
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
@@ -318,13 +339,33 @@ async function main() {
   const obvTurning = wObvRising;
   const capModeActive = inBearTerminal && deepBelow && rsiCapitulating && obvTurning;
 
-  // Send if score threshold met OR DCA dip is active OR sell mode activates OR capitulation
+  // ═══ DIVERGENCE STATE TRACKING ═══
+  // Detect divergence STATE CHANGE since last run (not just current state)
+  const state = loadState();
+  const currentDivState = obvBullDiv ? 'bull' : obvBearDiv ? 'bear' : null;
+  const divStateChanged = currentDivState !== state.lastDivState;
+  const divNewlyDetected = divStateChanged && currentDivState !== null;
+  // Also detect mode changes (sell/cap activations new since last run)
+  const sellModeNewlyActive = sellModeActive && !state.lastSellMode;
+  const capModeNewlyActive = capModeActive && !state.lastCapMode;
+
+  // Send if score threshold met OR DCA dip is active OR sell mode activates OR capitulation OR new divergence
   const trigger = score.pct * 100;
   const shouldSendNormal = trigger >= MIN_PCT;
   const shouldSendDip = dipActive;
   const shouldSendSell = sellModeActive;
   const shouldSendCap = capModeActive;
-  const shouldSend = shouldSendNormal || shouldSendDip || shouldSendSell || shouldSendCap;
+  const shouldSendDiv = divNewlyDetected;
+  const shouldSend = shouldSendNormal || shouldSendDip || shouldSendSell || shouldSendCap || shouldSendDiv;
+
+  // Always update state file regardless of email
+  saveState({
+    lastDivState: currentDivState,
+    lastSellMode: sellModeActive,
+    lastCapMode: capModeActive,
+    lastCheck: new Date().toISOString(),
+    lastPrice: curPrice
+  });
 
   if (shouldSend) {
     const reasons = [];
@@ -332,6 +373,7 @@ async function main() {
     if (shouldSendDip)    reasons.push(`DIP ${dcaTier.l}`);
     if (shouldSendSell)   reasons.push(`★ ZONA DE VENTA · techo de ciclo`);
     if (shouldSendCap)    reasons.push(`★ BOTTOM DE CICLO · capitulación`);
+    if (shouldSendDiv)    reasons.push(currentDivState==='bull'?'★ NUEVA DIV ALCISTA':'⚠ NUEVA DIV BAJISTA');
     const triggerReason = reasons.join(' + ');
     console.log(`\n→ Trigger: ${triggerReason} — enviando email...`);
 
@@ -421,7 +463,7 @@ async function main() {
 
     const body = `
 ZEC ALERT — ${new Date().toLocaleString('es-CO')}
-${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}${shouldSendSell?'\n★ ZONA DE VENTA · TECHO DE CICLO ACTIVO — ejecutar plan de salida asimétrico\n':''}${shouldSendCap?'\n★ BOTTOM DE CICLO · CAPITULACIÓN DETECTADA — oportunidad histórica de compra\n':''}
+${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}${shouldSendSell?'\n★ ZONA DE VENTA · TECHO DE CICLO ACTIVO — ejecutar plan de salida asimétrico\n':''}${shouldSendCap?'\n★ BOTTOM DE CICLO · CAPITULACIÓN DETECTADA — oportunidad histórica de compra\n':''}${shouldSendDiv?(currentDivState==='bull'?'\n★ NUEVA DIVERGENCIA ALCISTA OBV — precio cae mientras OBV sube (acumulación silenciosa)\n':'\n⚠ NUEVA DIVERGENCIA BAJISTA OBV — precio sube mientras OBV cae (distribución)\n'):''}
 ━━━ SEÑAL PONDERADA ━━━━━━━━━━━
 ${score.signal}
 ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posible)
@@ -479,7 +521,7 @@ Señal al ${MIN_PCT}% del score máximo
     await transporter.sendMail({
       from: `"ZEC Alert" <${EMAIL_USER}>`,
       to: EMAIL_TO,
-      subject: `ZEC: ${capModeActive?'★ BOTTOM CICLO · ':sellModeActive?'★ ZONA VENTA · ':''}${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
+      subject: `ZEC: ${capModeActive?'★ BOTTOM CICLO · ':sellModeActive?'★ ZONA VENTA · ':''}${shouldSendDiv?(currentDivState==='bull'?'★ NUEVA DIV ALCISTA · ':'⚠ NUEVA DIV BAJISTA · '):''}${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}`,
       text: body
     });
     console.log('✓ Email enviado.');
