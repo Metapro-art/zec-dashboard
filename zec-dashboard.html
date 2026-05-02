@@ -49,6 +49,7 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 .ch{position:relative;height:270px;cursor:crosshair}
 .rh{position:relative;height:120px}
 .mh{position:relative;height:105px}
+.obvh{position:relative;height:140px}
 
 /* Conditions */
 .cond-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2)}
@@ -94,6 +95,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   .ch{height:195px}
   .rh{height:90px}
   .mh{height:85px}
+  .obvh{height:115px}
   #price-main{font-size:36px !important}
   .hdr{flex-direction:column !important}
   .hdr-r{align-items:flex-start !important;gap:7px !important}
@@ -251,7 +253,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
       <span id="obv-price-range" style="font-size:9px;color:var(--muted2)"></span>
     </div>
-    <div style="position:relative;height:95px"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
+    <div class="obvh"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
   </div>
 
   <!-- Divider -->
@@ -262,7 +264,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
 
   <!-- OBV chart (bottom) -->
-  <div style="position:relative;height:95px;margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
+  <div class="obvh" style="margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
 
   <!-- Legend for divergence colors -->
   <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:.625rem">
@@ -501,6 +503,30 @@ input[type=number]:focus{border-color:#C9A84C55}
     Si llega a -30%, compras el 35% restante. La distribución es <strong>asimétrica</strong> —
     compras más cantidad de capital cuando el precio está más barato, así acumulas más ZEC.
     Tu precio promedio queda mucho más bajo que comprar todo de una vez.
+  </div>
+</div>
+
+<!-- ═══ CAPITULATION MODE · BOTTOM DE CICLO ═══ -->
+<div class="card" style="margin-bottom:1rem" id="cap-card">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:8px">
+    <div style="flex:1;min-width:0">
+      <span class="lbl" style="margin-bottom:2px;display:block">Bottom de ciclo · zona histórica de acumulación</span>
+      <span style="font-size:10px;color:var(--muted)">Compra de capitulación en bear terminal · oportunidad rara (1 vez por ciclo)</span>
+    </div>
+    <span id="cap-mode-tag" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);color:var(--muted);white-space:nowrap;flex-shrink:0"></span>
+  </div>
+
+  <!-- Mode banner -->
+  <div id="cap-banner" style="border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6"></div>
+
+  <!-- Conditions checklist -->
+  <div style="background:var(--card2);border-radius:9px;padding:.75rem;margin-bottom:.75rem">
+    <div class="lbl" style="margin-bottom:6px;font-size:9px">Condiciones requeridas (TODAS deben cumplirse)</div>
+    <div id="cap-conds-list" style="display:flex;flex-direction:column;gap:5px"></div>
+  </div>
+
+  <div style="font-size:10px;color:var(--muted);line-height:1.6">
+    <strong style="color:var(--text)">Lógica:</strong> el módulo se activa solo en bear market terminal (mes 42+ post-halving = ~mayo 2028) cuando el precio cae &gt;20% bajo EMA 200s y el OBV semanal empieza a girar al alza. Esa confluencia rara marca el bottom histórico del ciclo. Compra agresiva ahí ha sido óptima en ciclos anteriores. Independiente del DCA · usar capital separado.
   </div>
 </div>
 
@@ -1816,6 +1842,72 @@ function calcDCA(){
   summary.style.display='block';
 }
 
+function renderCapitulation(s){
+  /* ═══════════════════════════════════════════════
+     CAPITULATION MODE — bottom de ciclo bear terminal
+     Required (ALL):
+       1. Halving phase = 'bear' (mes 42+ post-halving)
+       2. Precio bajo EMA 200s al menos -20%
+       3. RSI semanal saliendo de zona <30 (pero subiendo)
+       4. OBV semanal girando al alza (empezando a acumular)
+  ═══════════════════════════════════════════════ */
+
+  const inBearTerminal = s.halvInfo.halvingPhaseKey==='bear';
+  const e200dist = s.wE200c ? ((s.cur-s.wE200c)/s.wE200c*100) : 0;
+  const deepBelow = s.wE200c && e200dist <= -20;
+  const rsiCapitulating = s.wRsiC!==null && s.wRsiC<40 && s.wRsiC>20;
+  const obvTurning = s.wObvRising; /* OBV semanal empezando a subir */
+
+  const conds=[
+    {ok:inBearTerminal, l:'Bear market terminal (mes 42+ post-halving)',
+     detail:`Actual: ${s.halvInfo.phase} · día ${s.halvInfo.daysSince}`},
+    {ok:deepBelow, l:'Precio al menos -20% bajo EMA 200s',
+     detail:s.wE200c ? `EMA 200s = $${s.wE200c.toFixed(2)} · distancia ${e200dist>=0?'+':''}${e200dist.toFixed(1)}%` : 'Sin datos EMA 200s'},
+    {ok:rsiCapitulating, l:'RSI semanal entre 20 y 40 (capitulación)',
+     detail:s.wRsiC!==null ? `RSI semanal: ${s.wRsiC.toFixed(1)}` : 'RSI semanal: —'},
+    {ok:obvTurning, l:'OBV semanal girando al alza (acumulación inicial)',
+     detail:obvTurning ? 'Pendiente positiva ↑' : 'Aún cayendo ↓'},
+  ];
+  const allMet = conds.every(c=>c.ok);
+
+  /* Conditions checklist */
+  document.getElementById('cap-conds-list').innerHTML=conds.map(c=>
+    `<div style="display:flex;align-items:flex-start;gap:8px;font-size:11px">
+       <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
+       <div style="flex:1;min-width:0">
+         <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
+         <div style="font-size:9px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+       </div>
+     </div>`
+  ).join('');
+
+  /* Mode tag */
+  const tag=document.getElementById('cap-mode-tag');
+  if(allMet){
+    tag.textContent='● BOTTOM DETECTADO';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #2ec4b677;background:#0a1612;color:#2ec4b6;white-space:nowrap;flex-shrink:0;animation:pulse-bull 2s ease-in-out infinite';
+  }else if(inBearTerminal){
+    tag.textContent='○ Bear terminal · esperando';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #f0606044;background:#1a0808;color:#f06060;white-space:nowrap;flex-shrink:0';
+  }else{
+    tag.textContent='○ Inactivo · fuera de ciclo bear';
+    tag.style.cssText='font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--card2);color:var(--muted);white-space:nowrap;flex-shrink:0';
+  }
+
+  /* Banner */
+  const banner=document.getElementById('cap-banner');
+  if(allMet){
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#0a1612;border:1.5px solid #2ec4b677;color:#2ec4b6';
+    banner.innerHTML='<strong>★ BOTTOM DE CICLO DETECTADO · Compra agresiva</strong><br><span style="font-size:11px;color:#a0d8d0">Las 4 condiciones se cumplen. Esta es la zona histórica de máxima oportunidad. Compra de convicción · usar capital reservado, NO el del DCA.</span>';
+  }else if(inBearTerminal){
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#180808;border:1.5px solid #f0606044;color:#f06060';
+    banner.innerHTML='<strong>Bear market terminal · esperando capitulación final</strong><br><span style="font-size:11px;color:#c08080">Estás en ventana del bottom de ciclo pero faltan condiciones. No comprar todavía — el precio puede seguir cayendo. Esperar capitulación con vuelta de OBV.</span>';
+  }else{
+    banner.style.cssText='border-radius:9px;padding:10px 12px;margin-bottom:.75rem;font-size:12px;line-height:1.6;background:#0d1612;border:1.5px solid #2ec4b633;color:#80b8a8';
+    banner.innerHTML=`<strong>Modo dormido · no estamos en bear terminal</strong><br><span style="font-size:11px;color:#608880">Fase actual: <strong>${s.halvInfo.phase}</strong>. Este módulo solo se activa en bear market profundo (mes 42+ post-halving). Estimado: ~mayo 2028 si sigue patrón del ciclo anterior.</span>`;
+  }
+}
+
 function renderSell(s){
   /* ═══════════════════════════════════════════════
      STRICT SELL STRATEGY — only activates in cycle top phase
@@ -1998,10 +2090,12 @@ function renderAll(s){
   document.getElementById('m-fib').textContent=s.nFib.toString();document.getElementById('m-fib').style.color=s.fibZone?GR:'var(--text)';
   document.getElementById('m-fib-s').textContent=s.fibZone?'En zona soporte':'Fuera de zona';
   if(s.tf==='weekly'){
-    document.getElementById('ema-lbl').textContent='vs EMA 20s';
-    const d=s.e20c?((s.cur-s.e20c)/s.e20c*100):null;
-    document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';document.getElementById('m-ema').style.color=d>=0?GR:RD;
-    document.getElementById('m-ema-s').textContent=d>=0?'Sobre EMA 20s':'Bajo EMA 20s';document.getElementById('ema-card').style.borderColor='var(--b1)';
+    document.getElementById('ema-lbl').textContent='vs EMA 200s';
+    const d=s.wE200c?((s.cur-s.wE200c)/s.wE200c*100):null;
+    document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';
+    document.getElementById('m-ema').style.color=d===null?'var(--text)':d>60?AM:d>=0?GR:RD;
+    document.getElementById('m-ema-s').textContent=d===null?'—':d>60?'Muy extendido — esperar':d>20?'Tendencia macro ↑':d>=0?'Sobre línea institucional':'Bajo EMA 200s · ciclo bajista';
+    document.getElementById('ema-card').style.borderColor=d===null?'var(--b1)':d>60?AM+'55':d>=0?GR+'33':RD+'44';
   }else{
     document.getElementById('ema-lbl').textContent='vs EMA 500';
     document.getElementById('m-ema').textContent=s.e500d!==null?(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'%':'—';
@@ -2021,7 +2115,7 @@ function renderAll(s){
 
   renderPriceChart(s);renderRSI(s);renderMACD(s);renderOBV(s);
   renderHalving(s);renderMcap(s);renderConfluence(s);
-  renderFibRet(s);renderExtensions(s);renderConds(s);renderDCA(s);renderSell(s);renderRR(s);
+  renderFibRet(s);renderExtensions(s);renderConds(s);renderDCA(s);renderCapitulation(s);renderSell(s);renderRR(s);
 }
 
 /* ═══════════════════════════════════════════════

@@ -310,18 +310,28 @@ async function main() {
   const sellModeActive = inTopPhase && inHighExt && wRsiHot;
   const sellInTopButWaiting = inTopPhase && !sellModeActive;
 
-  // Send if score threshold met OR DCA dip is active OR sell mode activates
+  // ═══ CAPITULATION MODE · BEAR TERMINAL BOTTOM ═══
+  const inBearTerminal = halv.key === 'bear';
+  const e200distVal = wE200c ? ((curPrice-wE200c)/wE200c*100) : 0;
+  const deepBelow = wE200c && e200distVal <= -20;
+  const rsiCapitulating = wRsiC !== null && wRsiC < 40 && wRsiC > 20;
+  const obvTurning = wObvRising;
+  const capModeActive = inBearTerminal && deepBelow && rsiCapitulating && obvTurning;
+
+  // Send if score threshold met OR DCA dip is active OR sell mode activates OR capitulation
   const trigger = score.pct * 100;
   const shouldSendNormal = trigger >= MIN_PCT;
   const shouldSendDip = dipActive;
   const shouldSendSell = sellModeActive;
-  const shouldSend = shouldSendNormal || shouldSendDip || shouldSendSell;
+  const shouldSendCap = capModeActive;
+  const shouldSend = shouldSendNormal || shouldSendDip || shouldSendSell || shouldSendCap;
 
   if (shouldSend) {
     const reasons = [];
     if (shouldSendNormal) reasons.push(`Score ${trigger.toFixed(0)}% >= ${MIN_PCT}%`);
     if (shouldSendDip)    reasons.push(`DIP ${dcaTier.l}`);
     if (shouldSendSell)   reasons.push(`★ ZONA DE VENTA · techo de ciclo`);
+    if (shouldSendCap)    reasons.push(`★ BOTTOM DE CICLO · capitulación`);
     const triggerReason = reasons.join(' + ');
     console.log(`\n→ Trigger: ${triggerReason} — enviando email...`);
 
@@ -360,6 +370,27 @@ async function main() {
       sellSection += `Sin las 3, NO vender.\n`;
     }
 
+    /* CAPITULATION section */
+    let capSection = '';
+    if (capModeActive) {
+      capSection = `\n━━━ ★ BOTTOM DE CICLO DETECTADO ━━\n`;
+      capSection += `BEAR MARKET TERMINAL · zona histórica de máxima oportunidad\n`;
+      capSection += `\n4 condiciones cumplidas:\n`;
+      capSection += `  ✓ Bear terminal (día ${halv.days} post-halving)\n`;
+      capSection += `  ✓ Precio ${e200distVal.toFixed(1)}% bajo EMA 200s\n`;
+      capSection += `  ✓ RSI semanal en zona capitulación (${wRsiC?.toFixed(1)})\n`;
+      capSection += `  ✓ OBV semanal girando al alza (acumulación inicial)\n`;
+      capSection += `\nCompra agresiva con capital reservado · NO usar capital DCA.\n`;
+      capSection += `Histórico: bottom de ciclo · oportunidad rara (1 vez cada 4 años).\n`;
+    } else if (inBearTerminal) {
+      capSection = `\n━━━ BEAR TERMINAL · ESPERANDO BOTTOM ━━\n`;
+      capSection += `Estás en bear market terminal pero faltan condiciones:\n`;
+      capSection += `  ${deepBelow?'✓':'✗'} Precio ≥20% bajo EMA 200s${wE200c?` (actual: ${e200distVal.toFixed(1)}%)`:''}\n`;
+      capSection += `  ${rsiCapitulating?'✓':'✗'} RSI semanal entre 20-40 (actual: ${wRsiC?.toFixed(1)||'—'})\n`;
+      capSection += `  ${obvTurning?'✓':'✗'} OBV semanal girando al alza\n`;
+      capSection += `Sin las 4, esperar — el precio puede seguir cayendo.\n`;
+    }
+
     /* DCA section */
     let dcaSection = '';
     if (dcaModeActive) {
@@ -390,7 +421,7 @@ async function main() {
 
     const body = `
 ZEC ALERT — ${new Date().toLocaleString('es-CO')}
-${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}${shouldSendSell?'\n★ ZONA DE VENTA · TECHO DE CICLO ACTIVO — ejecutar plan de salida asimétrico\n':''}
+${shouldSendDip&&!shouldSendNormal?'\n⬇ ALERTA DE DIP — comprable según estrategia DCA\n':''}${shouldSendSell?'\n★ ZONA DE VENTA · TECHO DE CICLO ACTIVO — ejecutar plan de salida asimétrico\n':''}${shouldSendCap?'\n★ BOTTOM DE CICLO · CAPITULACIÓN DETECTADA — oportunidad histórica de compra\n':''}
 ━━━ SEÑAL PONDERADA ━━━━━━━━━━━
 ${score.signal}
 ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posible)
@@ -409,7 +440,7 @@ ZEC Market Cap:  $${(zecMcap/1e6).toFixed(0)}M
 ━━━ CICLO HALVING ━━━━━━━━━━━━━
 ${halv.phase}
 ${halv.days} días desde halving Nov 2024
-${dcaSection}${sellSection}
+${dcaSection}${sellSection}${capSection}
 ━━━ MACRO — LAST PEAK ━━━━━━━━
 Ciclo: $${PEAK_LO} (sep 2025) → $${PEAK_HI} (nov 2025)
 Fib 0.382: $${pkFibs[.382].toFixed(2)}
@@ -448,7 +479,7 @@ Señal al ${MIN_PCT}% del score máximo
     await transporter.sendMail({
       from: `"ZEC Alert" <${EMAIL_USER}>`,
       to: EMAIL_TO,
-      subject: `ZEC: ${sellModeActive?'★ ZONA VENTA · ':''}${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
+      subject: `ZEC: ${capModeActive?'★ BOTTOM CICLO · ':sellModeActive?'★ ZONA VENTA · ':''}${score.signal} | ${Math.round(score.pct*100)}% | Conf ${confPct}% | $${curPrice.toFixed(2)}${obvBullDiv?' | ★ OBV DIV ALCISTA':obvBearDiv?' | ⚠ OBV DIV BAJISTA':''}`,
       text: body
     });
     console.log('✓ Email enviado.');
