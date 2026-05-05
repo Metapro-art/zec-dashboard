@@ -13,7 +13,7 @@
 :root{
   --bg:#080809;--card:#101012;--card2:#0c0c0e;
   --b1:#1e1e22;--b2:#161618;
-  --text:#ebe7de;--muted:#80808a;--muted2:#505058;
+  --text:#f0ede4;--muted:#a8a8b0;--muted2:#888892;
   --gold:#C9A84C;--green:#3fd672;--red:#f06060;
   --amber:#f0b429;--blue:#4da6ff;--purple:#b57cff;--teal:#2ec4b6;
 }
@@ -24,7 +24,7 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 /* Typography */
 .mono{font-family:'Courier New',Courier,monospace}
 .lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
-.slbl{font-size:9px;color:var(--muted2);letter-spacing:.05em}
+.slbl{font-size:10px;color:var(--muted2);letter-spacing:.05em}
 
 /* Cards */
 .card{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:1rem}
@@ -251,7 +251,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div style="margin-bottom:2px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
       <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
-      <span id="obv-price-range" style="font-size:9px;color:var(--muted2)"></span>
+      <span id="obv-price-range" style="font-size:10px;color:var(--muted2)"></span>
     </div>
     <div class="obvh"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
   </div>
@@ -259,7 +259,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <!-- Divider -->
   <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
     <div style="flex:1;height:1px;background:var(--b1)"></div>
-    <span style="font-size:9px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
+    <span style="font-size:10px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
     <div style="flex:1;height:1px;background:var(--b1)"></div>
   </div>
 
@@ -278,12 +278,12 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
       <span style="color:#2ec4b6;font-weight:bold">↑ Divergencia alcista:</span><br>
       Precio baja → OBV sube<br>
-      <span style="font-size:9px;color:var(--muted2)">Instituciones comprando en silencio</span>
+      <span style="font-size:10px;color:var(--muted2)">Instituciones comprando en silencio</span>
     </div>
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
       <span style="color:#ff4466;font-weight:bold">↓ Divergencia bajista:</span><br>
       Precio sube → OBV baja<br>
-      <span style="font-size:9px;color:var(--muted2)">Distribución — venden mientras sube</span>
+      <span style="font-size:10px;color:var(--muted2)">Distribución — venden mientras sube</span>
     </div>
   </div>
 
@@ -301,8 +301,8 @@ input[type=number]:focus{border-color:#C9A84C55}
     </div>
     <div id="div-history-list" style="display:flex;flex-direction:column;gap:4px;font-size:11px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;gap:8px;flex-wrap:wrap">
-      <span style="font-size:9px;color:var(--muted2)">Resolución a +7 días · pending = aún no han pasado 7 días</span>
-      <button onclick="clearDivHistory()" style="font-size:9px;padding:4px 9px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;min-height:26px">↺ Limpiar log</button>
+      <span style="font-size:10px;color:var(--muted2)">Resolución a +7 días · pending = aún no han pasado 7 días</span>
+      <button onclick="clearDivHistory()" style="font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;min-height:30px">↺ Limpiar log</button>
     </div>
   </div>
 </div>
@@ -314,7 +314,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div class="card-sm" style="text-align:center">
       <div class="lbl" style="margin-bottom:4px">Halving</div>
       <div class="mono" style="font-size:12px;color:var(--gold)">2do · Nov 2024</div>
-      <div style="font-size:9px;color:var(--muted);margin-top:2px">Bloque 1,680,000</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Bloque 1,680,000</div>
     </div>
     <div class="card-sm" style="text-align:center">
       <div class="lbl" style="margin-bottom:4px">Días desde halving</div>
@@ -323,20 +323,20 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div class="card-sm" style="text-align:center">
       <div class="lbl" style="margin-bottom:4px">Próximo halving</div>
       <div class="mono" style="font-size:12px;color:var(--muted)">~Nov 2028</div>
-      <div id="hv-next" style="font-size:9px;color:var(--muted);margin-top:2px"></div>
+      <div id="hv-next" style="font-size:10px;color:var(--muted);margin-top:2px"></div>
     </div>
     <div class="card-sm" style="text-align:center">
       <div class="lbl" style="margin-bottom:4px">Fase actual</div>
       <div id="hv-phase" class="mono" style="font-size:13px;color:var(--text)">—</div>
-      <div id="hv-phase-s" style="font-size:9px;color:var(--muted);margin-top:2px"></div>
+      <div id="hv-phase-s" style="font-size:10px;color:var(--muted);margin-top:2px"></div>
     </div>
   </div>
   <!-- Cycle progress bar -->
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-      <span style="font-size:9px;color:var(--muted)">Halving Nov 2024</span>
-      <span id="hv-pct" style="font-size:9px;color:var(--muted)"></span>
-      <span style="font-size:9px;color:var(--muted)">Halving ~Nov 2028</span>
+      <span style="font-size:10px;color:var(--muted)">Halving Nov 2024</span>
+      <span id="hv-pct" style="font-size:10px;color:var(--muted)"></span>
+      <span style="font-size:10px;color:var(--muted)">Halving ~Nov 2028</span>
     </div>
     <div class="pbar-wrap" style="height:6px;border-radius:3px;position:relative">
       <div id="hv-bar" class="pbar-fill" style="width:0;border-radius:3px"></div>
@@ -347,11 +347,11 @@ input[type=number]:focus{border-color:#C9A84C55}
       <div style="position:absolute;top:0;left:87.5%;width:1px;height:100%;background:var(--muted2)"></div>
     </div>
     <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:5px;padding:0">
-      <span style="font-size:9px;color:var(--muted2)">Corrección</span>
-      <span style="font-size:9px;color:var(--muted2)">Acumulación</span>
-      <span style="font-size:9px;color:var(--muted2)">Bull run</span>
-      <span style="font-size:9px;color:var(--muted2)">Techo</span>
-      <span style="font-size:9px;color:var(--muted2)">Bear</span>
+      <span style="font-size:10px;color:var(--muted2)">Corrección</span>
+      <span style="font-size:10px;color:var(--muted2)">Acumulación</span>
+      <span style="font-size:10px;color:var(--muted2)">Bull run</span>
+      <span style="font-size:10px;color:var(--muted2)">Techo</span>
+      <span style="font-size:10px;color:var(--muted2)">Bear</span>
     </div>
   </div>
   <div id="hv-note" style="font-size:11px;color:var(--muted);line-height:1.6;padding:.625rem .875rem;background:var(--card2);border-radius:8px;border:1px solid var(--b1)"></div>
@@ -487,7 +487,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     </div>
     <input id="dca-anchor" type="number" step="0.01" oninput="setAnchor()"
       style="width:100%;background:var(--card);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:14px;padding:8px 10px;border-radius:7px;outline:none">
-    <div style="font-size:9px;color:var(--muted);margin-top:5px">El precio desde el cual se calculan las caídas. Si compraste a $336, ese es tu ancla — los niveles se quedan fijos.</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:5px">El precio desde el cual se calculan las caídas. Si compraste a $336, ese es tu ancla — los niveles se quedan fijos.</div>
   </div>
 
   <!-- Capital input -->
@@ -495,7 +495,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div class="lbl" style="margin-bottom:6px">Capital total a destinar a DCA ($)</div>
     <input id="dca-capital" type="number" step="100" placeholder="ej: 1000" oninput="calcDCA()"
       style="width:100%;background:var(--card);border:1px solid var(--b1);color:var(--text);font-family:'Courier New',monospace;font-size:14px;padding:8px 10px;border-radius:7px;outline:none">
-    <div style="font-size:9px;color:var(--muted);margin-top:5px">Cuánto en total quieres acumular. Cada nivel toma un % distinto (15% / 20% / 30% / 35%).</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:5px">Cuánto en total quieres acumular. Cada nivel toma un % distinto (15% / 20% / 30% / 35%).</div>
   </div>
 
   <!-- 4 levels grid -->
@@ -569,7 +569,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <!-- Position marker -->
       <div id="cycle-marker" style="position:absolute;top:-3px;width:3px;height:24px;background:var(--gold);box-shadow:0 0 6px var(--gold);transition:left .8s;left:0"></div>
     </div>
-    <div class="cycle-labels" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:9px;color:var(--muted2);margin-top:5px;letter-spacing:.04em">
+    <div class="cycle-labels" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:10px;color:var(--muted2);margin-top:5px;letter-spacing:.04em">
       <span>Halving 2024</span>
       <span style="color:#f0834f">Acum.</span>
       <span style="color:#5ecc7b">Bull</span>
@@ -594,7 +594,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div style="background:var(--card2);border:1px dashed #C9A84C44;border-radius:9px;padding:10px 12px;margin-top:8px;text-align:center">
     <span style="font-size:10px;color:var(--gold);letter-spacing:.05em;text-transform:uppercase">Core holding permanente</span>
     <div class="mono" style="font-size:14px;color:var(--gold);margin-top:2px">15% — para el siguiente ciclo de halving</div>
-    <div style="font-size:9px;color:var(--muted);margin-top:3px">Nunca vender · cobertura para el ciclo 2028–2032</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:3px">Nunca vender · cobertura para el ciclo 2028–2032</div>
   </div>
 
   <div style="margin-top:.75rem;font-size:10px;color:var(--muted);line-height:1.6">
@@ -608,7 +608,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div class="g2" style="margin-bottom:.75rem">
     <div><div class="lbl" style="margin-bottom:4px">Entrada ($)</div><input id="rr-entry" type="number" step="0.01" oninput="calcRR()"></div>
     <div><div class="lbl" style="margin-bottom:4px">Stop loss ($)</div><input id="rr-stop" type="number" step="0.01" oninput="calcRR()">
-    <div id="rr-stop-note" style="font-size:9px;color:var(--muted);margin-top:3px"></div></div>
+    <div id="rr-stop-note" style="font-size:10px;color:var(--muted);margin-top:3px"></div></div>
   </div>
   <div id="rr-risk" style="font-size:11px;color:var(--muted);margin-bottom:.75rem"></div>
   <div class="lbl" style="margin-bottom:.625rem">R:R hacia extensiones Fibonacci</div>
@@ -858,36 +858,35 @@ function scoreFromConds(conds, extCtx){
    pero recalculado para D y S separados, sin extension cap.
    Esto asegura que confluencia y señal principal sean comparables.
 ═══════════════════════════════════════════════ */
-function quickScore({rsiD,rsiW,cur,e200c,volR,macdAbove,macdBullish,obvRising,wObvRising,div,fibZone,
-                     peakFibZone618,peakFibZone786,halvingPhase,e500d}){
-  /* TIMING — mejor de las 3 señales */
-  const macdBullSignal=macdBullish===true;
-  const rsiOversoldDiv=div?.t==='bull';
-  const rsiBoth=rsiD!==null&&rsiD<45 && rsiW!==null&&rsiW<45;
-  const timingActive=macdBullSignal||rsiOversoldDiv||rsiBoth;
-
-  /* CICLO — precio NO extendido */
-  const notExtended=(rsiD===null||rsiD<70) && (e500d===null||e500d<60);
+function quickScore({rsi,cur,ema50,ema200,volR,macdAbove,macdBullish,obvRising,div,fibZone}){
+  /* PURE MOMENTUM SCORE — solo indicadores del timeframe específico
+     No incluye condiciones macro/ciclo (esas las cubre la señal principal).
+     Mide qué tan alineado está el momentum en ESE timeframe específico. */
 
   const conds=[
-    {w:3,ok:halvingPhase==='accumulation'},
-    {w:2,ok:e200c?cur>e200c:false},
-    {w:2,ok:peakFibZone618||peakFibZone786},
-    {w:2,ok:notExtended},
-    {w:2,ok:fibZone},
-    {w:2,ok:obvRising&&wObvRising},
-    {w:2,ok:volR>=1.2},
-    {w:1,ok:timingActive},
+    /* Tendencia local (4 pts) */
+    {w:2,ok:ema50?cur>ema50:false},          /* Sobre EMA mediana del timeframe */
+    {w:2,ok:ema200?cur>ema200:false},        /* Sobre EMA larga del timeframe */
+    /* Momentum (5 pts) */
+    {w:2,ok:macdBullish===true},             /* MACD cruce bajo cero */
+    {w:1,ok:macdAbove===true},               /* MACD sobre señal */
+    {w:1,ok:rsi!==null&&rsi>=45&&rsi<=70},   /* RSI en zona compra/neutral, sin sobrecompra */
+    {w:1,ok:div?.t==='bull'},                /* Divergencia alcista RSI */
+    /* Volumen y OBV (3 pts) */
+    {w:2,ok:obvRising===true},               /* OBV acumulando */
+    {w:1,ok:volR>=1.2},                      /* Volumen sobre promedio */
+    /* Soporte (1 pt) */
+    {w:1,ok:fibZone===true},                 /* En zona Fibonacci */
   ];
   const earned=conds.reduce((a,c)=>a+(c.ok?c.w:0),0);
   const max=conds.reduce((a,c)=>a+c.w,0);
   const pct=max>0?earned/max:0;
   let sig,col;
-  if(pct>=.68){sig='Compra fuerte';col=GR;}
-  else if(pct>=.56){sig='Señal de compra';col='#5ecc7b';}
-  else if(pct>=.38){sig='Observar';col=AM;}
-  else if(pct>=.22){sig='Cautela';col='#f0834f';}
-  else{sig='Esperar';col=SL;}
+  if(pct>=.75){sig='Momentum fuerte';col=GR;}
+  else if(pct>=.55){sig='Momentum bueno';col='#5ecc7b';}
+  else if(pct>=.38){sig='Momentum mixto';col=AM;}
+  else if(pct>=.22){sig='Momentum débil';col='#f0834f';}
+  else{sig='Sin momentum';col=SL;}
   return{earned,max,pct,sig,col};
 }
 
@@ -1088,21 +1087,25 @@ function analyze(data,curPrice,tf){
   const dc=dSlice.map(d=>d.close),dv=dSlice.map(d=>d.volumeto);
   const dRsi=calcRSI(dc);const dRsiC=dRsi[dRsi.length-1];
   const dE50=calcEMA(dc,50);const dE50c=dE50[dE50.length-1];
+  const dE200=calcEMA(dc,Math.min(200,dc.length-2));const dE200c=dE200[dE200.length-1];
   const dVr=(dv.slice(-7).reduce((a,b)=>a+b,0)/7)/((dv.slice(-14,-7).reduce((a,b)=>a+b,0)/7)||1);
   const dMacd=calcMACD(dc);
   const dMacdAbove=dMacd.macd[dMacd.macd.length-1]!==null&&dMacd.signal[dMacd.signal.length-1]!==null&&dMacd.macd[dMacd.macd.length-1]>dMacd.signal[dMacd.signal.length-1];
   const dMacdBullish=dMacdAbove&&dMacd.macd[dMacd.macd.length-1]<0;
   const dObv=calcOBV(dc,dv);const dObvRising=linregSlope(dObv,14)>0;
   const dDiv=detectDiv(dc,dRsi);
-  /* Confluencia DIARIA — usa indicadores diarios para D/S/macd/OBV */
+  /* Confluencia DIARIA — momentum puro del timeframe diario */
   const confD=quickScore({
-    rsiD:dRsiC,rsiW:wRsiC,cur,e200c:wE200c,volR:dVr,
-    macdAbove:dMacdAbove,macdBullish:dMacdBullish,
-    obvRising:dObvRising,wObvRising,
-    div:dDiv,fibZone,
-    peakFibZone618,peakFibZone786,
-    halvingPhase:halvInfo.halvingPhaseKey,
-    e500d
+    rsi:dRsiC,
+    cur,
+    ema50:dE50c,           /* EMA 50 diario */
+    ema200:dE200c,         /* EMA 200 diario */
+    volR:dVr,
+    macdAbove:dMacdAbove,
+    macdBullish:dMacdBullish,
+    obvRising:dObvRising,
+    div:dDiv,
+    fibZone
   });
 
   const wE20arr=calcEMA(wData.closes,Math.min(20,wData.closes.length-2));
@@ -1111,15 +1114,18 @@ function analyze(data,curPrice,tf){
   const wDiv=detectDiv(wData.closes,wRsiArr);
   const wHi12=Math.max(...wData.highs.slice(-12));
 
-  /* Confluencia SEMANAL — mismos params pero con indicadores semanales para timing/momentum */
+  /* Confluencia SEMANAL — momentum puro del timeframe semanal */
   const confW=quickScore({
-    rsiD:wRsiC,rsiW:wRsiC,cur,e200c:wE200c,volR:wVr,
-    macdAbove:wMacdAbove,macdBullish:wMacdBullish,
-    obvRising:wObvRising,wObvRising,
-    div:wDiv,fibZone,
-    peakFibZone618,peakFibZone786,
-    halvingPhase:halvInfo.halvingPhaseKey,
-    e500d
+    rsi:wRsiC,
+    cur,
+    ema50:wE20c,           /* EMA 20s ≈ 140d, momentum mediano */
+    ema200:wE200c,         /* EMA 200s ≈ 4 años, macro */
+    volR:wVr,
+    macdAbove:wMacdAbove,
+    macdBullish:wMacdBullish,
+    obvRising:wObvRising,
+    div:wDiv,
+    fibZone
   });
 
   /* ═══ DCA MODE — accumulation phase strategy ═══ */
@@ -1775,10 +1781,10 @@ function renderConfluence(s){
   const avg=(s.confD.pct+s.confW.pct)/2;
   const pct=Math.round(avg*100);
   let verdict,col,note;
-  if(pct>=78){verdict='Confluencia muy alta';col=GR;note='Ambos timeframes alcistas — señal de alta confianza';}
-  else if(pct>=56){verdict='Confluencia buena';col='#5ecc7b';note='Mayoría de condiciones alineadas en D y S';}
-  else if(pct>=38){verdict='Confluencia parcial';col=AM;note='Timeframes divergentes — señal de confianza media';}
-  else{verdict='Sin confluencia';col=SL;note='Diario y semanal no coinciden — esperar alineación';}
+  if(pct>=75){verdict='Momentum aligneado en ambos';col=GR;note='Diario y semanal con momentum fuerte — máxima confianza';}
+  else if(pct>=55){verdict='Momentum mayormente positivo';col='#5ecc7b';note='Buena alineación de indicadores en D y S';}
+  else if(pct>=38){verdict='Momentum mixto';col=AM;note='Algunos indicadores divergen entre timeframes';}
+  else{verdict='Sin alineación';col=SL;note='Diario y semanal con momentum débil — esperar';}
   document.getElementById('cf-total').textContent=pct+'%';document.getElementById('cf-total').style.color=col;
   document.getElementById('cf-verdict').textContent=verdict;document.getElementById('cf-verdict').style.color=col;
   document.getElementById('cf-note').textContent=note;
@@ -1795,10 +1801,10 @@ function renderFibRet(s){
     const dist=((s.cur-price)/price*100),isNear=Math.abs(dist)<3;
     const isMacro=fibWindow==='peak'&&(fl===.618||fl===.786||fl===.382);
     return`<div style="background:${isNear?col+'22':isMacro?col+'0e':'var(--card2)'};border:1px solid ${isNear?col+'77':isMacro?col+'44':col+'22'};border-radius:9px;padding:8px 7px;min-width:0;transition:all .3s">
-      <div style="font-size:8px;color:${col};letter-spacing:.03em;margin-bottom:4px;line-height:1.3;word-break:break-all">${labels[fl]||'Fib '+lvl}</div>
+      <div style="font-size:9px;color:${col};letter-spacing:.03em;margin-bottom:4px;line-height:1.3;word-break:break-all">${labels[fl]||'Fib '+lvl}</div>
       <div class="mono" style="font-size:11px;color:var(--text)">$${price.toFixed(2)}</div>
-      <div style="font-size:9px;font-family:'Courier New',monospace;color:${dist>=0?GR:RD};margin-top:3px">${dist>=0?'+':''}${dist.toFixed(1)}%</div>
-      ${isNear?`<div style="font-size:8px;color:${col};margin-top:2px">◀ PRECIO</div>`:''}
+      <div style="font-size:10px;font-family:'Courier New',monospace;color:${dist>=0?GR:RD};margin-top:3px">${dist>=0?'+':''}${dist.toFixed(1)}%</div>
+      ${isNear?`<div style="font-size:9px;color:${col};margin-top:2px;font-weight:bold">◀ PRECIO</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1810,7 +1816,7 @@ function renderExtensions(s){
     return`<div style="background:var(--card2);border:1px solid ${c}33;border-radius:9px;padding:8px 10px">
       <div style="font-size:9px;color:${c};letter-spacing:.06em;margin-bottom:4px">Fib ${rv}</div>
       <div class="mono" style="font-size:13px;color:var(--text)">$${p.toFixed(2)}</div>
-      <div style="font-size:9px;color:var(--muted);margin-top:2px">+${pct2.toFixed(0)}%</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">+${pct2.toFixed(0)}%</div>
     </div>`;
   }).join('');
 }
@@ -1965,7 +1971,7 @@ function calcDCA(){
     totalZec+=zec;
     weightedSum+=lv.price*zec;
     const el=document.getElementById('dca-amount-'+i);
-    if(el) el.innerHTML=`$${amount.toFixed(0)} <span style="font-size:9px;color:var(--muted);font-weight:normal">· ${zec.toFixed(2)} ZEC</span>`;
+    if(el) el.innerHTML=`$${amount.toFixed(0)} <span style="font-size:10px;color:var(--muted);font-weight:normal">· ${zec.toFixed(2)} ZEC</span>`;
   });
   const avgPrice=weightedSum/totalZec;
   document.getElementById('dca-total').textContent='$'+cap.toLocaleString();
@@ -2008,7 +2014,7 @@ function renderCapitulation(s){
        <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
        <div style="flex:1;min-width:0">
          <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
-         <div style="font-size:9px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+         <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
        </div>
      </div>`
   ).join('');
@@ -2080,7 +2086,7 @@ function renderSell(s){
        <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
        <div style="flex:1;min-width:0">
          <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
-         <div style="font-size:9px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+         <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
        </div>
      </div>`
   ).join('');
