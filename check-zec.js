@@ -111,7 +111,7 @@ function getHalvingPhase() {
 function buildScore(params) {
   const { rsiD, rsiW, cur, e200c, volR, macdAbove, macdBullish, obvRising,
           div, fibZone, peakFib618, peakFib786, halvPhase,
-          wObvRising, e500d, chg7d } = params;
+          wObvRising, e200d, chg7d } = params;
 
   /* TIMING — best of 3 momentum signals */
   const macdBullSignal = macdBullish === true;
@@ -124,7 +124,7 @@ function buildScore(params) {
                        : 'Ninguna';
 
   /* CICLO — price not extended */
-  const notExtended = (rsiD===null||rsiD<70) && ((e500d||0)<60);
+  const notExtended = (rsiD===null||rsiD<70) && ((e200d||0)<30);
 
   const conds = [
     /* MACRO (7pt max) */
@@ -132,7 +132,7 @@ function buildScore(params) {
     { cat:'Macro',  l:'Precio sobre EMA 200 semanal',              w:2, ok: e200c ? cur>e200c : false },
     { cat:'Macro',  l:'Zona Last Peak Fib (0.618–0.786)',          w:2, ok: peakFib618||peakFib786 },
     /* CICLO (4pt max) */
-    { cat:'Ciclo',  l:'Precio NO extendido (RSI<70, EMA500<60%)',  w:2, ok: notExtended },
+    { cat:'Ciclo',  l:'Precio NO extendido (RSI<70, EMA200<30%)',  w:2, ok: notExtended },
     { cat:'Ciclo',  l:'Soporte Fib 60d (0.382–0.618)',             w:2, ok: fibZone },
     /* FLUJO (4pt max) */
     { cat:'Flujo',  l:'OBV alcista en diario Y semanal',           w:2, ok: obvRising && wObvRising },
@@ -145,17 +145,18 @@ function buildScore(params) {
   const max    = conds.reduce((a,c)=>a+c.w, 0);
   const pct    = max>0 ? earned/max : 0;
 
-  /* Extension cap — same logic as dashboard */
+  /* Extension cap — uses EMA 200 daily (more reactive than EMA 500) */
   const c7 = chg7d || 0;
-  const veryExtended = (rsiD>70 && (e500d||0)>60) || (rsiD>72 && c7>20);
-  const extended     = rsiD>62 || (e500d||0)>50 || c7>15;
+  const e2 = e200d || 0;
+  const veryExtended = (rsiD>70 && e2>40) || (rsiD>72 && c7>20);
+  const extended     = rsiD>62 || e2>30 || c7>15;
 
   let signal, extNote='';
   if (veryExtended) {
     signal='Cautela (precio extendido)';
     const reasons=[];
     if(rsiD>70) reasons.push(`RSI ${rsiD?.toFixed(1)} sobrecompra`);
-    if((e500d||0)>60) reasons.push(`+${(e500d||0).toFixed(0)}% sobre EMA 500`);
+    if(e2>40) reasons.push(`+${e2.toFixed(0)}% sobre EMA 200`);
     if(c7>20) reasons.push(`subió ${c7.toFixed(1)}% en 7d`);
     extNote=`⚠ ${reasons.join(' + ')}. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
   } else if (extended) {
@@ -163,7 +164,7 @@ function buildScore(params) {
     signal=(rawSig==='Compra fuerte'||rawSig==='Señal de compra') ? 'Observar (precio extendido)' : rawSig;
     const reasons=[];
     if(rsiD>62) reasons.push(`RSI ${rsiD?.toFixed(1)} zona alta`);
-    if((e500d||0)>50) reasons.push(`precio +${(e500d||0).toFixed(0)}% sobre EMA 500`);
+    if(e2>30) reasons.push(`precio +${e2.toFixed(0)}% sobre EMA 200`);
     if(c7>15) reasons.push(`subió ${c7.toFixed(1)}% en 7 días`);
     extNote=`${reasons.join(' · ')}. Señal rebajada — mejor entrada en pullback.`;
   } else {
@@ -193,10 +194,15 @@ async function main() {
     if(zec){ curPrice=zec.PRICE; chg24=(zec.CHANGEPCT24HOUR>=0?'+':'')+zec.CHANGEPCT24HOUR.toFixed(2)+'%'; }
   } catch { console.log('Live price fallback'); }
 
-  // EMA 500
+  // EMA 500 (informativo, contexto macro)
   const e500all = calcEMA(allC, 500);
   const e500c   = e500all[e500all.length-1];
   const e500d   = e500c ? ((curPrice-e500c)/e500c*100).toFixed(1)+'%' : 'N/A';
+
+  // EMA 200 daily (filtro activo de extensión)
+  const e200all = calcEMA(allC, Math.min(200, allC.length-2));
+  const e200cD  = e200all[e200all.length-1];
+  const e200dVal = e200cD ? ((curPrice-e200cD)/e200cD*100) : 0;
 
   // Daily (120 days)
   const dS   = data.slice(-120);
@@ -296,7 +302,7 @@ async function main() {
     obvRising:dObvRising, wObvRising,
     div:dDiv, fibZone,
     peakFib618, peakFib786, halvPhase:halv.key,
-    e500d:e500dVal, chg7d
+    e200d:e200dVal, chg7d
   });
 
   // Weekly score (using weekly-derived data) for confluence display
@@ -306,7 +312,7 @@ async function main() {
     obvRising:wObvRising, wObvRising,
     div:wDiv, fibZone,
     peakFib618, peakFib786, halvPhase:halv.key,
-    e500d:e500dVal
+    e200d:e200dVal
   });
 
   const confPct = Math.round(((score.pct+wScore.pct)/2)*100);
@@ -363,7 +369,12 @@ async function main() {
 
   // Send if score threshold met OR DCA dip is active OR sell mode activates OR capitulation OR new divergence
   const trigger = score.pct * 100;
-  const shouldSendNormal = trigger >= MIN_PCT;
+  /* Opción B: filtrar emails normales cuando hay extensión activa (señal rebajada).
+     El score puede estar alto por estructura (post-halving, OBV, etc.) pero si
+     RSI está alto, precio +30% sobre EMA 200, o pump reciente, NO es momento de entrar.
+     Solo mando email "normal" si: score alto Y sin extWarn (momento de entrada limpio). */
+  const hasExtCap = !!score.extNote;
+  const shouldSendNormal = trigger >= MIN_PCT && !hasExtCap;
   const shouldSendDip = dipActive;
   const shouldSendSell = sellModeActive;
   const shouldSendCap = capModeActive;
@@ -482,12 +493,13 @@ ${score.earned}/${score.max} pts (${Math.round(score.pct*100)}% del máximo posi
 Confluencia D+S: ${confPct}%
 ${score.extNote?'\n⚠ '+score.extNote:''}
 ━━━ CONTEXTO DE ENTRADA ━━━━━━━
-RSI diario ${dRsiC?.toFixed(1)} ${dRsiC>70?'— SOBRECOMPRA, no entrar ahora':dRsiC>65?'— elevado, precaución':dRsiC<30?'— SOBREVENTA, zona óptima':dRsiC<45?'— zona de compra ✓':'— neutral'}
-EMA 500: ${e500dVal.toFixed(1)}% ${e500dVal>60?'— MUY EXTENDIDO, esperar pullback':e500dVal>30?'— extendido':e500dVal>0?'— tendencia alcista ✓':'— bajo EMA 500'}
+RSI diario ${dRsiC?.toFixed(1)} ${dRsiC>70?'— SOBRECOMPRA, no entrar ahora':dRsiC>62?'— elevado, precaución':dRsiC<30?'— SOBREVENTA, zona óptima':dRsiC<45?'— zona de compra ✓':'— neutral'}
+EMA 200: ${e200dVal.toFixed(1)}% ${e200dVal>40?'— MUY EXTENDIDO, esperar pullback':e200dVal>30?'— extendido, esperar':e200dVal>0?'— tendencia alcista ✓':'— bajo EMA 200'}
 
 ━━━ PRECIO ━━━━━━━━━━━━━━━━━━━━
 Precio actual:   $${curPrice.toFixed(2)} (${chg24})
-EMA 500:         $${e500c?.toFixed(2)} (${e500d})
+EMA 200 diaria:  $${e200cD?.toFixed(2)} (${e200dVal>=0?'+':''}${e200dVal.toFixed(1)}%)
+EMA 500 diaria:  $${e500c?.toFixed(2)} (${e500d}) ◀ contexto macro
 EMA 200 semanal: $${wE200c?.toFixed(2)} ${wE200c&&curPrice>wE200c?'(precio sobre ella ✓)':'(precio bajo ella)'}
 ZEC Market Cap:  $${(zecMcap/1e6).toFixed(0)}M
 

@@ -754,7 +754,7 @@ function aggWeekly(data){
 ═══════════════════════════════════════════════ */
 function buildWeightedConds(params){
   const{rsiD,rsiW,cur,e200c,volR,macdAbove,macdBullish,obvRising,div,fibZone,
-        peakFibZone618,peakFibZone786,halvingPhase,wObvRising,e500d}=params;
+        peakFibZone618,peakFibZone786,halvingPhase,wObvRising,e200d}=params;
 
   /* TIMING — la MEJOR de las 3 señales de momento (no las 3 separadas) */
   const macdBullSignal = macdBullish===true;       /* mejor: cruce bajo cero */
@@ -763,7 +763,7 @@ function buildWeightedConds(params){
   const timingActive   = macdBullSignal||rsiOversoldDiv||rsiBoth;
 
   /* CICLO — precio NO extendido (filtro de timing macro) */
-  const notExtended = (rsiD===null||rsiD<70) && (e500d===null||e500d<60);
+  const notExtended = (rsiD===null||rsiD<70) && (e200d===null||e200d<30);
 
   return[
     /* ── MACRO (3 cond, 7pt máx) — independientes entre sí ── */
@@ -779,7 +779,7 @@ function buildWeightedConds(params){
 
     /* ── CICLO/PRECIO (2 cond, 4pt) — posición técnica ── */
     {cat:'Ciclo',l:'Precio NO extendido',
-     detail:'RSI diario < 70 y precio < 60% sobre EMA 500 · timing válido',
+     detail:'RSI diario < 70 y precio < 30% sobre EMA 200 · timing válido',
      w:2,ok:notExtended,col:AM},
     {cat:'Ciclo',l:'Soporte Fib 60d (0.382–0.618)',
      detail:'Precio en retroceso técnico de corto plazo',
@@ -818,21 +818,25 @@ function scoreFromConds(conds, extCtx){
   const pct=max>0?earned/max:0;
 
   const rsi=extCtx?.rsi??50;
-  const e500d=extCtx?.e500d??0;
+  const e200d=extCtx?.e200d??0;
   const chg7d=extCtx?.chg7d??0;
-  /* Very extended: clear overbought */
-  const veryExtended = (rsi>70 && e500d>60) || (rsi>72 && chg7d>20);
-  /* Extended: RSI elevado OR precio extendido OR pump fuerte reciente */
-  const extended = rsi>62 || e500d>50 || chg7d>15;
+  /* Very extended: clear overbought + significant distance from mid-term EMA */
+  const veryExtended = (rsi>70 && e200d>40) || (rsi>72 && chg7d>20);
+  /* Extended: RSI elevado OR precio alejado de EMA 200 OR pump fuerte reciente */
+  const extended = rsi>62 || e200d>30 || chg7d>15;
 
   let sig,col,extWarn=null;
 
   if(veryExtended){
     /* Hard cap — structural signal can be good but this is NOT an entry point */
     sig='Cautela';col='#f0834f';
+    const reasons=[];
+    if(rsi>70) reasons.push(`RSI diario ${rsi.toFixed(1)} (sobrecompra)`);
+    if(e200d>40) reasons.push(`precio +${e200d.toFixed(0)}% sobre EMA 200`);
+    if(chg7d>20) reasons.push(`subió ${chg7d.toFixed(1)}% en 7d`);
     extWarn={
       level:'high',
-      msg:`${rsi>70?`RSI diario ${rsi.toFixed(1)} (sobrecompra)`:''}${rsi>70&&(e500d>60||chg7d>20)?' + ':''}${e500d>60?`precio ${e500d.toFixed(0)}% sobre EMA 500`:''}${(rsi>70||e500d>60)&&chg7d>20?' + ':''}${chg7d>20?`subió ${chg7d.toFixed(1)}% en 7d`:''}. Señal estructural válida pero precio muy extendido — esperar retroceso antes de entrar.`
+      msg:`${reasons.join(' + ')}. Señal estructural válida pero precio muy extendido — esperar retroceso antes de entrar.`
     };
   }else if(extended){
     /* Soft cap — can reach Observar max */
@@ -842,7 +846,7 @@ function scoreFromConds(conds, extCtx){
     col=needsCap?AM:(pct>=.38?AM:pct>=.22?'#f0834f':SL);
     const reasons=[];
     if(rsi>62) reasons.push(`RSI ${rsi.toFixed(1)} en zona alta`);
-    if(e500d>50) reasons.push(`precio +${e500d.toFixed(0)}% sobre EMA 500`);
+    if(e200d>30) reasons.push(`precio +${e200d.toFixed(0)}% sobre EMA 200`);
     if(chg7d>15) reasons.push(`subió +${chg7d.toFixed(1)}% en 7 días`);
     extWarn={
       level:'medium',
@@ -994,6 +998,7 @@ function analyze(data,curPrice,tf){
   const e50c=e50arr[e50arr.length-1];
   const e20c=e20arr[e20arr.length-1];
   const e200c=e200arr[e200arr.length-1];
+  const e200d=e200c?((cur-e200c)/e200c*100):null;
 
   /* Weekly EMA 200 — always compute from weekly data */
   const wData=aggWeekly(data);
@@ -1085,11 +1090,11 @@ function analyze(data,curPrice,tf){
     fibZone,                                      /* short-term fib */
     peakFibZone618,peakFibZone786,                /* macro fib */
     halvingPhase:halvInfo.halvingPhaseKey,
-    e500d                                         /* for "not extended" check */
+    e200d                                         /* for "not extended" check (EMA 200) */
   });
   const close7d=closes.length>=7?closes[closes.length-8]:closes[0];
   const chg7d=close7d?((cur-close7d)/close7d*100):0;
-  const sc=scoreFromConds(conds,{rsi:rsiD,e500d,chg7d});
+  const sc=scoreFromConds(conds,{rsi:rsiD,e200d,chg7d});
 
   /* Confluence */
   const dSlice=data.slice(-120);
@@ -1186,7 +1191,8 @@ function analyze(data,curPrice,tf){
 
   return{
     closes,vols,labels,highs,lows,cur,chg,
-    e50arr,e20arr,e200arr,e500sl,e50c,e20c,e200c,e500c,e500d,wE200c,
+    e50arr,e20arr,e200arr,e500sl,e50c,e20c,e200c,e500c,e500d,e200d,wE200c,
+    chg7d,
     rsiArr,rsiC,wRsiArr,wRsiC,div,
     macdData,macdAbove,macdCross,macdBullish,
     wMacdAbove,wMacdBullish,
@@ -2244,11 +2250,13 @@ function renderAll(s){
     document.getElementById('m-ema-s').textContent=d===null?'—':d>60?'Muy extendido — esperar':d>20?'Tendencia macro ↑':d>=0?'Sobre línea institucional':'Bajo EMA 200s · ciclo bajista';
     document.getElementById('ema-card').style.borderColor=d===null?'var(--b1)':d>60?AM+'55':d>=0?GR+'33':RD+'44';
   }else{
-    document.getElementById('ema-lbl').textContent='vs EMA 500';
-    document.getElementById('m-ema').textContent=s.e500d!==null?(s.e500d>=0?'+':'')+s.e500d.toFixed(1)+'%':'—';
-    document.getElementById('m-ema').style.color=s.e500d>60?AM:s.e500d>=0?GR:RD;
-    document.getElementById('m-ema-s').textContent=s.e500d>60?'Muy extendido — esperar':s.e500d>20?'Tendencia macro ↑':s.e500d>-20?'Zona neutral':'Bajo EMA 500';
-    document.getElementById('ema-card').style.borderColor=s.e500d>60?AM+'55':s.e500d>=0?GR+'33':RD+'44';
+    /* DIARIO — EMA 200 daily como referencia activa de extensión (filtro de alertas) */
+    document.getElementById('ema-lbl').textContent='vs EMA 200';
+    const d=s.e200d;
+    document.getElementById('m-ema').textContent=d!==null?(d>=0?'+':'')+d.toFixed(1)+'%':'—';
+    document.getElementById('m-ema').style.color=d===null?'var(--text)':d>40?AM:d>30?'#f0834f':d>=0?GR:RD;
+    document.getElementById('m-ema-s').textContent=d===null?'—':d>40?'Muy extendido · esperar':d>30?'Extendido · pullback':d>0?'Sobre EMA 200 ↑':'Bajo EMA 200';
+    document.getElementById('ema-card').style.borderColor=d===null?'var(--b1)':d>40?AM+'55':d>30?'#f0834f55':d>=0?GR+'33':RD+'44';
   }
   document.getElementById('m-vol').textContent=s.volR.toFixed(2)+'×';document.getElementById('m-vol').style.color=s.volR>=1.1?GR:s.volR>=.9?AM:RD;
   document.getElementById('m-vol-s').textContent=s.volR>=1.1?'Vol en alza':s.volR>=.9?'Estable':'Cayendo';
