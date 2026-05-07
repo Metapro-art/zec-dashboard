@@ -111,7 +111,7 @@ function getHalvingPhase() {
 function buildScore(params) {
   const { rsiD, rsiW, cur, e200c, volR, macdAbove, macdBullish, obvRising,
           div, fibZone, peakFib618, peakFib786, halvPhase,
-          wObvRising, e500d } = params;
+          wObvRising, e500d, chg7d } = params;
 
   /* TIMING — best of 3 momentum signals */
   const macdBullSignal = macdBullish === true;
@@ -146,17 +146,26 @@ function buildScore(params) {
   const pct    = max>0 ? earned/max : 0;
 
   /* Extension cap — same logic as dashboard */
-  const veryExtended = rsiD>70 && (e500d||0)>60;
-  const extended     = rsiD>65 || (e500d||0)>60;
+  const c7 = chg7d || 0;
+  const veryExtended = (rsiD>70 && (e500d||0)>60) || (rsiD>72 && c7>20);
+  const extended     = rsiD>62 || (e500d||0)>50 || c7>15;
 
   let signal, extNote='';
   if (veryExtended) {
     signal='Cautela (precio extendido)';
-    extNote=`⚠ RSI ${rsiD?.toFixed(1)} en sobrecompra + ${(e500d||0).toFixed(0)}% sobre EMA 500. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
+    const reasons=[];
+    if(rsiD>70) reasons.push(`RSI ${rsiD?.toFixed(1)} sobrecompra`);
+    if((e500d||0)>60) reasons.push(`+${(e500d||0).toFixed(0)}% sobre EMA 500`);
+    if(c7>20) reasons.push(`subió ${c7.toFixed(1)}% en 7d`);
+    extNote=`⚠ ${reasons.join(' + ')}. Señal estructural válida pero PRECIO MUY EXTENDIDO — no entrar. Esperar retroceso.`;
   } else if (extended) {
     const rawSig = pct>=.68?'Compra fuerte':pct>=.56?'Señal de compra':pct>=.38?'Observar':pct>=.22?'Cautela':'Esperar';
     signal=(rawSig==='Compra fuerte'||rawSig==='Señal de compra') ? 'Observar (precio extendido)' : rawSig;
-    extNote=`${rsiD>65?`RSI ${rsiD?.toFixed(1)} zona alta. `:''}${(e500d||0)>60?`Precio ${(e500d||0).toFixed(0)}% sobre EMA 500. `:''}Señal rebajada — mejor entrada en pullback.`;
+    const reasons=[];
+    if(rsiD>62) reasons.push(`RSI ${rsiD?.toFixed(1)} zona alta`);
+    if((e500d||0)>50) reasons.push(`precio +${(e500d||0).toFixed(0)}% sobre EMA 500`);
+    if(c7>15) reasons.push(`subió ${c7.toFixed(1)}% en 7 días`);
+    extNote=`${reasons.join(' · ')}. Señal rebajada — mejor entrada en pullback.`;
   } else {
     if      (pct>=.68) signal='COMPRA FUERTE';
     else if (pct>=.56) signal='Señal de compra';
@@ -278,13 +287,16 @@ async function main() {
     else dcaTier = {l:'CAÍDA LEVE', pct:'8–12%', note:'Caída pequeña — tramo pequeño'};
   }
 
+  const close7d = dc.length>=8 ? dc[dc.length-8] : dc[0];
+  const chg7d = close7d ? ((curPrice-close7d)/close7d*100) : 0;
+
   const score = buildScore({
     rsiD:dRsiC, rsiW:wRsiC, cur:curPrice, e200c:wE200c,
     volR:dVr, macdAbove:dMacdAbove, macdBullish:dMacdBull,
     obvRising:dObvRising, wObvRising,
     div:dDiv, fibZone,
     peakFib618, peakFib786, halvPhase:halv.key,
-    e500d:e500dVal
+    e500d:e500dVal, chg7d
   });
 
   // Weekly score (using weekly-derived data) for confluence display
