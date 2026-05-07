@@ -23,8 +23,8 @@ body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,16px) 0}
 
 /* Typography */
 .mono{font-family:'Courier New',Courier,monospace}
-.lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
-.slbl{font-size:10px;color:var(--muted2);letter-spacing:.05em}
+.lbl{font-size:11px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.slbl{font-size:11px;color:var(--muted2);letter-spacing:.05em}
 
 /* Cards */
 .card{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:1rem}
@@ -153,7 +153,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <button id="btn-d" class="tf-btn on" onclick="setTF('daily')">DIARIO</button>
       <button id="btn-w" class="tf-btn" onclick="setTF('weekly')">SEMANAL</button>
     </div>
-    <div id="upd-time" style="font-size:10px;color:var(--muted2)"></div>
+    <div id="upd-time" style="font-size:11px;color:var(--muted2)"></div>
   </div>
 </div>
 
@@ -164,7 +164,7 @@ input[type=number]:focus{border-color:#C9A84C55}
 <div style="margin-bottom:1rem">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
     <span id="score-pts" style="font-size:11px;color:var(--muted)"></span>
-    <span id="score-max" style="font-size:10px;color:var(--muted2)"></span>
+    <span id="score-max" style="font-size:11px;color:var(--muted2)"></span>
   </div>
   <div class="pbar-wrap" style="height:4px;margin-bottom:5px">
     <div id="score-bar" class="pbar-fill" style="width:0"></div>
@@ -200,7 +200,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
   <div class="ch"><canvas id="cPrice" role="img" aria-label="Precio ZEC"></canvas></div>
   <div id="pchart-leg" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:.625rem"></div>
-  <div style="font-size:10px;color:var(--muted2);margin-top:4px">Rueda = zoom · Arrastra = mover</div>
+  <div style="font-size:11px;color:var(--muted2);margin-top:4px">Rueda = zoom · Arrastra = mover</div>
 </div>
 
 <!-- ═══ RSI ═══ -->
@@ -251,7 +251,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div style="margin-bottom:2px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
       <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
-      <span id="obv-price-range" style="font-size:10px;color:var(--muted2)"></span>
+      <span id="obv-price-range" style="font-size:11px;color:var(--muted2)"></span>
     </div>
     <div class="obvh"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
   </div>
@@ -259,7 +259,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <!-- Divider -->
   <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
     <div style="flex:1;height:1px;background:var(--b1)"></div>
-    <span style="font-size:10px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
+    <span style="font-size:11px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">OBV acumulado</span>
     <div style="flex:1;height:1px;background:var(--b1)"></div>
   </div>
 
@@ -278,12 +278,12 @@ input[type=number]:focus{border-color:#C9A84C55}
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
       <span style="color:#2ec4b6;font-weight:bold">↑ Divergencia alcista:</span><br>
       Precio baja → OBV sube<br>
-      <span style="font-size:10px;color:var(--muted2)">Instituciones comprando en silencio</span>
+      <span style="font-size:11px;color:var(--muted2)">Instituciones comprando en silencio</span>
     </div>
     <div style="font-size:10px;color:var(--muted);line-height:1.6">
       <span style="color:#ff4466;font-weight:bold">↓ Divergencia bajista:</span><br>
       Precio sube → OBV baja<br>
-      <span style="font-size:10px;color:var(--muted2)">Distribución — venden mientras sube</span>
+      <span style="font-size:11px;color:var(--muted2)">Distribución — venden mientras sube</span>
     </div>
   </div>
 
@@ -301,7 +301,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     </div>
     <div id="div-history-list" style="display:flex;flex-direction:column;gap:4px;font-size:11px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;gap:8px;flex-wrap:wrap">
-      <span style="font-size:10px;color:var(--muted2)">Resolución a +7 días · pending = aún no han pasado 7 días</span>
+      <span style="font-size:11px;color:var(--muted2)">Resolución a +7 días · pending = aún no han pasado 7 días</span>
       <button onclick="clearDivHistory()" style="font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;min-height:30px">↺ Limpiar log</button>
     </div>
   </div>
@@ -347,11 +347,11 @@ input[type=number]:focus{border-color:#C9A84C55}
       <div style="position:absolute;top:0;left:87.5%;width:1px;height:100%;background:var(--muted2)"></div>
     </div>
     <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:5px;padding:0">
-      <span style="font-size:10px;color:var(--muted2)">Corrección</span>
-      <span style="font-size:10px;color:var(--muted2)">Acumulación</span>
-      <span style="font-size:10px;color:var(--muted2)">Bull run</span>
-      <span style="font-size:10px;color:var(--muted2)">Techo</span>
-      <span style="font-size:10px;color:var(--muted2)">Bear</span>
+      <span style="font-size:11px;color:var(--muted2)">Corrección</span>
+      <span style="font-size:11px;color:var(--muted2)">Acumulación</span>
+      <span style="font-size:11px;color:var(--muted2)">Bull run</span>
+      <span style="font-size:11px;color:var(--muted2)">Techo</span>
+      <span style="font-size:11px;color:var(--muted2)">Bear</span>
     </div>
   </div>
   <div id="hv-note" style="font-size:11px;color:var(--muted);line-height:1.6;padding:.625rem .875rem;background:var(--card2);border-radius:8px;border:1px solid var(--b1)"></div>
@@ -534,7 +534,7 @@ input[type=number]:focus{border-color:#C9A84C55}
 
   <!-- Conditions checklist -->
   <div style="background:var(--card2);border-radius:9px;padding:.75rem;margin-bottom:.75rem">
-    <div class="lbl" style="margin-bottom:6px;font-size:9px">Condiciones requeridas (TODAS deben cumplirse)</div>
+    <div class="lbl" style="margin-bottom:6px;font-size:10px">Condiciones requeridas (TODAS deben cumplirse)</div>
     <div id="cap-conds-list" style="display:flex;flex-direction:column;gap:5px"></div>
   </div>
 
@@ -556,7 +556,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <!-- Cycle progress bar -->
   <div style="margin-bottom:.875rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:6px">
-      <span style="font-size:10px;color:var(--muted2);letter-spacing:.05em;text-transform:uppercase">Posición en ciclo de 4 años</span>
+      <span style="font-size:11px;color:var(--muted2);letter-spacing:.05em;text-transform:uppercase">Posición en ciclo de 4 años</span>
       <span id="cycle-pos" style="font-size:10px;font-family:'Courier New',monospace;color:var(--muted)"></span>
     </div>
     <div style="position:relative;height:18px;background:var(--card2);border-radius:9px;overflow:hidden;border:1px solid var(--b1)">
@@ -569,7 +569,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <!-- Position marker -->
       <div id="cycle-marker" style="position:absolute;top:-3px;width:3px;height:24px;background:var(--gold);box-shadow:0 0 6px var(--gold);transition:left .8s;left:0"></div>
     </div>
-    <div class="cycle-labels" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:10px;color:var(--muted2);margin-top:5px;letter-spacing:.04em">
+    <div class="cycle-labels" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:11px;color:var(--muted2);margin-top:5px;letter-spacing:.04em">
       <span>Halving 2024</span>
       <span style="color:#f0834f">Acum.</span>
       <span style="color:#5ecc7b">Bull</span>
@@ -583,7 +583,7 @@ input[type=number]:focus{border-color:#C9A84C55}
 
   <!-- Activation conditions checklist -->
   <div id="sell-conditions" style="background:var(--card2);border-radius:9px;padding:.75rem;margin-bottom:.875rem">
-    <div class="lbl" style="margin-bottom:6px;font-size:9px">Condiciones requeridas (TODAS deben cumplirse)</div>
+    <div class="lbl" style="margin-bottom:6px;font-size:10px">Condiciones requeridas (TODAS deben cumplirse)</div>
     <div id="sell-conds-list" style="display:flex;flex-direction:column;gap:5px"></div>
   </div>
 
@@ -616,7 +616,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   <div style="margin-top:.75rem;font-size:10px;color:var(--muted)">R:R ≥ 3 = excelente &nbsp; R:R ≥ 2 = bueno &nbsp; R:R &lt; 1 = no recomendable</div>
 </div>
 
-<div style="text-align:center;font-size:10px;color:var(--muted2);padding:.875rem;line-height:1.7">
+<div style="text-align:center;font-size:11px;color:var(--muted2);padding:.875rem;line-height:1.7">
   Cel: Chrome → ⋮ → Añadir a pantalla de inicio<br>
   Precio: cada 60s · Análisis completo: cada 5 min · Alertas: GitHub Actions
 </div>
@@ -819,8 +819,11 @@ function scoreFromConds(conds, extCtx){
 
   const rsi=extCtx?.rsi??50;
   const e500d=extCtx?.e500d??0;
-  const veryExtended = rsi>70 && e500d>60;
-  const extended     = rsi>65 || e500d>60;
+  const chg7d=extCtx?.chg7d??0;
+  /* Very extended: clear overbought */
+  const veryExtended = (rsi>70 && e500d>60) || (rsi>72 && chg7d>20);
+  /* Extended: RSI elevado OR precio extendido OR pump fuerte reciente */
+  const extended = rsi>62 || e500d>50 || chg7d>15;
 
   let sig,col,extWarn=null;
 
@@ -829,7 +832,7 @@ function scoreFromConds(conds, extCtx){
     sig='Cautela';col='#f0834f';
     extWarn={
       level:'high',
-      msg:`RSI diario ${rsi.toFixed(1)} (sobrecompra) + precio ${e500d.toFixed(0)}% sobre EMA 500. Señal estructural válida pero precio muy extendido — esperar retroceso antes de entrar.`
+      msg:`${rsi>70?`RSI diario ${rsi.toFixed(1)} (sobrecompra)`:''}${rsi>70&&(e500d>60||chg7d>20)?' + ':''}${e500d>60?`precio ${e500d.toFixed(0)}% sobre EMA 500`:''}${(rsi>70||e500d>60)&&chg7d>20?' + ':''}${chg7d>20?`subió ${chg7d.toFixed(1)}% en 7d`:''}. Señal estructural válida pero precio muy extendido — esperar retroceso antes de entrar.`
     };
   }else if(extended){
     /* Soft cap — can reach Observar max */
@@ -837,9 +840,13 @@ function scoreFromConds(conds, extCtx){
     const needsCap=rawSig==='Compra fuerte'||rawSig==='Señal de compra';
     sig=needsCap?'Observar':rawSig;
     col=needsCap?AM:(pct>=.38?AM:pct>=.22?'#f0834f':SL);
+    const reasons=[];
+    if(rsi>62) reasons.push(`RSI ${rsi.toFixed(1)} en zona alta`);
+    if(e500d>50) reasons.push(`precio +${e500d.toFixed(0)}% sobre EMA 500`);
+    if(chg7d>15) reasons.push(`subió +${chg7d.toFixed(1)}% en 7 días`);
     extWarn={
       level:'medium',
-      msg:`${rsi>65?`RSI diario ${rsi.toFixed(1)} — zona de sobrecompra. `:''}${e500d>60?`Precio ${e500d.toFixed(0)}% sobre EMA 500 — extendido. `:''}Señal rebajada: esperar pullback para mejor entrada.`
+      msg:`${reasons.join(' · ')}. Señal rebajada: esperar pullback para mejor entrada.`
     };
   }else{
     if(pct>=.68){sig='Compra fuerte';col=GR;}
@@ -1080,7 +1087,9 @@ function analyze(data,curPrice,tf){
     halvingPhase:halvInfo.halvingPhaseKey,
     e500d                                         /* for "not extended" check */
   });
-  const sc=scoreFromConds(conds,{rsi:rsiD,e500d});
+  const close7d=closes.length>=7?closes[closes.length-8]:closes[0];
+  const chg7d=close7d?((cur-close7d)/close7d*100):0;
+  const sc=scoreFromConds(conds,{rsi:rsiD,e500d,chg7d});
 
   /* Confluence */
   const dSlice=data.slice(-120);
@@ -1447,7 +1456,7 @@ function renderDivHistory(currentPrice){
   history=resolveOldDivergences(history,currentPrice);
 
   if(history.length===0){
-    list.innerHTML='<div style="font-size:10px;color:var(--muted2);padding:8px;text-align:center;background:var(--card2);border-radius:6px">Sin divergencias detectadas todavía. Aparecerán aquí cuando el sistema las identifique.</div>';
+    list.innerHTML='<div style="font-size:11px;color:var(--muted2);padding:8px;text-align:center;background:var(--card2);border-radius:6px">Sin divergencias detectadas todavía. Aparecerán aquí cuando el sistema las identifique.</div>';
     statsEl.textContent='';
     return;
   }
@@ -1837,7 +1846,7 @@ function renderConds(s){
       <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${c.ok?c.col||GR:SL};${c.ok?'box-shadow:0 0 6px '+c.col+'66':''}" ></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:${c.ok?'var(--text)':'#444450'};line-height:1.3">${c.l}</div>
-        <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+        <div style="font-size:11px;color:var(--muted2);margin-top:1px">${c.detail}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
         <span class="wbadge" style="background:${c.ok?c.col+'22':'var(--b2)'};color:${c.ok?c.col:SL}">
@@ -2014,7 +2023,7 @@ function renderCapitulation(s){
        <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
        <div style="flex:1;min-width:0">
          <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
-         <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+         <div style="font-size:11px;color:var(--muted2);margin-top:1px">${c.detail}</div>
        </div>
      </div>`
   ).join('');
@@ -2086,7 +2095,7 @@ function renderSell(s){
        <span style="color:${c.ok?GR:RD};flex-shrink:0;font-family:'Courier New',monospace;width:14px;text-align:center">${c.ok?'✓':'✗'}</span>
        <div style="flex:1;min-width:0">
          <div style="color:${c.ok?'var(--text)':'var(--muted)'}">${c.l}</div>
-         <div style="font-size:10px;color:var(--muted2);margin-top:1px">${c.detail}</div>
+         <div style="font-size:11px;color:var(--muted2);margin-top:1px">${c.detail}</div>
        </div>
      </div>`
   ).join('');
@@ -2333,6 +2342,14 @@ async function refresh(){
 refresh();
 setInterval(refreshPrice,60*1000);
 setInterval(refresh,5*60*1000);
+
+/* Force refresh when tab becomes visible after being in background */
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    refreshPrice();
+    refresh();
+  }
+});
 </script>
 </body>
 </html>
