@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#080809">
 <title>ZEC · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -123,6 +126,80 @@ input[type=number]:focus{border-color:#C9A84C55}
   .sell-row-bot{flex-wrap:wrap !important;gap:4px !important}
   .sell-row-bot > div:first-child{width:100% !important}
 }
+
+/* ════════════════════════════════════════════════════
+   2026 GLASS REDESIGN — capa de overrides (no toca el motor)
+════════════════════════════════════════════════════ */
+:root{
+  --bg:#07070b;--card:rgba(23,23,31,0.55);--card2:rgba(15,15,21,0.5);
+  --b1:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.045);
+  --text:#eceaf2;--muted:#9c9caa;--muted2:#71717f;
+  --gold:#d8b860;--green:#36d399;--red:#f6708a;
+  --amber:#f5bd4a;--blue:#5cb0ff;--purple:#bf8cff;--teal:#34d3c3;
+  --glass-blur:16px;--radius:18px;--shadow:0 10px 34px rgba(0,0,0,0.46);
+}
+html,body{
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:radial-gradient(1200px 760px at 50% -12%,#16131f 0%,#0a0a10 48%,#07070b 100%) fixed,#07070b;
+  color:var(--text);letter-spacing:-0.011em;-webkit-font-smoothing:antialiased;
+}
+.mono,#price-main,#m-rsi,#m-fib,#m-ema,#m-vol,#m-macro,input[type=number]{
+  font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace !important;
+  font-variant-numeric:tabular-nums;
+}
+.shell{max-width:1080px}
+.lbl{color:var(--muted);font-weight:600;letter-spacing:.13em;font-size:10.5px}
+
+/* Glass cards */
+.card{
+  background:var(--card);
+  backdrop-filter:blur(var(--glass-blur)) saturate(150%);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(150%);
+  border:1px solid var(--b1);border-radius:var(--radius);box-shadow:var(--shadow);
+  position:relative;transition:transform .28s cubic-bezier(.4,0,.2,1),border-color .28s,box-shadow .28s;
+}
+.card::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,0.07),transparent 38%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;padding:1px}
+.shell>.card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.14);box-shadow:0 16px 44px rgba(0,0,0,0.55)}
+.card-sm{background:var(--card2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--b1);border-radius:12px}
+
+/* Glass buttons */
+.tf-btn{border-radius:10px;background:rgba(255,255,255,0.045);backdrop-filter:blur(6px);font-weight:600;border-color:var(--b1);color:var(--muted)}
+.tf-btn.on{background:linear-gradient(135deg,var(--gold),#b78f38);color:#0a0a0a;border-color:transparent;box-shadow:0 5px 16px rgba(216,184,96,0.32)}
+.zbtn{border-radius:9px;background:rgba(255,255,255,0.035);color:var(--muted)}
+.zbtn:hover,.zbtn.on{border-color:var(--gold);color:var(--gold);background:rgba(216,184,96,0.08)}
+
+/* Collapsible panels */
+.card.collapsible>.panel-head{cursor:pointer;user-select:none}
+.panel-chev{margin-left:auto;color:var(--muted2);font-size:12px;transition:transform .38s cubic-bezier(.4,0,.2,1);padding-left:8px}
+.card.collapsed .panel-chev{transform:rotate(-90deg)}
+.panel-body{overflow:hidden;transition:max-height .46s cubic-bezier(.4,0,.2,1),opacity .34s ease}
+.card.collapsed .panel-body{opacity:0}
+
+/* Skeleton shimmer */
+.skel{position:relative;overflow:hidden;color:transparent !important;border-radius:7px;background:rgba(255,255,255,0.05)}
+.skel::after{content:'';position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.09),transparent);animation:shimmer 1.4s infinite}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+
+/* Sticky glass header + gradient hero number */
+.hdr{position:sticky;top:0;z-index:60;backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);
+  background:linear-gradient(180deg,rgba(8,8,13,0.86),rgba(8,8,13,0.42));border-radius:16px;border:1px solid var(--b1);padding:14px 16px !important}
+#price-main{font-weight:600;letter-spacing:-.03em;
+  background:linear-gradient(135deg,#ffffff,#d7cfb4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#sig-badge{backdrop-filter:blur(8px);font-weight:600}
+
+/* Live dot */
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:middle;animation:livepulse 1.9s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(54,211,153,0.55)}70%{box-shadow:0 0 0 8px rgba(54,211,153,0)}100%{box-shadow:0 0 0 0 rgba(54,211,153,0)}}
+
+/* Entrance + scrollbar */
+.shell>*{animation:fadeUp .5s ease both}
+.shell>*:nth-child(2){animation-delay:.04s}.shell>*:nth-child(3){animation-delay:.08s}.shell>*:nth-child(4){animation-delay:.12s}.shell>*:nth-child(n+5){animation-delay:.16s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.11);border-radius:6px}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.18)}::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
 <body>
@@ -198,7 +275,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <button class="zbtn" onclick="resetZoom()">↺</button>
     </div>
   </div>
-  <div class="ch"><canvas id="cPrice" role="img" aria-label="Precio ZEC"></canvas></div>
+  <div class="ch"><div id="cPrice" style="width:100%;height:100%" role="img" aria-label="Precio ZEC"></div></div>
   <div id="pchart-leg" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:.625rem"></div>
   <div style="font-size:11px;color:var(--muted2);margin-top:4px">Rueda = zoom · Arrastra = mover</div>
 </div>
@@ -209,7 +286,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     <span class="lbl" style="margin-bottom:0">RSI 14 · Divergencias</span>
     <span id="div-tag" style="font-size:11px;color:var(--muted)"></span>
   </div>
-  <div class="rh"><canvas id="cRSI" role="img" aria-label="RSI 14"></canvas></div>
+  <div class="rh"><div id="cRSI" style="width:100%;height:100%" role="img" aria-label="RSI 14"></div></div>
 </div>
 
 <!-- ═══ MACD ═══ -->
@@ -218,7 +295,7 @@ input[type=number]:focus{border-color:#C9A84C55}
     <span class="lbl" style="margin-bottom:0">MACD (12,26,9) · Momentum</span>
     <span id="macd-tag" style="font-size:11px;color:var(--muted)"></span>
   </div>
-  <div class="mh"><canvas id="cMACD" role="img" aria-label="MACD"></canvas></div>
+  <div class="mh"><div id="cMACD" style="width:100%;height:100%" role="img" aria-label="MACD"></div></div>
   <div style="display:flex;gap:14px;margin-top:.5rem">
     <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:var(--blue);display:inline-block;border-radius:1px"></span>MACD</span>
     <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:14px;height:2px;background:var(--red);display:inline-block;border-radius:1px;border-top:1px dashed var(--red);height:0px"></span>Señal</span>
@@ -253,7 +330,7 @@ input[type=number]:focus{border-color:#C9A84C55}
       <span style="font-size:9px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase">Precio ZEC</span>
       <span id="obv-price-range" style="font-size:11px;color:var(--muted2)"></span>
     </div>
-    <div class="obvh"><canvas id="cOBVPrice" role="img" aria-label="Precio ZEC para comparar con OBV"></canvas></div>
+    <div class="obvh"><div id="cOBVPrice" style="width:100%;height:100%" role="img" aria-label="Precio ZEC para comparar con OBV"></div></div>
   </div>
 
   <!-- Divider -->
@@ -264,7 +341,7 @@ input[type=number]:focus{border-color:#C9A84C55}
   </div>
 
   <!-- OBV chart (bottom) -->
-  <div class="obvh" style="margin-bottom:.625rem"><canvas id="cOBV" role="img" aria-label="OBV acumulado"></canvas></div>
+  <div class="obvh" style="margin-bottom:.625rem"><div id="cOBV" style="width:100%;height:100%" role="img" aria-label="OBV acumulado"></div></div>
 
   <!-- Legend for divergence colors -->
   <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:.625rem">
@@ -624,9 +701,7 @@ input[type=number]:focus{border-color:#C9A84C55}
 </div><!-- shell -->
 
 <!-- SCRIPTS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════
    CONSTANTS & STATE
@@ -645,17 +720,14 @@ let raw=null,stats=null,tf='daily',fibWindow=60,livePrice=null,liveMcap=null;
 /* ═══════════════════════════════════════════════
    CROSSHAIR PLUGIN
 ═══════════════════════════════════════════════ */
-Chart.register({
-  id:'crosshair',
-  afterDraw(ch){
-    if(!ch._cx)return;
-    const{ctx,chartArea:{left,right,top,bottom}}=ch;
-    ctx.save();ctx.strokeStyle='rgba(201,168,76,0.32)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-    ctx.beginPath();ctx.moveTo(ch._cx,top);ctx.lineTo(ch._cx,bottom);ctx.stroke();
-    if(ch._cy){ctx.beginPath();ctx.moveTo(left,ch._cy);ctx.lineTo(right,ch._cy);ctx.stroke();}
-    ctx.restore();
-  }
-});
+/* ── ECharts shared helpers (tema glass) ── */
+const EC_MONO="'JetBrains Mono',ui-monospace,monospace";
+function ecGet(id){const el=document.getElementById(id);if(!el)return null;return echarts.getInstanceByDom(el)||echarts.init(el,null,{renderer:'canvas'});}
+function ecGrid(extra){return Object.assign({left:50,right:16,top:14,bottom:24,containLabel:false},extra||{});}
+function ecAxisX(labels){return{type:'category',data:labels,boundaryGap:false,axisLine:{lineStyle:{color:GRID}},axisTick:{show:false},splitLine:{show:false},axisLabel:{color:TICK,fontSize:10,fontFamily:EC_MONO,hideOverlap:true}};}
+function ecAxisY(extra){return Object.assign({type:'value',scale:true,axisLine:{show:false},axisTick:{show:false},axisLabel:{color:TICK,fontSize:10,fontFamily:EC_MONO},splitLine:{lineStyle:{color:GRID,type:'dashed'}}},extra||{});}
+function ecTip(formatter,accent){return{trigger:'axis',axisPointer:{type:'cross',lineStyle:{color:(accent||G)+'66',type:'dashed'},crossStyle:{color:(accent||G)+'55'},label:{backgroundColor:'#15151c',borderColor:(accent||G)+'55',borderWidth:1,color:'#eceaf2',fontFamily:EC_MONO,fontSize:10}},backgroundColor:'rgba(13,13,18,0.93)',borderColor:(accent||G)+'4d',borderWidth:1,padding:[8,11],textStyle:{color:'#eceaf2',fontFamily:EC_MONO,fontSize:11},formatter};}
+function ecArea(color,topA,botA){return new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:color+topA},{offset:1,color:color+botA}]);}
 
 /* ═══════════════════════════════════════════════
    MATH — verified correct
@@ -1262,41 +1334,33 @@ function bindTT(chart,canvas){
 function pad(a,n=8){return[...(a||[]),...Array(n).fill(null)];}
 
 function renderPriceChart(s){
-  if(cP)cP.destroy();
   _fibs=s.fibs;
-  const PAD=8,n=s.closes.length;
-  const padL=[...s.labels,...Array(PAD).fill('')];
-  const fibDS=Object.entries(FIB_COLORS).filter(([rv])=>parseFloat(rv)>0&&parseFloat(rv)<1)
-    .map(([rv,col])=>({label:'Fib '+rv,data:pad(Array(n).fill(s.fibs[parseFloat(rv)]),PAD),borderColor:col+'88',borderWidth:1.5,borderDash:[6,5],pointRadius:0,fill:false,tension:0,spanGaps:false}));
-  const ds=[
-    {label:'ZEC',data:pad(s.closes,PAD),borderColor:G,borderWidth:2.5,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:G,fill:false,tension:.3,spanGaps:false},
-    {label:'EMA 50',data:pad(s.e50arr,PAD),borderColor:BL+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[8,4],spanGaps:false},
-    ...fibDS
-  ];
-  /* Daily: EMA 200, EMA 500 */
-  if(s.tf==='daily'&&s.e500sl){
-    ds.splice(2,0,{label:'EMA 500',data:pad(s.e500sl,PAD),borderColor:PU+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[3,6],spanGaps:false});
-    ds.splice(3,0,{label:'EMA 200',data:pad(s.e200arr,PAD),borderColor:'#f47244bb',borderWidth:1.6,pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
-  }
-  /* Weekly: EMA 20w, EMA 200w (institutional) */
+  const ec=ecGet('cPrice');
+  const labels=s.labels;
+  const mkEma=(name,arr,color,dash)=>({name,type:'line',data:arr,smooth:true,showSymbol:false,lineStyle:{color,width:1.6,type:dash||'dashed',opacity:.9},z:2});
+  const emaS=[mkEma('EMA 50',s.e50arr,BL)];
+  if(s.tf==='daily'&&s.e500sl){emaS.push(mkEma('EMA 500',s.e500sl,PU,[2,5]));emaS.push(mkEma('EMA 200',s.e200arr,'#f47244'));}
   if(s.tf==='weekly'){
-    ds.splice(2,0,{label:'EMA 20s',data:pad(s.e20arr,PAD),borderColor:PU+'cc',borderWidth:1.8,pointRadius:0,fill:false,tension:.4,borderDash:[6,4],spanGaps:false});
-    /* EMA 200 weekly — needs to be computed for weekly closes length */
-    const wData=aggWeekly(raw);
-    const wE200=calcEMA(wData.closes,Math.min(200,wData.closes.length-2));
-    ds.splice(3,0,{label:'EMA 200s',data:pad(wE200,PAD),borderColor:TEAL+'cc',borderWidth:2,pointRadius:0,fill:false,tension:.4,borderDash:[4,5],spanGaps:false});
+    emaS.push(mkEma('EMA 20s',s.e20arr,PU));
+    const wData=aggWeekly(raw);const wE200=calcEMA(wData.closes,Math.min(200,wData.closes.length-2));
+    emaS.push(mkEma('EMA 200s',wE200,TEAL,'solid'));
   }
-  const canvas=document.getElementById('cPrice');
-  cP=new Chart(canvas,{type:'line',data:{labels:padL,datasets:ds},options:{
-    responsive:true,maintainAspectRatio:false,animation:false,
-    interaction:{mode:'index',intersect:false},
-    plugins:{legend:{display:false},tooltip:{enabled:false},
-      zoom:{zoom:{wheel:{enabled:true,speed:0.08},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:10}}},
-      crosshair:{}},
-    scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-            y:{ticks:{color:TICK,font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:GRID}}}
-  }});
-  bindTT(cP,canvas);
+  const fibLines=Object.entries(FIB_COLORS).filter(([rv])=>parseFloat(rv)>0&&parseFloat(rv)<1)
+    .map(([rv,col])=>({yAxis:s.fibs[parseFloat(rv)],lineStyle:{color:col+'99',type:'dashed',width:1.1},label:{show:true,position:'insideEndTop',formatter:'Fib '+rv,color:col,fontSize:9,fontFamily:EC_MONO}}));
+  const priceS={name:'ZEC',type:'line',data:s.closes,smooth:true,showSymbol:false,symbol:'circle',symbolSize:7,
+    lineStyle:{color:G,width:2.6,shadowColor:G+'55',shadowBlur:10},itemStyle:{color:G,borderColor:'#0a0a0e',borderWidth:2},
+    areaStyle:{color:ecArea(G,'38','00')},z:3,
+    markLine:{silent:true,symbol:'none',data:fibLines}};
+  ec.setOption({
+    animation:true,animationDuration:680,animationEasing:'cubicOut',
+    grid:ecGrid({left:54,bottom:42}),
+    tooltip:ecTip(p=>{if(!p||!p.length)return'';let h='<div style="font-size:9px;letter-spacing:.08em;color:'+G+';text-transform:uppercase;margin-bottom:5px">'+(p[0].axisValue||'')+'</div>';p.forEach(it=>{if(it.value==null||String(it.seriesName).indexOf('Fib')===0)return;h+='<div style="display:flex;justify-content:space-between;gap:14px;padding:1px 0"><span style="color:#9a9aa2">'+it.seriesName+'</span><b style="color:'+(it.color||'#eceaf2')+'">$'+Number(it.value).toFixed(2)+'</b></div>';});return h;}),
+    xAxis:ecAxisX(labels),
+    yAxis:ecAxisY({axisLabel:{color:TICK,fontSize:10,fontFamily:EC_MONO,formatter:v=>'$'+v.toFixed(0)}}),
+    dataZoom:[{type:'inside',throttle:60,zoomOnMouseWheel:true,moveOnMouseMove:true,moveOnMouseWheel:false},{type:'slider',height:15,bottom:4,borderColor:'transparent',backgroundColor:'rgba(255,255,255,0.025)',fillerColor:'rgba(216,184,96,0.13)',handleStyle:{color:G,borderColor:G},moveHandleStyle:{color:G},dataBackground:{lineStyle:{color:GRID},areaStyle:{color:'rgba(255,255,255,0.03)'}},selectedDataBackground:{lineStyle:{color:G+'88'},areaStyle:{color:G+'18'}},textStyle:{color:TICK,fontSize:9,fontFamily:EC_MONO}}],
+    series:[priceS,...emaS]
+  },true);
+  cP=ec;
   const li=s.tf==='daily'
     ?[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 500'],['#f47244','EMA 200'],[AM,'Fib .382'],[GR,'Fib .618']]
     :[[G,'ZEC'],[BL,'EMA 50'],[PU,'EMA 20s'],[TEAL,'EMA 200s ★'],[AM,'Fib .382'],[GR,'Fib .618']];
@@ -1307,61 +1371,47 @@ function renderPriceChart(s){
 }
 
 function renderRSI(s){
-  if(cR)cR.destroy();
-  const n=s.closes.length;
-  const ZP={id:'rsizone',beforeDraw(ch){
-    const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=ch;if(!y)return;
-    const y70=y.getPixelForValue(70),y30=y.getPixelForValue(30);
-    ctx.save();
-    ctx.fillStyle='rgba(240,96,96,0.09)';ctx.fillRect(left,top,right-left,y70-top);
-    ctx.fillStyle='rgba(63,214,114,0.09)';ctx.fillRect(left,y30,right-left,bottom-y30);
-    ctx.font='bold 9px Courier New';ctx.textAlign='right';
-    ctx.fillStyle='rgba(240,96,96,0.78)';ctx.fillText('SOBRECOMPRA 70',right-4,y70-4);
-    ctx.fillStyle='rgba(63,214,114,0.78)';ctx.fillText('SOBREVENTA 30',right-4,y30+11);
-    ctx.restore();
-  }};
-  cR=new Chart(document.getElementById('cRSI'),{type:'line',
-    data:{labels:s.labels,datasets:[
-      {data:s.rsiArr,borderColor:G,borderWidth:2,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:G,fill:false,tension:.35},
-      {data:Array(n).fill(70),borderColor:RD,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
-      {data:Array(n).fill(30),borderColor:GR,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
-      {data:Array(n).fill(50),borderColor:'#38383e',borderWidth:1,pointRadius:0,fill:false},
-    ]},plugins:[ZP],
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},rsizone:{},
-        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'55',borderWidth:1,
-          titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:12},
-          callbacks:{title:i=>i[0]?.label||'',label:i=>{const v=i.raw;if(v===70||v===30||v===50)return null;return' RSI: '+v?.toFixed(1);}}}},
-      scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-              y:{min:0,max:100,ticks:{color:TICK,font:{size:10},stepSize:25},grid:{color:GRID}}}
-    }
-  });
+  const ec=ecGet('cRSI');
+  ec.setOption({
+    animation:true,animationDuration:520,
+    grid:ecGrid({left:34,right:16,top:12,bottom:20}),
+    tooltip:ecTip(p=>{const it=p&&p.find(x=>x.seriesName==='RSI');if(!it||it.value==null)return'';return'<div style="font-size:9px;color:'+G+';margin-bottom:3px">'+(p[0].axisValue||'')+'</div><b>RSI '+Number(it.value).toFixed(1)+'</b>';}),
+    xAxis:ecAxisX(s.labels),
+    yAxis:ecAxisY({min:0,max:100,interval:25}),
+    series:[{name:'RSI',type:'line',data:s.rsiArr,smooth:true,showSymbol:false,
+      lineStyle:{color:G,width:2,shadowColor:G+'4d',shadowBlur:7},itemStyle:{color:G},areaStyle:{color:ecArea(G,'24','00')},
+      markLine:{silent:true,symbol:'none',data:[
+        {yAxis:70,lineStyle:{color:RD,type:'dashed',width:1.3},label:{formatter:'70 · sobrecompra',color:RD,fontSize:9,fontFamily:EC_MONO,position:'insideEndTop'}},
+        {yAxis:30,lineStyle:{color:GR,type:'dashed',width:1.3},label:{formatter:'30 · sobreventa',color:GR,fontSize:9,fontFamily:EC_MONO,position:'insideEndBottom'}},
+        {yAxis:50,lineStyle:{color:'#3a3a44',type:'dotted',width:1},label:{show:false}}
+      ]},
+      markArea:{silent:true,data:[
+        [{yAxis:70,itemStyle:{color:'rgba(240,96,96,0.08)'}},{yAxis:100}],
+        [{yAxis:0,itemStyle:{color:'rgba(63,214,114,0.08)'}},{yAxis:30}]
+      ]}}]
+  },true);
+  cR=ec;
   document.getElementById('div-tag').textContent=s.div?(s.div.t==='bull'?'Alcista detectada':'Bajista detectada'):'Sin divergencia';
   document.getElementById('div-tag').style.color=s.div?(s.div.t==='bull'?GR:RD):SL;
 }
 
 function renderMACD(s){
-  if(cM)cM.destroy();
-  const PAD=8,padL=[...s.labels,...Array(PAD).fill('')];
+  const ec=ecGet('cMACD');
   const{macd,signal,hist}=s.macdData;
-  const hcol=[...hist.map((v,i)=>{if(v===null)return'transparent';const bull=v>=0,prev=hist[i-1];const str=prev!==null&&((bull&&v>prev)||(!bull&&v<prev));return bull?(str?GR:GR+'66'):(str?RD:RD+'66');}),
-    ...Array(PAD).fill('transparent')];
-  cM=new Chart(document.getElementById('cMACD'),{type:'bar',
-    data:{labels:padL,datasets:[
-      {type:'line',label:'MACD',data:pad(macd,PAD),borderColor:BL,borderWidth:1.8,pointRadius:0,fill:false,tension:.3,order:1,spanGaps:false},
-      {type:'line',label:'Señal',data:pad(signal,PAD),borderColor:RD,borderWidth:1.5,pointRadius:0,fill:false,tension:.3,borderDash:[4,3],order:2,spanGaps:false},
-      {type:'bar',label:'Hist',data:pad(hist,PAD),backgroundColor:hcol,borderColor:'transparent',order:3},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},
-        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:BL+'44',borderWidth:1,titleColor:TICK,bodyColor:BL,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-          callbacks:{title:i=>i[0]?.label||'',label:i=>i.datasetIndex===2?null:' '+i.dataset.label+': '+i.parsed.y?.toFixed(3)}}},
-      scales:{x:{ticks:{color:TICK,font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-              y:{ticks:{color:TICK,font:{size:10}},grid:{color:GRID}}}
-    }
-  });
+  const histData=hist.map((v,i)=>{if(v==null)return{value:null};const bull=v>=0,prev=hist[i-1];const str=prev!=null&&((bull&&v>prev)||(!bull&&v<prev));return{value:v,itemStyle:{color:bull?(str?GR:GR+'77'):(str?RD:RD+'77'),borderRadius:[1,1,0,0]}};});
+  ec.setOption({
+    animation:true,animationDuration:520,
+    grid:ecGrid({left:42,right:16,top:12,bottom:20}),
+    tooltip:ecTip(p=>{if(!p||!p.length)return'';let h='<div style="font-size:9px;color:'+BL+';margin-bottom:3px">'+(p[0].axisValue||'')+'</div>';p.forEach(it=>{if(it.value==null||it.seriesName==='Hist')return;h+='<div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#9a9aa2">'+it.seriesName+'</span><b style="color:'+it.color+'">'+Number(it.value).toFixed(3)+'</b></div>';});return h;},BL),
+    xAxis:ecAxisX(s.labels),
+    yAxis:ecAxisY({}),
+    series:[
+      {name:'Hist',type:'bar',data:histData,barWidth:'62%',z:1},
+      {name:'MACD',type:'line',data:macd,smooth:true,showSymbol:false,lineStyle:{color:BL,width:1.8},itemStyle:{color:BL},z:3},
+      {name:'Señal',type:'line',data:signal,smooth:true,showSymbol:false,lineStyle:{color:RD,width:1.5,type:'dashed'},itemStyle:{color:RD},z:2}
+    ]
+  },true);
+  cM=ec;
   const mc=macd[macd.length-1],sc2=signal[signal.length-1];
   const tag=document.getElementById('macd-tag');
   if(mc!==null&&sc2!==null){
@@ -1542,9 +1592,6 @@ function checkDivAlert(divType,currentPrice){
    OBV CHART — dual panel with divergence coloring
 ═══════════════════════════════════════════════ */
 function renderOBV(s){
-  if(cO)cO.destroy();
-  if(cOP)cOP.destroy();
-
   const n=s.closes.length;
   const PAD=8;
   const padL=[...s.labels,...Array(PAD).fill('')];
@@ -1662,33 +1709,19 @@ function renderOBV(s){
   const priceMin=Math.min(...s.closes)*0.994;
   const priceMax=Math.max(...s.closes)*1.006;
 
-  cOP=new Chart(document.getElementById('cOBVPrice'),{
-    type:'line',
-    data:{labels:padL,datasets:[{
-      data:pad(s.closes,PAD),
-      borderColor:G,
-      borderWidth:2,
-      segment:{borderColor:ctx=>segmentColor(ctx,G,bullDiv?DIV_COL_BULL:DIV_COL_BEAR)},
-      pointRadius:0,fill:true,
-      backgroundColor:'rgba(201,168,76,0.05)',
-      tension:.3,spanGaps:false
-    }]},
-    plugins:[DivZonePlugin],
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},divzone:{},
-        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:G+'44',borderWidth:1,
-          titleColor:TICK,bodyColor:G,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-          callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' $'+i.raw.toFixed(2):null}}},
-      scales:{
-        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-        y:{min:priceMin,max:priceMax,
-           ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>'$'+v.toFixed(0)},
-           grid:{color:GRID}}
-      }
-    }
-  });
+  const divArea=divType?[[{xAxis:s.labels[divStart],itemStyle:{color:bullDiv?'rgba(46,196,182,0.10)':'rgba(255,68,102,0.10)'}},{xAxis:s.labels[n-1]}]]:[];
+  const divAccent=bullDiv?DIV_COL_BULL:bearDiv?DIV_COL_BEAR:G;
+  const ecp=ecGet('cOBVPrice');
+  ecp.setOption({
+    animation:true,animationDuration:480,
+    grid:ecGrid({left:44,right:14,top:18,bottom:18}),
+    tooltip:ecTip(p=>{const it=p&&p[0];if(!it||it.value==null)return'';return'<div style="font-size:9px;color:'+G+';margin-bottom:3px">'+(it.axisValue||'')+'</div><b>$'+Number(it.value).toFixed(2)+'</b>';}),
+    xAxis:ecAxisX(s.labels),
+    yAxis:ecAxisY({min:priceMin,max:priceMax,axisLabel:{color:TICK,fontSize:9,fontFamily:EC_MONO,formatter:v=>'$'+v.toFixed(0)}}),
+    series:[{name:'Precio',type:'line',data:s.closes,smooth:true,showSymbol:false,lineStyle:{color:G,width:2},itemStyle:{color:G},areaStyle:{color:ecArea(G,'22','00')},
+      markArea:divType?{silent:true,label:{show:true,position:['5%','6%'],color:divAccent,fontSize:9,fontFamily:EC_MONO,formatter:bullDiv?'DIV ALCISTA':'DIV BAJISTA'},data:divArea}:undefined}]
+  },true);
+  cOP=ecp;
   document.getElementById('obv-price-range').textContent=
     'H $'+Math.max(...s.closes).toFixed(2)+' · L $'+Math.min(...s.closes).toFixed(2);
 
@@ -1700,36 +1733,17 @@ function renderOBV(s){
   const normalObvCol=s.obvRising?GR:RD;
   const divObvCol=bullDiv?DIV_COL_BULL:DIV_COL_BEAR;
 
-  cO=new Chart(document.getElementById('cOBV'),{
-    type:'line',
-    data:{labels:padL,datasets:[{
-      data:pad(obvVals,PAD),
-      borderColor:normalObvCol,
-      borderWidth:2.2,
-      segment:{
-        borderColor:ctx=>segmentColor(ctx,normalObvCol,divObvCol),
-        borderWidth:ctx=>ctx.p0DataIndex>=divStart&&divType?2.8:2
-      },
-      pointRadius:0,fill:true,
-      backgroundColor:s.obvRising?'rgba(63,214,114,0.07)':'rgba(240,96,96,0.07)',
-      tension:.3,spanGaps:false
-    }]},
-    plugins:[DivZonePlugin],
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},divzone:{},
-        tooltip:{enabled:true,backgroundColor:'#0c0c0f',borderColor:(divType?divObvCol:normalObvCol)+'55',borderWidth:1,
-          titleColor:TICK,bodyColor:divType?divObvCol:normalObvCol,titleFont:{size:9},bodyFont:{family:'Courier New',size:11},
-          callbacks:{title:i=>i[0]?.label||'',label:i=>i.raw!=null?' OBV: '+i.raw.toFixed(1)+'M':null}}},
-      scales:{
-        x:{ticks:{color:TICK,font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:GRID}},
-        y:{min:obvMin-obvRange*.05,max:obvMax+obvRange*.05,
-           ticks:{color:TICK,font:{size:9},maxTicksLimit:4,callback:v=>v.toFixed(0)+'M'},
-           grid:{color:GRID}}
-      }
-    }
-  });
+  const eco=ecGet('cOBV');
+  eco.setOption({
+    animation:true,animationDuration:480,
+    grid:ecGrid({left:44,right:14,top:14,bottom:18}),
+    tooltip:ecTip(p=>{const it=p&&p[0];if(!it||it.value==null)return'';return'<div style="font-size:9px;color:'+normalObvCol+';margin-bottom:3px">'+(it.axisValue||'')+'</div><b>OBV '+Number(it.value).toFixed(1)+'M</b>';},normalObvCol),
+    xAxis:ecAxisX(s.labels),
+    yAxis:ecAxisY({min:obvMin-obvRange*.05,max:obvMax+obvRange*.05,axisLabel:{color:TICK,fontSize:9,fontFamily:EC_MONO,formatter:v=>v.toFixed(0)+'M'}}),
+    series:[{name:'OBV',type:'line',data:obvVals,smooth:true,showSymbol:false,lineStyle:{color:normalObvCol,width:2.2},itemStyle:{color:normalObvCol},areaStyle:{color:ecArea(normalObvCol,'1e','00')},
+      markArea:divType?{silent:true,data:divArea}:undefined}]
+  },true);
+  cO=eco;
 
   /* Stats */
   const ds=document.getElementById('obv-daily-stat');
@@ -2282,8 +2296,8 @@ function renderAll(s){
 /* ═══════════════════════════════════════════════
    CONTROLS
 ═══════════════════════════════════════════════ */
-function zoomChart(f){if(cP)cP.zoom(f);}
-function resetZoom(){if(cP)cP.resetZoom();}
+function zoomChart(f){if(!cP)return;const dz=(cP.getOption().dataZoom||[])[0]||{start:0,end:100};const a=dz.start||0,b=(dz.end==null?100:dz.end),mid=(a+b)/2,half=Math.max(2,(b-a)/2/f);cP.dispatchAction({type:'dataZoom',start:Math.max(0,mid-half),end:Math.min(100,mid+half)});}
+function resetZoom(){if(cP)cP.dispatchAction({type:'dataZoom',start:0,end:100});}
 
 function setFibWindow(w){
   fibWindow=w;
@@ -2364,6 +2378,71 @@ document.addEventListener('visibilitychange',()=>{
     refresh();
   }
 });
+
+/* ════════════════════════════════════════════════════
+   2026 ENHANCEMENTS — capa de UI (paneles, count-up, skeleton, live)
+════════════════════════════════════════════════════ */
+(function(){
+  function resizeCharts(){[cP,cR,cM,cO,cOP].forEach(c=>{try{c&&c.resize&&c.resize();}catch(e){}});}
+  window.addEventListener('resize',resizeCharts);
+
+  /* Paneles desplegables (acordeón animado) */
+  function enhancePanels(){
+    document.querySelectorAll('.shell > .card').forEach(card=>{
+      if(card._enh)return;card._enh=true;
+      const head=card.firstElementChild;if(!head)return;
+      const rest=[];let nx=head.nextElementSibling;while(nx){rest.push(nx);nx=nx.nextElementSibling;}
+      if(!rest.length)return;
+      const body=document.createElement('div');body.className='panel-body';
+      rest.forEach(el=>body.appendChild(el));card.appendChild(body);
+      card.classList.add('collapsible');head.classList.add('panel-head');
+      const chev=document.createElement('span');chev.className='panel-chev';chev.textContent='▾';head.appendChild(chev);
+      body.style.maxHeight='none';
+      head.addEventListener('click',e=>{
+        if(e.target.closest('button,input,a,select,canvas'))return;
+        const closing=!card.classList.contains('collapsed');
+        body.style.maxHeight=body.scrollHeight+'px';
+        if(closing){requestAnimationFrame(()=>{card.classList.add('collapsed');body.style.maxHeight='0';});}
+        else{card.classList.remove('collapsed');requestAnimationFrame(()=>{body.style.maxHeight=body.scrollHeight+'px';});
+          body.addEventListener('transitionend',function te(){if(!card.classList.contains('collapsed')){body.style.maxHeight='none';resizeCharts();}body.removeEventListener('transitionend',te);});}
+      });
+    });
+  }
+
+  /* Count-up en valores numéricos */
+  const NUM=/-?\d[\d,]*\.?\d*/;
+  function watchCountUp(el){
+    el._cuVal=parseFloat(((el.textContent.match(NUM)||['0'])[0]).replace(/,/g,''))||0;
+    new MutationObserver(()=>{
+      if(el._cuLock)return;const txt=el.textContent,m=txt.match(NUM);if(!m)return;
+      const target=parseFloat(m[0].replace(/,/g,''));if(isNaN(target))return;
+      const prev=el._cuVal;if(prev===target){el._cuVal=target;return;}
+      const pre=txt.slice(0,m.index),suf=txt.slice(m.index+m[0].length),dec=(m[0].split('.')[1]||'').length;
+      const t0=performance.now();el._cuLock=true;
+      (function step(t){const k=Math.min(1,(t-t0)/620),e=1-Math.pow(1-k,3),cur=prev+(target-prev)*e;
+        el.textContent=pre+cur.toFixed(dec)+suf;
+        if(k<1)requestAnimationFrame(step);else{el.textContent=txt;el._cuVal=target;el._cuLock=false;}})(t0);
+    }).observe(el,{childList:true,characterData:true,subtree:true});
+  }
+
+  /* Skeletons hasta que llegan los datos */
+  function initSkel(){
+    ['price-main','m-rsi','m-fib','m-ema','m-vol','m-macro'].forEach(id=>{const el=document.getElementById(id);if(el&&(el.textContent==='—'||el.textContent.trim()===''))el.classList.add('skel');});
+    const b=document.getElementById('sig-badge');if(!b)return;
+    new MutationObserver((mu,obs)=>{
+      if(b.textContent.indexOf('Cargando')<0&&b.textContent.trim()!==''){document.querySelectorAll('.skel').forEach(e=>e.classList.remove('skel'));obs.disconnect();}
+    }).observe(b,{childList:true,characterData:true,subtree:true});
+  }
+
+  /* Punto LIVE pulsante junto a la hora */
+  function liveDot(){const u=document.getElementById('upd-time');if(u&&!u._dot&&u.parentNode){const d=document.createElement('span');d.className='live-dot';u.parentNode.insertBefore(d,u);u._dot=true;}}
+
+  function boot(){
+    enhancePanels();initSkel();liveDot();
+    ['price-main','m-rsi','m-ema','m-vol','m-fib'].forEach(id=>{const el=document.getElementById(id);if(el)watchCountUp(el);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
 </script>
 </body>
 </html>
