@@ -936,31 +936,37 @@ function getHalvingInfo(){
    API
 ═══════════════════════════════════════════════ */
 async function fetchHistorical(){
-  const r=await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ZEC&tsym=USD&limit=2000');
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const d=await r.json();
-  if(d.Response==='Error')throw new Error(d.Message||'API error');
-  return d.Data.Data;
+  /* Binance daily OHLCV — sin API key, CORS habilitado. Paginado a ~2000 velas diarias. */
+  const map=k=>({time:Math.floor(k[0]/1000),close:+k[4],high:+k[2],low:+k[3],volumeto:+k[7]});
+  const base='https://api.binance.com/api/v3/klines?symbol=ZECUSDT&interval=1d';
+  const r1=await fetch(base+'&limit=1000');
+  if(!r1.ok)throw new Error('HTTP '+r1.status);
+  const recent=(await r1.json()).map(map);
+  let older=[];
+  if(recent.length){
+    const endTime=recent[0].time*1000-1;
+    const r2=await fetch(base+'&limit=1000&endTime='+endTime);
+    if(r2.ok)older=(await r2.json()).map(map);
+  }
+  const all=older.concat(recent);
+  if(!all.length)throw new Error('Sin datos de Binance');
+  return all;
 }
 
 async function fetchLive(){
   try{
-    const r=await fetch('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ZEC,BTC&tsyms=USD');
+    const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ZECUSDT');
     if(!r.ok)return null;
     const d=await r.json();
-    const zec=d.RAW?.ZEC?.USD;
-    const btc=d.RAW?.BTC?.USD;
-    if(!zec)return null;
-    /* Estimate total market cap: BTC + altcoins */
-    /* BTC dominance ≈ 52-56%. Use BTC mcap / 0.54 as total estimate */
-    const btcMcap=btc?.MKTCAP||0;
-    const totalMcapEst=btcMcap>0?btcMcap/0.54:0;
+    const price=+d.lastPrice;
+    if(!price)return null;
+    /* Binance no entrega market cap; lo estimamos con el supply circulante. */
     return{
-      price:zec.PRICE,
-      chg24:zec.CHANGEPCT24HOUR,
-      mcap:zec.MKTCAP||(zec.PRICE*ZEC_SUPPLY),
-      totalMcap:totalMcapEst,
-      supply:zec.SUPPLY||ZEC_SUPPLY
+      price,
+      chg24:+d.priceChangePercent,
+      mcap:price*ZEC_SUPPLY,
+      totalMcap:0,
+      supply:ZEC_SUPPLY
     };
   }catch{return null;}
 }
