@@ -32,13 +32,34 @@ function saveState(state) {
   } catch(e) { console.log('Save state error:', e.message); }
 }
 
-function fetchJSON(url) {
+function fetchJSON(url, retries = 2) {
   return new Promise((resolve, reject) => {
-    https.get(url, res => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { reject(e); } });
-    }).on('error', reject);
+    const attempt = (triesLeft) => {
+      const req = https.get(url, res => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch(e) {
+            if (triesLeft > 0) { setTimeout(()=>attempt(triesLeft-1), 2000); }
+            else reject(e);
+          }
+        });
+      });
+      req.on('error', err => {
+        if (triesLeft > 0) { setTimeout(()=>attempt(triesLeft-1), 2000); }
+        else reject(err);
+      });
+      if (typeof req.setTimeout === 'function') {
+        req.setTimeout(15000, () => {
+          req.destroy();
+          if (triesLeft > 0) { setTimeout(()=>attempt(triesLeft-1), 2000); }
+          else reject(new Error('Timeout fetching '+url));
+        });
+      }
+    };
+    attempt(retries);
   });
 }
 
@@ -183,7 +204,11 @@ async function main() {
 
   const json = await fetchJSON('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ZEC&tsym=USD&limit=2000');
   if (json.Response==='Error') throw new Error('API: '+json.Message);
-  const data = json.Data.Data;
+  if (!json.Data || !json.Data.Data || !Array.isArray(json.Data.Data) || json.Data.Data.length < 250) {
+    throw new Error('API: datos insuficientes o formato inesperado');
+  }
+  const data = json.Data.Data.filter(d => d && d.close > 0);
+  if (data.length < 250) throw new Error('API: muy pocos datos válidos tras filtrar');
   const allC = data.map(d=>d.close);
 
   // Live price
@@ -554,4 +579,20 @@ Señal al ${MIN_PCT}% del score máximo
   }
 }
 
-main().catch(e => { console.error('Error fatal:', e); process.exit(1); });
+main().catch(e => {
+  console.error('Error:', e.message || e);
+  /* API/network errors are temporary — exit 0 so the workflow doesn't
+     show as "failed" and spam failure emails. Real code bugs (TypeError,
+     ReferenceError) still exit 1 so we notice them. */
+  const msg = String(e.message || e);
+  const isTemporary = msg.includes('API:') || msg.includes('Timeout') ||
+                      msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT') ||
+                      msg.includes('ENOTFOUND') || msg.includes('socket') ||
+                      msg.includes('network') || msg.includes('getaddrinfo');
+  if (isTemporary) {
+    console.log('→ Error temporal de red/API. Saliendo con código 0 (reintentará en el próximo run).');
+    process.exit(0);
+  }
+  console.error(e.stack);
+  process.exit(1);
+});

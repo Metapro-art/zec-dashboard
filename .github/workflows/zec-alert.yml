@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install nodemailer
@@ -35,13 +35,15 @@ jobs:
         run: node check-zec.js
 
       - name: Commit state file if changed
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain last-state.json)" ]]; then
             git add last-state.json
             git commit -m "Update divergence state [skip ci]"
-            git push
+            git pull --rebase --autostash || true
+            git push || echo "Push failed, will retry next run"
           else
             echo "State unchanged, no commit needed"
           fi
